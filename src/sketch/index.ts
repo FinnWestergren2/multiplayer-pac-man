@@ -1,5 +1,6 @@
 import * as p5 from "p5";
 import { Player } from "./Player";
+import * as Loader from "../utils/mapLoader/loader";
 
 export default function sketch(p: p5) {
 	const players: Player[] = [];
@@ -8,9 +9,9 @@ export default function sketch(p: p5) {
 		p.createCanvas(400, 400);
 		const cols = 3;
 		const size = Math.min(p.width/(cols * Math.sqrt(2)), p.height/(cols * Math.sqrt(2)));
+		console.log(Loader.load("test"))
 		for(let i = 1; i < cols; i++){
 			for(let j = 1; j < cols; j++){
-				console.log(i, j);
 				const x = j * p.width/(cols);
 				const y = i * p.height/(cols);
 				players.push(new Player(x,y,size));
