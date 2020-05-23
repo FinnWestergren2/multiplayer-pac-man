@@ -5,33 +5,33 @@ import sketch from "../sketch/index.ts";
 
 class P5Wrapper extends Component {
   static propTypes = {
-    onReady: PropTypes.func.isRequired
+  	onReady: PropTypes.func.isRequired
   };
 
   componentDidMount() {
-    this.canvas = new window.p5(sketch, "app-p5_container");
+  	this.canvas = new window.p5(sketch, "app-p5_container");
   }
 
   componentWillReceiveProps(nextProps) {
-    this.canvas.pushProps(nextProps);
+  	this.canvas.pushProps(nextProps);
   }
 
   shouldComponentUpdate() { // just in case :)
-    return false;
+  	return false;
   }
 
   componentWillUnmount() {
-    this.canvas.remove();
+  	this.canvas.remove();
   }
 
   render() {
-    // console.log("::: P5Wrapper.props:", this.props);
-    return (
-      <div
-        id="app-p5_container"
-        style={{ width: "100%", textAlign: "center" }}
-      />
-    );
+  	// console.log("::: P5Wrapper.props:", this.props);
+  	return (
+  		<div
+  			id="app-p5_container"
+  			style={{ width: "100%", textAlign: "center" }}
+  		/>
+  	);
   }
 }
 
