@@ -1,4 +1,4 @@
-import CellTypes from "./cellTypes";
+import CellTypes from "../../sketch/GameMap/cellTypes";
 import $ from "jquery";
 
 export const load: () => Promise<CellTypes[][]> = async () => {

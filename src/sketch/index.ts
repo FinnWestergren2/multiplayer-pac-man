@@ -1,29 +1,31 @@
 import * as p5 from "p5";
 import { Player } from "./Player";
 import * as Loader from "../utils/mapLoader/loader";
-import CellTypes from "../utils/mapLoader/cellTypes";
+import GameMap, { CellTypes, Cell } from "./GameMap";
 
 export default function sketch(p: p5) {
 	const players: Player[] = [];
+	const cells: Cell[][] = [];
 
 	p.setup = function (): void {
 		Loader.load().then((response: CellTypes[][]) => {
-			p.createCanvas(400, 400);
-			const cols = response[2][2];
-			const size = Math.min(p.width/(cols * Math.sqrt(2)), p.height/(cols * Math.sqrt(2)));
-			for(let i = 1; i < cols; i++){
-				for(let j = 1; j < cols; j++){
-					const x = j * p.width/(cols);
-					const y = i * p.height/(cols);
-					players.push(new Player(x,y,size));
-				}
-			}
+			p.createCanvas(600, 600);
+			const size = p.width/response.length;
+			const spacing = size/2;
+			response.forEach((row: CellTypes[], y) => {
+				cells.push(
+					row.map((col: CellTypes, x) => {
+						return new Cell(col, spacing + x*size, spacing + y*size, size);
+					})
+				)
+			})
 		});
 	};
 
 	p.draw = function () {
 		p.background(0);
 		players.forEach(pl => pl.draw(p));
+		cells.forEach(row => row.forEach(cell => cell.draw(p)));
 	};
     
 
