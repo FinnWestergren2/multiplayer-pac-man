@@ -1,18 +1,20 @@
 import * as p5 from "p5";
-import CellTypes from "./GameMap/cellTypes";
-import Cell from "./GameMap/Cell";
 import GameMap from "./GameMap";
+import { updateAppDimensions } from "../ducks/mapState";
+import { GlobalStore } from "../containers/Game";
 
 export default function sketch(p: p5): void {
 	var gameMap: GameMap;
 
 	p.setup = function (): void {
-		p.createCanvas(600, 600);
-		gameMap = new GameMap(p.width, p.height);
+		// @ts-ignore
+		GlobalStore.dispatch(updateAppDimensions(600, 600));
+		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions
+		p.createCanvas(canvasWidth, canvasHeight);
+		gameMap = new GameMap();
 	};
 
 	p.draw = function (): void {
-		p.background(0);
 		gameMap.draw(p);
 	};
 }

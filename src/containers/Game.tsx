@@ -2,6 +2,10 @@ import React, { FunctionComponent } from "react";
 import P5Wrapper from "./P5Wrapper";
 import Octicon, {Sync} from '@primer/octicons-react';
 import styled from "@emotion/styled";
+import { createStore, applyMiddleware } from 'redux';
+import Reducer from '../ducks';
+import thunk from 'redux-thunk';
+import { refreshMap } from "../ducks/mapState";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -19,11 +23,16 @@ const FlexContainer = styled.div`
     }
 `;
 
+export const GlobalStore = createStore(Reducer, applyMiddleware(thunk));
+
+
 const Game: FunctionComponent = () => {
     return (
         <FlexContainer>
             <P5Wrapper />
-            <span onClick={console.log}>
+            <span onClick={() => 
+                // @ts-ignore
+                GlobalStore.dispatch(refreshMap())}>
                 <Octicon
                     icon={Sync} 
                     size={20} />

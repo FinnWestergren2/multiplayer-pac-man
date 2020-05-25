@@ -37,6 +37,7 @@ app.get('/', async (err, res) => {
 	res.status(200);
 	res.send(data);
 	res.end();
+	console.log(data);
 });
 
 module.exports = server;
