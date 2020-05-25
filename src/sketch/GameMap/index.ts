@@ -6,24 +6,29 @@ import { refreshMap } from "../../ducks/mapState";
 
 export default class GameMap {
     private cells: Cell[][] =[];
+    private shouldReDraw: boolean = false;
     public constructor(){
         //@ts-ignore
         GlobalStore.dispatch(refreshMap());
-        GlobalStore.subscribe(this.init);
+        GlobalStore.subscribe(this.updateCells);
     }
 
-    private init = () => {
+    private updateCells = () => {
         const mapCells = GlobalStore.getState().mapState.mapCells;
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
 		this.cells = mapCells.map((row: CellTypes[], y: number) =>
 			row.map((column: CellTypes, x) => 
 				new Cell(column, halfCellSize + x*cellSize, halfCellSize + y*cellSize, cellSize)
 			)
-		);
+        );
+        this.shouldReDraw = true;        
     }
 
 
     public draw = (p: p5) => {
-        this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
+        if (this.shouldReDraw) { // performance optimization (may be unnecessary)
+            this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
+            this.shouldReDraw = false;
+        }
     }
 }
