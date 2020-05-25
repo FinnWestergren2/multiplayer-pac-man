@@ -10,8 +10,8 @@ export default function sketch(p: p5): void {
 		Loader.load().then((response: CellTypes[][]) => {
 			p.createCanvas(600, 600);
 			const size = Math.min(
-				p.width/Math.max(...(response.map(r => r.length))),
-				p.height/response.length);
+				(p.width-1)/Math.max(...(response.map(r => r.length))),
+				(p.height-1)/response.length);
 			const spacing = size/2;
 			response.forEach((row: CellTypes[], y) => {
 				cells.push(
