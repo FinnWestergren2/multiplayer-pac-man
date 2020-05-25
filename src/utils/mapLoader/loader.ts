@@ -3,7 +3,7 @@ import $ from "jquery";
 
 export const loadMap: () => Promise<CellTypes[][]> = async () => {
     return await new Promise<CellTypes[][]>((resolve: any) => {
-        $.getJSON("http://localhost:8080/test2", "", resolve);
+        $.getJSON("http://localhost:8080/test1", "", resolve);
     });
 };
 

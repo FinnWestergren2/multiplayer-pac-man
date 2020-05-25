@@ -18,7 +18,7 @@ export default class GameMap {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
 		this.cells = mapCells.map((row: CellTypes[], y: number) =>
 			row.map((column: CellTypes, x) => 
-				new Cell(column, halfCellSize + x*cellSize, halfCellSize + y*cellSize, cellSize)
+				new Cell(column, halfCellSize + x*cellSize, halfCellSize + y*cellSize)
 			)
         );
         this.shouldReDraw = true;        
@@ -27,6 +27,7 @@ export default class GameMap {
 
     public draw = (p: p5) => {
         if (this.shouldReDraw) { // performance optimization (may be unnecessary)
+            p.background(255);
             this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
             this.shouldReDraw = false;
         }
