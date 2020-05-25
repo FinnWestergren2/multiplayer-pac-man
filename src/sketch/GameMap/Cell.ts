@@ -27,7 +27,7 @@ export default class Cell {
     public draw: (p: p5) => void = (p) => {
         p.push();
         p.translate(this.xPos, this.yPos);
-        p.rect(-this.size/2, -this.size/2, this.size, this.size);
+        p.rect(-this.size * 0.5, -this.size * 0.5, this.size, this.size);
         p.textAlign("center","center");
         p.text(this.cellTypeName, 0, 0);
         this.drawDebugLines(p);
@@ -37,7 +37,7 @@ export default class Cell {
     private drawDebugLines: (p: p5) => void = (p) => {
         p.stroke(0,255,0);
         if (this.up) {
-            p.line(0, 0, 0, -this.size/2);
+            p.line(0, 0, 0, -this.size * 0.5);
         }
         if (this.down) {
             p.line(0, 0, 0, this.size/2);
