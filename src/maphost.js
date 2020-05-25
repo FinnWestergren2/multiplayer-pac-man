@@ -4,7 +4,6 @@ const app = express();
 const server = require('http').Server(app);
 const port = 8080;
 const helmet = require('helmet');
-const csv = require('./test/mapFile.json');
 const fs = require('fs');
 
 app.use(helmet());
@@ -32,12 +31,18 @@ server.listen(port, (err) => {
 });
 
 
-app.get('/', async (err, res) => {
-	const data = await fs.promises.readFile("./src/test/mapFile.json");
+app.get('/test1', async (err, res) => {
+	const data = await fs.promises.readFile("./src/test/test1.json");
 	res.status(200);
 	res.send(data);
 	res.end();
-	console.log(data);
+});
+
+app.get('/test2', async (err, res) => {
+	const data = await fs.promises.readFile("./src/test/test2.json");
+	res.status(200);
+	res.send(data);
+	res.end();
 });
 
 module.exports = server;
