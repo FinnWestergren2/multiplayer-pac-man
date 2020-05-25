@@ -4,7 +4,8 @@ const app = express();
 const server = require('http').Server(app);
 const port = 8080;
 const helmet = require('helmet');
-const csv = require('./test/mapFile.json')
+const csv = require('./test/mapFile.json');
+const fs = require('fs');
 
 app.use(helmet());
 app.use(bodyParser.json());
@@ -30,9 +31,11 @@ server.listen(port, (err) => {
 	console.log('Node Endpoints working :)');
 });
 
-app.get('/', (err, res) => {
+
+app.get('/', async (err, res) => {
+	const data = await fs.promises.readFile("./src/test/mapFile.json");
 	res.status(200);
-	res.send(csv);
+	res.send(data);
 	res.end();
 });
 
