@@ -4,26 +4,31 @@ enum CellTypes {
     "RIGHT" = 2,
     "DOWN" = 4,
     "LEFT" = 8
-};
+}
 
 export default CellTypes;
 
+export const isOpenUp: (celltype: CellTypes) => boolean = (cellType) => CellTypes.UP === (CellTypes.UP & cellType);
+export const isOpenDown: (celltype: CellTypes) => boolean = (cellType) => CellTypes.DOWN === (CellTypes.DOWN & cellType);
+export const isOpenLeft: (celltype: CellTypes) => boolean = (cellType) => CellTypes.LEFT === (CellTypes.LEFT & cellType);
+export const isOpenRight: (celltype: CellTypes) => boolean = (cellType) => CellTypes.RIGHT === (CellTypes.RIGHT & cellType);
+
 export const getString: (cellType: CellTypes) => string = (cellType) => {
-    var out = "";
+    let out = "";
     if (cellType === CellTypes.CLOSED){
         return "CLOSED";
     }
-    if (CellTypes.UP === (CellTypes.UP & cellType)){
+    if (isOpenUp(cellType)){
         out += "UP ";
     }
-    if (CellTypes.DOWN === (CellTypes.DOWN & cellType)){
+    if (isOpenDown(cellType)){
         out += "DOWN ";
     }
-    if (CellTypes.LEFT === (CellTypes.LEFT & cellType)){
+    if (isOpenLeft(cellType)){
         out += "LEFT ";
     }
-    if (CellTypes.RIGHT === (CellTypes.RIGHT & cellType)){
+    if (isOpenRight(cellType)){
         out += "RIGHT ";
     }
     return out.trim();
-}
+};
