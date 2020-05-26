@@ -59,7 +59,6 @@ export default (state: mapState = initialState, action: Action) => {
 export const refreshMap:() => ThunkAction<void, mapState, {}, AnyAction> = () => {
     return function(dispatch: ThunkDispatch<{}, {}, AnyAction>, getState: () => any) {
         loadMap().then(response => {
-            console.log(getState());
             dispatch({type: ActionTypes.REFRESH_MAP, payload: response});
             dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(response, getState().mapState.appDimensions)});
         });

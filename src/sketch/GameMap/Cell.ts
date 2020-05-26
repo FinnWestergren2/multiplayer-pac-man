@@ -6,7 +6,6 @@ export default class Cell {
     public cellType: CellTypes;
     private xPos: number;
     private yPos: number;
-    private size: number;
     private halfSize: number;
     private cellTypeName: string;
     private up: boolean;
@@ -18,7 +17,6 @@ export default class Cell {
         this.cellType = cellType;
         this.xPos = x;
         this.yPos = y;
-        this.size = GlobalStore.getState().mapState.cellDimensions.cellSize;
         this.halfSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
         this.cellTypeName = getString(cellType);
         this.up = isOpenUp(cellType);
