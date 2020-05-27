@@ -1,9 +1,9 @@
 import * as p5 from "p5";
-import CellTypes , { getString, isOpenDown, isOpenLeft, isOpenRight, isOpenUp } from "./cellTypes";
+import Directions , { getString, isDown, isLeft, isRight, isUp } from "./directions";
 import { GlobalStore } from "../../containers/Game";
 
 export default class Cell {
-    public cellType: CellTypes;
+    public cellType: Directions;
     private xPos: number;
     private yPos: number;
     private halfSize: number;
@@ -13,16 +13,16 @@ export default class Cell {
     private left: boolean;
     private right: boolean;
 
-    public constructor(cellType: CellTypes, x: number, y: number){
+    public constructor(cellType: Directions, x: number, y: number){
         this.cellType = cellType;
         this.xPos = x;
         this.yPos = y;
         this.halfSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
         this.cellTypeName = getString(cellType);
-        this.up = isOpenUp(cellType);
-        this.down = isOpenDown(cellType);
-        this.left = isOpenLeft(cellType);
-        this.right = isOpenRight(cellType);
+        this.up = isUp(cellType);
+        this.down = isDown(cellType);
+        this.left = isLeft(cellType);
+        this.right = isRight(cellType);
     }
 
     public draw: (p: p5) => void = (p) => {

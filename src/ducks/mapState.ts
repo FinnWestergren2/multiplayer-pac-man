@@ -1,4 +1,4 @@
-import CellTypes from "../sketch/GameMap/cellTypes";
+import Directions from "../sketch/GameMap/directions";
 import { loadMap } from "../utils/mapLoader/loader";
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 import { AnyAction } from 'redux';
@@ -20,12 +20,12 @@ export type CellDimensions = {
 }
 
 type Action = 
-    {type: ActionTypes.REFRESH_MAP, payload: CellTypes[][]} |
+    {type: ActionTypes.REFRESH_MAP, payload: Directions[][]} |
     {type: ActionTypes.UPDATE_APP_DIMENSIONS, payload: AppDimensions} | 
     {type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: CellDimensions} 
 
 type mapState = {
-    mapCells: CellTypes[][];
+    mapCells: Directions[][];
     appDimensions: AppDimensions
     cellDimensions: CellDimensions
 }
@@ -72,7 +72,7 @@ export const updateAppDimensions = (width: number, height: number) => {
     }
 }
 
-const generateCellDimensions = (data: CellTypes[][], appDimensions: AppDimensions) => {
+const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
     const size = Math.min(
         (appDimensions.canvasWidth-1)/Math.max(...(data.map(r => r.length))),
         (appDimensions.canvasHeight-1)/data.length);

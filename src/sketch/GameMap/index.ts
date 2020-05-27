@@ -1,5 +1,5 @@
 import Cell from "./Cell";
-import CellTypes from "./cellTypes";
+import Directions from "./directions";
 import p5 from "p5";
 import { GlobalStore } from "../../containers/Game";
 import { refreshMap } from "../../ducks/mapState";
@@ -16,8 +16,8 @@ export default class GameMap {
     private updateCells = () => {
         const mapCells = GlobalStore.getState().mapState.mapCells;
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
-		this.cells = mapCells.map((row: CellTypes[], y: number) =>
-			row.map((column: CellTypes, x) => 
+		this.cells = mapCells.map((row: Directions[], y: number) =>
+			row.map((column: Directions, x) => 
 				new Cell(column, halfCellSize + x * cellSize, halfCellSize + y * cellSize)
 			)
         );

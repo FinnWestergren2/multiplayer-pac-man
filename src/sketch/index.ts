@@ -3,10 +3,11 @@ import GameMap from "./GameMap";
 import { updateAppDimensions } from "../ducks/mapState";
 import { GlobalStore } from "../containers/Game";
 import { Player } from "./Player/Player";
+import { bindHumanPlayer } from "./Player/controller";
 
 export default function sketch(p: p5): void {
 	var gameMap: GameMap;
-	var player: Player
+	var players: Player[];
 
 	p.setup = function (): void {
 		// @ts-ignore
@@ -14,13 +15,13 @@ export default function sketch(p: p5): void {
 		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions
 		p.createCanvas(canvasWidth, canvasHeight);
 		gameMap = new GameMap();
-		player = new Player(1,1);
-		player.makeHumanPlayer(p);
+		players = [new Player(1,1), new Player(1,1)];
+		bindHumanPlayer(p, players[0]);
 	};
 
 	p.draw = function (): void {
 		p.background(255);
 		gameMap.draw(p);
-		player.draw(p);
+		players.forEach(pl => pl.draw(p));
 	};
 }

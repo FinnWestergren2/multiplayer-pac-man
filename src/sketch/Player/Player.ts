@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { GlobalStore } from "../../containers/Game";
-import CellTypes, { getString, isOpenRight, isOpenLeft, isOpenDown, isOpenUp } from "../GameMap/cellTypes";
+import Directions, { isRight, isLeft, isDown, isUp } from "../GameMap/directions";
 
 const SPEED = 2;
 
@@ -24,62 +24,57 @@ export class Player {
         this.size = halfCellSize;
         this.locationX = cellSize * this.cellX - halfCellSize;
         this.locationY = cellSize * this.cellY - halfCellSize;
-        this.setVelocity(SPEED,0);
     }
 
     public draw: (p: p5) => void = p => {
         p.push();
         p.translate(this.locationX, this.locationY);
-        p.fill(255,0,0);
+        p.fill(255, 0, 0);
         p.ellipse(0, 0, this.size);
         p.pop();
         this.move();
     };
 
-    public setVelocity = (dx: number, dy: number) => {
+    public receiveInput(dir: Directions) {
+        switch (dir) {
+            case (Directions.UP):
+                this.setVelocity(0, -SPEED);
+                return;
+            case (Directions.DOWN):
+                this.setVelocity(0, SPEED);
+                return;
+            case (Directions.LEFT):
+                this.setVelocity(-SPEED, 0);
+                return;
+            case (Directions.RIGHT):
+                this.setVelocity(SPEED, 0);
+                return;
+        }
+    }
+
+    private setVelocity = (dx: number, dy: number) => {
         this.velocityX = dx;
         this.velocityY = dy;
     }
 
     private move = () => {
-        if(this.canMoveLeftHorizontally())
-        {
+        if (this.canMoveLeftHorizontally()) {
             this.locationX += this.velocityX;
         }
-        if(this.canMoveVertically()){
+        if (this.canMoveVertically()) {
             this.locationY += this.velocityY;
         }
     };
 
-    private canMoveLeftHorizontally = () => 
+    private canMoveLeftHorizontally = () =>
         this.velocityX > 0
-        ? (this.locationX % (this.size * 2) <= this.size || isOpenRight(this.currentCellType()))
-        : (this.locationX % (this.size * 2) >= this.size || isOpenLeft(this.currentCellType()));
-    
-    private canMoveVertically = () => 
+            ? (this.locationX % (this.size * 2) <= this.size || isRight(this.currentCellType()))
+            : (this.locationX % (this.size * 2) >= this.size || isLeft(this.currentCellType()));
+
+    private canMoveVertically = () =>
         this.velocityY > 0
-        ? (this.locationY % (this.size * 2) <= this.size || isOpenDown(this.currentCellType()))
-        : (this.locationY % (this.size * 2) >= this.size || isOpenUp(this.currentCellType()));
-    
-
-
-    public makeHumanPlayer (p: p5) {
-        const player = this;
-        p.keyPressed = function(): void {
-            if(p.keyCode === p.RIGHT_ARROW) {
-                player.setVelocity(SPEED,0);
-            }
-            if(p.keyCode === p.LEFT_ARROW) {
-                player.setVelocity(-SPEED,0);
-            }
-            if(p.keyCode === p.UP_ARROW) {
-                player.setVelocity(0,-SPEED);
-            }
-            if(p.keyCode === p.DOWN_ARROW) {
-                player.setVelocity(0,SPEED);
-            }
-        };
-    };
+            ? (this.locationY % (this.size * 2) <= this.size || isDown(this.currentCellType()))
+            : (this.locationY % (this.size * 2) >= this.size || isUp(this.currentCellType()));
 
     private currentCellType = () => {
         try {
@@ -88,7 +83,7 @@ export class Player {
             const y = Math.floor(this.locationY / cellSize);
             return GlobalStore.getState().mapState.mapCells[y][x];
         } catch (error) {
-            return CellTypes.CLOSED;
+            return Directions.NONE;
         }
     }
 }
