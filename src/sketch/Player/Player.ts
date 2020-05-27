@@ -4,43 +4,40 @@ import Directions, { isRight, isLeft, isDown, isUp } from "../GameMap/directions
 
 const SPEED = 2;
 
-type coords = {x: number, y:number}
+type CoordPair = {x: number, y:number}
+const zeroPair = {x: 0, y: 0};
+const addPairs = (p1: CoordPair, p2: CoordPair) => {
+    return {x: p1.x + p2.x, y: p1.y + p2.y}
+}
+const subtractPairs = (p1: CoordPair, p2: CoordPair) => {
+    return {x: p1.x - p2.x, y: p1.y - p2.y}
+}
 
 export class Player {
-    private initX: number;
-    private initY: number;
-    private cellX = 0;
-    private cellY = 0;
-    private locationX = 0;
-    private locationY = 0;
-    private velocityX = 0;
-    private velocityY = 0;
+    private initialPos: CoordPair;
+    private cell: CoordPair = {...zeroPair};
+    private location: CoordPair = {...zeroPair};
+    private velocity: CoordPair = {...zeroPair};
+    private target: CoordPair = {...zeroPair};
     private size = 0;
-    private targetX = 0;
-    private targetY = 0;
 
     public constructor(initX: number, initY: number) {
-        this.initX = initX;
-        this.initY = initY;
-        GlobalStore.subscribe(this.init);
+        this.initialPos = {x: initX, y: initY}
+        GlobalStore.subscribe(this.initialize);
     }
 
-    private init = () => {
+    private initialize = () => {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
         this.size = halfCellSize;
-        this.cellX = this.initX;
-        this.cellY = this.initY;
-        this.locationX = cellSize * this.cellX - halfCellSize;
-        this.locationY = cellSize * this.cellY - halfCellSize;
-        this.velocityX = 0;
-        this.velocityY = 0;
+        this.cell = {...this.initialPos};
+        this.location = {x: cellSize * this.initialPos.x - halfCellSize, y: cellSize * this.initialPos.y - halfCellSize};
+        this.velocity = {...zeroPair};
     };
 
     public draw: (p: p5) => void = p => {
-        this.locationX += this.velocityX;
-        this.locationY += this.velocityY;
+        this.location = addPairs(this.location, this.velocity);
         p.push();
-        p.translate(this.locationX, this.locationY);
+        p.translate(this.location.x, this.location.y);
         p.fill(255, 0, 0);
         p.ellipse(0, 0, this.size);
         p.pop();
@@ -49,45 +46,39 @@ export class Player {
     public receiveInput(dir: Directions) {
         switch (dir) {
             case (Directions.UP):
-                this.setVelocity(0, -SPEED);
+                this.velocity = { x: 0, y: -SPEED };
                 return;
             case (Directions.DOWN):
-                this.setVelocity(0, SPEED);
+                this.velocity = { x: 0, y: SPEED };
                 return;
             case (Directions.LEFT):
-                this.setVelocity(-SPEED, 0);
+                this.velocity = { x: -SPEED, y: 0 };
                 return;
             case (Directions.RIGHT):
-                this.setVelocity(SPEED, 0);
+                this.velocity = { x: SPEED, y: 0 };
                 return;
         }
     }
 
-    private setTarget = (tX: number, tY: number) => {
-        this.targetX = tX;
-        this.targetY = tY;
-    }
-
-    private setVelocity = (dx: number, dy: number) => {
-        this.velocityX = dx;
-        this.velocityY = dy;
+    private moveTowardsTarget = () => {
+        
     }
 
     private canMoveHorizontally = () =>
-        this.velocityX > 0
-            ? (this.locationX % (this.size * 2) <= this.size || isRight(this.currentCellType()))
-            : (this.locationX % (this.size * 2) >= this.size || isLeft(this.currentCellType()));
+        this.velocity.x > 0
+            ? (this.location.x % (this.size * 2) <= this.size || isRight(this.currentCellType()))
+            : (this.location.x % (this.size * 2) >= this.size || isLeft(this.currentCellType()));
 
     private canMoveVertically = () =>
-        this.velocityY > 0
-            ? (this.locationY % (this.size * 2) <= this.size || isDown(this.currentCellType()))
-            : (this.locationY % (this.size * 2) >= this.size || isUp(this.currentCellType()));
+        this.velocity.y > 0
+            ? (this.location.y % (this.size * 2) <= this.size || isDown(this.currentCellType()))
+            : (this.location.y % (this.size * 2) >= this.size || isUp(this.currentCellType()));
 
     private currentCellType = () => {
         try {
             const cellSize = GlobalStore.getState().mapState.cellDimensions.cellSize
-            const x = Math.floor(this.locationX / cellSize);
-            const y = Math.floor(this.locationY / cellSize);
+            const x = Math.floor(this.location.y / cellSize);
+            const y = Math.floor(this.location.x / cellSize);
             return GlobalStore.getState().mapState.mapCells[y][x];
         } catch (error) {
             return Directions.NONE;
