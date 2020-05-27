@@ -4,35 +4,46 @@ import Directions, { isRight, isLeft, isDown, isUp } from "../GameMap/directions
 
 const SPEED = 2;
 
+type coords = {x: number, y:number}
+
 export class Player {
-    private cellX: number;
-    private cellY: number;
+    private initX: number;
+    private initY: number;
+    private cellX = 0;
+    private cellY = 0;
     private locationX = 0;
     private locationY = 0;
     private velocityX = 0;
     private velocityY = 0;
     private size = 0;
+    private targetX = 0;
+    private targetY = 0;
 
-    public constructor(cellX: number, cellY: number) {
-        this.cellX = cellX;
-        this.cellY = cellY;
+    public constructor(initX: number, initY: number) {
+        this.initX = initX;
+        this.initY = initY;
         GlobalStore.subscribe(this.init);
     }
 
     private init = () => {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
         this.size = halfCellSize;
+        this.cellX = this.initX;
+        this.cellY = this.initY;
         this.locationX = cellSize * this.cellX - halfCellSize;
         this.locationY = cellSize * this.cellY - halfCellSize;
-    }
+        this.velocityX = 0;
+        this.velocityY = 0;
+    };
 
     public draw: (p: p5) => void = p => {
+        this.locationX += this.velocityX;
+        this.locationY += this.velocityY;
         p.push();
         p.translate(this.locationX, this.locationY);
         p.fill(255, 0, 0);
         p.ellipse(0, 0, this.size);
         p.pop();
-        this.move();
     };
 
     public receiveInput(dir: Directions) {
@@ -52,21 +63,17 @@ export class Player {
         }
     }
 
+    private setTarget = (tX: number, tY: number) => {
+        this.targetX = tX;
+        this.targetY = tY;
+    }
+
     private setVelocity = (dx: number, dy: number) => {
         this.velocityX = dx;
         this.velocityY = dy;
     }
 
-    private move = () => {
-        if (this.canMoveLeftHorizontally()) {
-            this.locationX += this.velocityX;
-        }
-        if (this.canMoveVertically()) {
-            this.locationY += this.velocityY;
-        }
-    };
-
-    private canMoveLeftHorizontally = () =>
+    private canMoveHorizontally = () =>
         this.velocityX > 0
             ? (this.locationX % (this.size * 2) <= this.size || isRight(this.currentCellType()))
             : (this.locationX % (this.size * 2) >= this.size || isLeft(this.currentCellType()));
