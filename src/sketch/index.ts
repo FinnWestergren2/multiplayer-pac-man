@@ -15,7 +15,7 @@ export default function sketch(p: p5): void {
 		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions
 		p.createCanvas(canvasWidth, canvasHeight);
 		gameMap = new GameMap();
-		players = [new Player(1,1), new Player(1,1)];
+		players = [new Player(1,1)];
 		bindHumanPlayer(p, players[0]);
 	};
 
