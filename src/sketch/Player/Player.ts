@@ -70,13 +70,13 @@ export class Player {
         p.pop();
     }
 
-    private debugInfo: () => any[] = () => [
+    private debugInfo: () => string[] = () => [
         Object.values(this.location).toString(),
         Object.values(this.targetLocation()).toString(),
-        this.canMoveRight(),
-        this.canMoveLeft(),
-        this.canMoveUp(),
-        this.canMoveDown()
+        `Right:\t${this.canMoveRight()}`,
+        `Left:\t${this.canMoveLeft()}`,
+        `Up:\t${this.canMoveUp()}`,
+        `Down:\t${this.canMoveDown()}`
     ]
 
     private moveTowardsTarget = () => {
