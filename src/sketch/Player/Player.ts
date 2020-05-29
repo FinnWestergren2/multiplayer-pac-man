@@ -20,6 +20,7 @@ export class Player {
     private velocity: CoordPair = {...zeroPair};
     private target: CoordPair = {x: 1, y: 1};
     private size = 0;
+    private currentDirection: Directions = Directions.NONE;
 
     public constructor(initX: number, initY: number) {
         this.initialPos = {x: initX, y: initY}
@@ -73,11 +74,15 @@ export class Player {
     private debugInfo: () => string[] = () => [
         Object.values(this.location).toString(),
         Object.values(this.targetLocation()).toString(),
-        `Right:\t${this.canMoveRight()}`,
-        `Left:\t${this.canMoveLeft()}`,
-        `Up:\t${this.canMoveUp()}`,
-        `Down:\t${this.canMoveDown()}`
-    ]
+        `Right:    ${this.canMoveRight()}`,
+        `Left:       ${this.canMoveLeft()}`,
+        `Up:        ${this.canMoveUp()}`,
+        `Down:   ${this.canMoveDown()}`
+    ];
+
+    private handleUpdate = () => {
+
+    }
 
     private moveTowardsTarget = () => {
         const target = this.targetLocation();
@@ -92,23 +97,23 @@ export class Player {
             this.location.y = target.y;
         }
         if (snapX && snapY){
-            return;
+            return true;
         }
         if (Math.floor(this.location.x) < Math.floor(target.x) && this.canMoveRight()){
             this.velocity = { x: SPEED, y: 0 };
-            return;
+            return false;
         }
         if (Math.floor(this.location.x) > Math.floor(target.x) && this.canMoveLeft()){
             this.velocity = { x: -SPEED, y: 0 };
-            return;
+            return false;
         }
         if (Math.floor(this.location.y) > Math.floor(target.y) && this.canMoveUp()){
             this.velocity = { x: 0, y: -SPEED };
-            return;
+            return false;
         }
         if (Math.floor(this.location.y) < Math.floor(target.y)  && this.canMoveDown()){
             this.velocity = { x: 0, y: SPEED };
-            return;
+            return false;
         }
     }
 
