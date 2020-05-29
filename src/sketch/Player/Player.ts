@@ -66,15 +66,32 @@ export class Player {
         p.line(this.targetLocation().x, this.targetLocation().y, this.location.x, this.location.y);
         p.push();
         p.translate(this.location.x, this.location.y);
-        p.text(Object.values(this.location).toString() + "\n" + Object.values(this.targetLocation()).toString(), 0, 20);
+        p.text(this.debugInfo().join('\n'), 0, 20);
         p.pop();
     }
 
+    private debugInfo: () => any[] = () => [
+        Object.values(this.location).toString(),
+        Object.values(this.targetLocation()).toString(),
+        this.canMoveRight(),
+        this.canMoveLeft(),
+        this.canMoveUp(),
+        this.canMoveDown()
+    ]
+
     private moveTowardsTarget = () => {
         const target = this.targetLocation();
-        if (Math.abs(this.location.x - target.x) < SPEED && Math.abs(this.location.y - target.y) < SPEED){
-            this.velocity = {...zeroPair}
-            this.location = target;
+        const snapX = Math.abs(this.location.x - target.x) < SPEED
+        const snapY = Math.abs(this.location.y - target.y) < SPEED
+        if (snapX) {
+            this.velocity.x = 0;
+            this.location.x = target.x;
+        }
+        if (snapY) {
+            this.velocity.y = 0;
+            this.location.y = target.y;
+        }
+        if (snapX && snapY){
             return;
         }
         if (Math.floor(this.location.x) < Math.floor(target.x) && this.canMoveRight()){
@@ -104,10 +121,10 @@ export class Player {
         return {x: Math.floor(this.location.x / (this.size * 2)), y: Math.floor(this.location.y / (this.size * 2))}
     }
 
-    private canMoveRight = () => this.location.x % (this.size * 2) <= this.size || isRight(this.currentCellType());
-    private canMoveLeft = () => this.location.x % (this.size * 2) >= this.size || isLeft(this.currentCellType());
-    private canMoveUp = () => this.location.y % (this.size * 2) >= this.size || isUp(this.currentCellType());
-    private canMoveDown = () => this.location.y % (this.size * 2) <= this.size || isDown(this.currentCellType());
+    private canMoveRight = () =>  isRight(this.currentCellType());
+    private canMoveLeft = () => isLeft(this.currentCellType());
+    private canMoveUp = () => isUp(this.currentCellType());
+    private canMoveDown = () => isDown(this.currentCellType());
 
     private currentCellType = () => {
         try {
