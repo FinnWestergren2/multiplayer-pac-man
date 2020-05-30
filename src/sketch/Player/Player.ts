@@ -137,10 +137,10 @@ export class Player {
         return toLocationCoords(Player.targetCell(this.location, this.currentDirection))
     };
 
-    private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x < toLocationCoords(this.currentCell()).x;
-    private canMoveLeft = () => isLeft(this.currentCellType()) ||  this.location.x > toLocationCoords(this.currentCell()).x;
-    private canMoveUp = () => isUp(this.currentCellType()) ||  this.location.y > toLocationCoords(this.currentCell()).y;
-    private canMoveDown = () => isDown(this.currentCellType()) ||  this.location.y < toLocationCoords(this.currentCell()).y;
+    private canMoveRight = () => isRight(this.currentCellType()) || this.location.x < toLocationCoords(this.currentCell()).x;
+    private canMoveLeft = () => isLeft(this.currentCellType()) || this.location.x > toLocationCoords(this.currentCell()).x;
+    private canMoveUp = () => isUp(this.currentCellType()) || this.location.y > toLocationCoords(this.currentCell()).y;
+    private canMoveDown = () => isDown(this.currentCellType()) || this.location.y < toLocationCoords(this.currentCell()).y;
     private notMoving = () => this.velocity.x === 0 && this.velocity.y === 0;
     private currentCellType = () => getCellType(this.currentCell());
     private targetCellType = () => getCellType(Player.targetCell(this.location, this.currentDirection));
