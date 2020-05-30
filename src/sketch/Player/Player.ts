@@ -2,7 +2,8 @@ import p5 from "p5";
 import { GlobalStore } from "../../containers/Game";
 import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/directions";
 
-const SPEED_FACTOR = 0.07;
+const SPEED_FACTOR = 0.035;
+const SIZE_FACTOR = 0.9;
 type CoordPair = { x: number, y: number }
 const zeroPair = { x: 0, y: 0 };
 const addPairs = (p1: CoordPair, p2: CoordPair) => {
@@ -15,7 +16,6 @@ export class Player {
     private velocity: CoordPair = { ...zeroPair };
     private size = 0;
     private speed = 0;
-    private halfCellSize = 0;
     private currentDirection: Directions = Directions.NONE;
     private nextDirection: Directions = Directions.NONE;
 
@@ -26,9 +26,8 @@ export class Player {
 
     private initialize = () => {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
-        this.size = 1.3 * halfCellSize;
-        this.speed = halfCellSize * SPEED_FACTOR;
-        this.halfCellSize = halfCellSize;
+        this.size = SIZE_FACTOR * cellSize;
+        this.speed = cellSize * SPEED_FACTOR;
         this.location = { x: cellSize * this.initialPos.x - halfCellSize, y: cellSize * this.initialPos.y - halfCellSize };
         this.velocity = { ...zeroPair };
         this.currentDirection = Directions.NONE;
@@ -43,7 +42,7 @@ export class Player {
         p.fill(255, 0, 0);
         p.ellipse(0, 0, this.size);
         p.pop();
-        this.drawDebugInfo(p);
+        // this.drawDebugInfo(p);
     };
 
 
@@ -88,17 +87,20 @@ export class Player {
     ];
 
     private handleUpdate = () => {
-        if (this.moveTowardsTarget()) {
-            if (this.nextDirection !== Directions.NONE) {
+        if (this.moveTowardsTarget()) { 
+            if (this.nextDirection !== Directions.NONE) { // take the queued direction
                 this.currentDirection = this.nextDirection;
                 this.nextDirection = Directions.NONE;
             }
             else {
-                this.receiveInput(this.currentDirection);
+                this.receiveInput(this.currentDirection); // continue the way you were going
             }
         }
     }
 
+    /*
+        returns true if the player has hit the center of the target cell
+    */
     private moveTowardsTarget = () => {
         const target = this.targetLocation();
         const snapX = Math.abs(this.location.x - target.x) < this.speed
@@ -132,27 +134,30 @@ export class Player {
         }
     }
 
-    private targetCell = (rootCell: CoordPair = this.currentCell()) => {
-        const translation = this.translateToLocation(rootCell);
-        const targetCell = { ...rootCell }
-        switch (this.currentDirection) {
+
+    static targetCell = (locationCoords: CoordPair,  direction: Directions) => {
+        const currentCell = Player.toGridCoords(locationCoords);
+        const translation = Player.translateToLocation(currentCell);
+        const targetCell = { ...currentCell }
+        const currentCellType = Player.getCellType(currentCell);
+        switch (direction) {
             case Directions.UP:
-                if (this.location.y <= translation.y && isUp(this.currentCellType())) {
+                if (locationCoords.y <= translation.y && isUp(currentCellType)) {
                     targetCell.y--;
                 }
                 break;
             case Directions.DOWN:
-                if (this.location.y >= translation.y && isDown(this.currentCellType())) {
+                if (locationCoords.y >= translation.y && isDown(currentCellType)) {
                     targetCell.y++;
                 }
                 break;
             case Directions.LEFT:
-                if (this.location.x <= translation.x && isLeft(this.currentCellType())) {
+                if (locationCoords.x <= translation.x && isLeft(currentCellType)) {
                     targetCell.x--;
                 }
                 break;
             case Directions.RIGHT:
-                if (this.location.x >= translation.x && isRight(this.currentCellType())) {
+                if (locationCoords.x >= translation.x && isRight(currentCellType)) {
                     targetCell.x++;
                 }
                 break;
@@ -160,21 +165,26 @@ export class Player {
         return targetCell
     }
 
-    private targetLocation = () => this.translateToLocation(this.targetCell());
+    private targetLocation = () => {
+        return Player.translateToLocation(Player.targetCell(this.location, this.currentDirection))
+    };
 
-    private currentCell: () => CoordPair = () => {
-        return { x: Math.floor(this.location.x / (this.halfCellSize * 2)) , y: Math.floor(this.location.y / (this.halfCellSize * 2)) }
+    static toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationCoords) => {
+        const halfCellSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
+        return { x: Math.floor(locationCoords.x / (halfCellSize * 2)) , y: Math.floor(locationCoords.y / (halfCellSize * 2)) }
     }
 
-    private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x <this.translateToLocation(this.currentCell()).x;
-    private canMoveLeft = () => isLeft(this.currentCellType()) ||  this.location.x >this.translateToLocation(this.currentCell()).x;
-    private canMoveUp = () => isUp(this.currentCellType()) ||  this.location.y >this.translateToLocation(this.currentCell()).y;
-    private canMoveDown = () => isDown(this.currentCellType()) ||  this.location.y <this.translateToLocation(this.currentCell()).y;
+    private currentCell = () => Player.toGridCoords(this.location);
 
-    private currentCellType = () => this.getCellType(this.currentCell());
-    private targetCellType = () => this.getCellType(this.targetCell());
+    private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x < Player.translateToLocation(this.currentCell()).x;
+    private canMoveLeft = () => isLeft(this.currentCellType()) ||  this.location.x > Player.translateToLocation(this.currentCell()).x;
+    private canMoveUp = () => isUp(this.currentCellType()) ||  this.location.y > Player.translateToLocation(this.currentCell()).y;
+    private canMoveDown = () => isDown(this.currentCellType()) ||  this.location.y < Player.translateToLocation(this.currentCell()).y;
 
-    private getCellType = (coords: CoordPair) => {
+    private currentCellType = () => Player.getCellType(this.currentCell());
+    private targetCellType = () => Player.getCellType(Player.targetCell(this.location, this.currentDirection));
+
+    static getCellType = (coords: CoordPair) => {
         try {
             return GlobalStore.getState().mapState.mapCells[coords.y][coords.x];
         } catch (error) {
@@ -182,10 +192,11 @@ export class Player {
         }
     }
 
-    private translateToLocation = (coords: CoordPair) => {
+    static translateToLocation = (coords: CoordPair) => {
+        const halfCellSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
         return {
-            x: (coords.x) * (this.halfCellSize * 2) + this.halfCellSize,
-            y: (coords.y) * (this.halfCellSize * 2) + this.halfCellSize
+            x: (coords.x) * (halfCellSize * 2) + halfCellSize,
+            y: (coords.y) * (halfCellSize * 2) + halfCellSize
         }
     }
 
