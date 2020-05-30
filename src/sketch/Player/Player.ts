@@ -1,14 +1,10 @@
 import p5 from "p5";
 import { GlobalStore } from "../../containers/Game";
 import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/directions";
+import CoordPair, { zeroPair, addPairs, toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPair";
 
 const SPEED_FACTOR = 0.035;
 const SIZE_FACTOR = 0.9;
-type CoordPair = { x: number, y: number }
-const zeroPair = { x: 0, y: 0 };
-const addPairs = (p1: CoordPair, p2: CoordPair) => {
-    return { x: p1.x + p2.x, y: p1.y + p2.y }
-}
 
 export class Player {
     private initialPos: CoordPair;
@@ -138,45 +134,24 @@ export class Player {
     }
 
     private targetLocation = () => {
-        return Player.toLocationCoords(Player.targetCell(this.location, this.currentDirection))
+        return toLocationCoords(Player.targetCell(this.location, this.currentDirection))
     };
 
-    private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x < Player.toLocationCoords(this.currentCell()).x;
-    private canMoveLeft = () => isLeft(this.currentCellType()) ||  this.location.x > Player.toLocationCoords(this.currentCell()).x;
-    private canMoveUp = () => isUp(this.currentCellType()) ||  this.location.y > Player.toLocationCoords(this.currentCell()).y;
-    private canMoveDown = () => isDown(this.currentCellType()) ||  this.location.y < Player.toLocationCoords(this.currentCell()).y;
+    private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x < toLocationCoords(this.currentCell()).x;
+    private canMoveLeft = () => isLeft(this.currentCellType()) ||  this.location.x > toLocationCoords(this.currentCell()).x;
+    private canMoveUp = () => isUp(this.currentCellType()) ||  this.location.y > toLocationCoords(this.currentCell()).y;
+    private canMoveDown = () => isDown(this.currentCellType()) ||  this.location.y < toLocationCoords(this.currentCell()).y;
     private notMoving = () => this.velocity.x === 0 && this.velocity.y === 0;
-    private currentCellType = () => Player.getCellType(this.currentCell());
-    private targetCellType = () => Player.getCellType(Player.targetCell(this.location, this.currentDirection));
-    private currentCell = () => Player.toGridCoords(this.location);
+    private currentCellType = () => getCellType(this.currentCell());
+    private targetCellType = () => getCellType(Player.targetCell(this.location, this.currentDirection));
+    private currentCell = () => toGridCoords(this.location);
 
-    static getCellType = (gridCoords: CoordPair) => {
-        try {
-            return GlobalStore.getState().mapState.mapCells[gridCoords.y][gridCoords.x];
-        } catch (error) {
-            return Directions.NONE;
-        }
-    }
-
-    // returns the absolute center of a cell
-    static toLocationCoords = (gridCoords: CoordPair) => {
-        const halfCellSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
-        return {
-            x: (gridCoords.x) * (halfCellSize * 2) + halfCellSize,
-            y: (gridCoords.y) * (halfCellSize * 2) + halfCellSize
-        }
-    }
-
-    static toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationCoords) => {
-        const halfCellSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
-        return { x: Math.floor(locationCoords.x / (halfCellSize * 2)) , y: Math.floor(locationCoords.y / (halfCellSize * 2)) }
-    }
-
+    // maybe this should just be a private method
     static targetCell = (locationCoords: CoordPair,  direction: Directions) => {
-        const currentCell = Player.toGridCoords(locationCoords);
-        const translation = Player.toLocationCoords(currentCell);
+        const currentCell = toGridCoords(locationCoords);
+        const translation = toLocationCoords(currentCell);
         const targetCell = { ...currentCell }
-        const currentCellType = Player.getCellType(currentCell);
+        const currentCellType = getCellType(currentCell);
         switch (direction) {
             case Directions.UP:
                 if (locationCoords.y <= translation.y && isUp(currentCellType)) {
