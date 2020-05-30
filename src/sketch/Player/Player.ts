@@ -2,8 +2,7 @@ import p5 from "p5";
 import { GlobalStore } from "../../containers/Game";
 import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/directions";
 
-const SPEED = 5;
-
+const SPEED_FACTOR = 0.07;
 type CoordPair = { x: number, y: number }
 const zeroPair = { x: 0, y: 0 };
 const addPairs = (p1: CoordPair, p2: CoordPair) => {
@@ -15,7 +14,10 @@ export class Player {
     private location: CoordPair = { ...zeroPair };
     private velocity: CoordPair = { ...zeroPair };
     private size = 0;
+    private speed = 0;
+    private halfCellSize = 0;
     private currentDirection: Directions = Directions.NONE;
+    private nextDirection: Directions = Directions.NONE;
 
     public constructor(initX: number, initY: number) {
         this.initialPos = { x: initX, y: initY }
@@ -24,9 +26,13 @@ export class Player {
 
     private initialize = () => {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
-        this.size = halfCellSize;
+        this.size = 1.3 * halfCellSize;
+        this.speed = halfCellSize * SPEED_FACTOR;
+        this.halfCellSize = halfCellSize;
         this.location = { x: cellSize * this.initialPos.x - halfCellSize, y: cellSize * this.initialPos.y - halfCellSize };
         this.velocity = { ...zeroPair };
+        this.currentDirection = Directions.NONE;
+        this.nextDirection = Directions.NONE;
     };
 
     public draw: (p: p5) => void = p => {
@@ -49,7 +55,18 @@ export class Player {
             (isRight(dir) && this.canMoveRight() && (isLeft(this.currentDirection) || this.notMoving()));
         if (allowImediateOverride) {
             this.currentDirection = dir;
+            this.nextDirection = Directions.NONE;
+            return;
         }
+        const allowQueueDirection = 
+            (isDown(dir) && isDown(this.targetCellType())) ||
+            (isUp(dir) && isUp(this.targetCellType())) ||
+            (isRight(dir) && isRight(this.targetCellType())) ||
+            (isLeft(dir) && isLeft(this.targetCellType()))
+        if (allowQueueDirection) {
+            this.nextDirection = dir;
+        }
+        
     }
 
     private drawDebugInfo(p: p5) {
@@ -72,14 +89,20 @@ export class Player {
 
     private handleUpdate = () => {
         if (this.moveTowardsTarget()) {
-            this.receiveInput(this.currentDirection);
+            if (this.nextDirection !== Directions.NONE) {
+                this.currentDirection = this.nextDirection;
+                this.nextDirection = Directions.NONE;
+            }
+            else {
+                this.receiveInput(this.currentDirection);
+            }
         }
     }
 
     private moveTowardsTarget = () => {
         const target = this.targetLocation();
-        const snapX = Math.abs(this.location.x - target.x) < SPEED
-        const snapY = Math.abs(this.location.y - target.y) < SPEED
+        const snapX = Math.abs(this.location.x - target.x) < this.speed
+        const snapY = Math.abs(this.location.y - target.y) < this.speed
         if (snapX) {
             this.velocity.x = 0;
             this.location.x = target.x;
@@ -92,27 +115,26 @@ export class Player {
             return true;
         }
         if (this.currentDirection === Directions.RIGHT && this.canMoveRight()) {
-            this.velocity = { x: SPEED, y: 0 };
+            this.velocity = { x: this.speed, y: 0 };
             return false;
         }
         if (this.currentDirection === Directions.LEFT && this.canMoveLeft()) {
-            this.velocity = { x: -SPEED, y: 0 };
+            this.velocity = { x: -this.speed, y: 0 };
             return false;
         }
         if (this.currentDirection === Directions.UP && this.canMoveUp()) {
-            this.velocity = { x: 0, y: -SPEED };
+            this.velocity = { x: 0, y: -this.speed };
             return false;
         }
         if (this.currentDirection === Directions.DOWN && this.canMoveDown()) {
-            this.velocity = { x: 0, y: SPEED };
+            this.velocity = { x: 0, y: this.speed };
             return false;
         }
     }
 
-    private targetCell = () => {
-        const currentCell = this.currentCell();
-        const translation = this.translateToLocation(currentCell);
-        const targetCell = { ...currentCell }
+    private targetCell = (rootCell: CoordPair = this.currentCell()) => {
+        const translation = this.translateToLocation(rootCell);
+        const targetCell = { ...rootCell }
         switch (this.currentDirection) {
             case Directions.UP:
                 if (this.location.y <= translation.y && isUp(this.currentCellType())) {
@@ -141,7 +163,7 @@ export class Player {
     private targetLocation = () => this.translateToLocation(this.targetCell());
 
     private currentCell: () => CoordPair = () => {
-        return { x: Math.floor(this.location.x / (this.size * 2)) , y: Math.floor(this.location.y / (this.size * 2)) }
+        return { x: Math.floor(this.location.x / (this.halfCellSize * 2)) , y: Math.floor(this.location.y / (this.halfCellSize * 2)) }
     }
 
     private canMoveRight = () => isRight(this.currentCellType()) ||  this.location.x <this.translateToLocation(this.currentCell()).x;
@@ -162,8 +184,8 @@ export class Player {
 
     private translateToLocation = (coords: CoordPair) => {
         return {
-            x: (coords.x) * (this.size * 2) + this.size,
-            y: (coords.y) * (this.size * 2) + this.size
+            x: (coords.x) * (this.halfCellSize * 2) + this.halfCellSize,
+            y: (coords.y) * (this.halfCellSize * 2) + this.halfCellSize
         }
     }
 
