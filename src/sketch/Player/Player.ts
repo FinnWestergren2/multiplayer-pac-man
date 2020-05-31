@@ -85,7 +85,7 @@ export class Player {
         `CurrentDirection: ${getString(this.currentDirection)}`
     ];
 
-    private handleUpdate = () => {
+    protected handleUpdate = () => {
         if (this.moveTowardsTarget()) { 
             if (this.nextDirection !== Directions.NONE) { // take the queued direction
                 this.currentDirection = this.nextDirection;
@@ -100,7 +100,7 @@ export class Player {
     /*
         returns true if the player has hit the center of the target cell
     */
-    private moveTowardsTarget = () => {
+    protected moveTowardsTarget = () => {
         const target = this.targetLocation();
         const snapX = Math.abs(this.location.x - target.x) < this.speed
         const snapY = Math.abs(this.location.y - target.y) < this.speed

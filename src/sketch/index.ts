@@ -4,6 +4,7 @@ import { updateAppDimensions } from "../ducks/mapState";
 import { GlobalStore } from "../containers/Game";
 import { Player } from "./Player/Player";
 import { bindHumanPlayers } from "./Player/controller";
+import { RandomAi } from "./Player/RandomAI";
 
 export default function sketch(p: p5): void {
 	var gameMap: GameMap;
@@ -15,7 +16,7 @@ export default function sketch(p: p5): void {
 		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions
 		p.createCanvas(canvasWidth, canvasHeight);
 		gameMap = new GameMap();
-		players = [new Player(1,1), new Player(2,2)];
+		players = [new Player(1,1), new RandomAi(2,2)];
 		bindHumanPlayers(p, players.slice(0,1));
 	};
 
