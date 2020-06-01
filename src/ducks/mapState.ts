@@ -1,5 +1,5 @@
 import Directions from "../sketch/GameMap/directions";
-import { loadMap } from "../utils/mapLoader/loader";
+import { loadMap } from "../xhr/loader";
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 import { AnyAction } from 'redux';
 

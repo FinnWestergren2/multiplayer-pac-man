@@ -1,4 +1,4 @@
-import Directions from "../../sketch/GameMap/directions";
+import Directions from "../sketch/GameMap/directions";
 import $ from "jquery";
 
 export const loadMap: () => Promise<Directions[][]> = async () => {
