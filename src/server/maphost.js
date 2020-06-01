@@ -32,14 +32,14 @@ server.listen(port, (err) => {
 
 
 app.get('/test1', async (err, res) => {
-	const data = await fs.promises.readFile("./src/test/test1.json");
+	const data = await fs.promises.readFile("./src/server/test/test1.json");
 	res.status(200);
 	res.send(data);
 	res.end();
 });
 
 app.get('/test2', async (err, res) => {
-	const data = await fs.promises.readFile("./src/test/test2.json");
+	const data = await fs.promises.readFile("./src/server/test/test2.json");
 	res.status(200);
 	res.send(data);
 	res.end();
