@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "host": "node src/server/maphost.js",
+    "host": "node --inspect src/server",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
