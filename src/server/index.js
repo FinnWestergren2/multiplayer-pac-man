@@ -45,4 +45,13 @@ app.get('/test2', async (err, res) => {
 	res.end();
 });
 
+// app.get('/generateMap', async (err, res) => {
+// 	const mapGenerator = require('./utils/mapGenerator');
+// 	const data = mapGenerator.generateMapUsingRandomDFS();
+// 	res.status(200);
+// 	res.send(data);
+// 	res.end();
+// });
+
+
 module.exports = server;
