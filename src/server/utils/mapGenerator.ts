@@ -3,7 +3,7 @@ import CoordPair, { zeroPair } from "../../sketch/GameMap/CoordPair"
 import Directions from "../../sketch/GameMap/directions";
 
 
-export const generateMapUsingRandomDFS = () => {
+const generateMapUsingRandomDFS = () => {
     const startingLocation: CoordPair = {...zeroPair};
     const dimensions: CoordPair = {x: 10, y: 10}
     const {mapDirections, visited} = emptyMap(dimensions);

@@ -3,7 +3,7 @@ import $ from "jquery";
 
 export const loadMap: () => Promise<Directions[][]> = async () => {
     return await new Promise<Directions[][]>((resolve: any) => {
-        $.getJSON("http://localhost:8080/test1", "", resolve);
+        $.getJSON("http://localhost:8080/generateMap", "", resolve);
     });
 };
 

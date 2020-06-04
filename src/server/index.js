@@ -1,14 +1,18 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const server = require('http').Server(app);
-const port = 8080;
-const helmet = require('helmet');
-const fs = require('fs');
+import express, { static } from 'express';
+import { json, urlencoded } from 'body-parser';
+import { Server } from 'http';
+import { generateMapUsingRandomDFS } from './utils/mapGenerator';
+import helmet from 'helmet';
+import { promises } from 'fs';
 
+const app = express();
+const server = Server(app);
+const port = 8080;
+
+app.use(static('.'));
 app.use(helmet());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -32,26 +36,24 @@ server.listen(port, (err) => {
 
 
 app.get('/test1', async (err, res) => {
-	const data = await fs.promises.readFile("./src/server/test/test1.json");
+	const data = await promises.readFile("./src/server/test/test1.json");
 	res.status(200);
 	res.send(data);
 	res.end();
 });
 
 app.get('/test2', async (err, res) => {
-	const data = await fs.promises.readFile("./src/server/test/test2.json");
+	const data = await promises.readFile("./src/server/test/test2.json");
 	res.status(200);
 	res.send(data);
 	res.end();
 });
 
-// app.get('/generateMap', async (err, res) => {
-// 	const mapGenerator = require('./utils/mapGenerator');
-// 	const data = mapGenerator.generateMapUsingRandomDFS();
-// 	res.status(200);
-// 	res.send(data);
-// 	res.end();
-// });
+app.get('/generateMap', async (err, res) => {
+	const data = generateMapUsingRandomDFS()
+	res.status(200);
+	res.send(data);
+	res.end();
+});
 
-
-module.exports = server;
+export { server };
