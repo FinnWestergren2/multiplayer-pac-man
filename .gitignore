@@ -8,6 +8,7 @@
 
 # production
 /build
+/server-lib
 
 # misc
 .DS_Store
