@@ -13,7 +13,7 @@ export const generateMapUsingRandomDFS = () => {
 
 const emptyMap = (dimensions: CoordPair) => {
     function* fillEmptyMap<T> (withWhat: T) {
-        function* emptyRow(length: number){
+        function* emptyRow(length: number) {
             for (let j = 0; j < length; j++) {
                 yield withWhat
             }
