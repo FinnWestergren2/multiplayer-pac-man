@@ -1,4 +1,4 @@
-import express, { static } from 'express';
+import express from 'express';
 import { json, urlencoded } from 'body-parser';
 import { Server } from 'http';
 import { generateMapUsingRandomDFS } from './utils/mapGenerator';
@@ -6,10 +6,9 @@ import helmet from 'helmet';
 import { promises } from 'fs';
 
 const app = express();
-const server = Server(app);
+const server = new Server(app);
 const port = 8080;
 
-app.use(static('.'));
 app.use(helmet());
 app.use(json());
 app.use(urlencoded({ extended: true }));
@@ -26,6 +25,8 @@ app.options('*', function(req, res) {
 	res.send(200);
 });
 
+
+//@ts-ignore
 server.listen(port, (err) => {
 	if (err) {
 		throw err;
