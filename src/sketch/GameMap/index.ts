@@ -6,7 +6,7 @@ import { refreshMap } from "../../ducks/mapState";
 
 export default class GameMap {
     private cells: Cell[][] =[];
-    private shouldReDraw: boolean = false;
+    private shouldReDraw = false;
     public constructor(){
         //@ts-ignore
         GlobalStore.dispatch(refreshMap());

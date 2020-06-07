@@ -17,7 +17,7 @@ export class Player {
     private currentFrame = 0;
 
     public constructor(initX: number, initY: number) {
-        this.initialPos = { x: initX, y: initY }
+        this.initialPos = { x: initX, y: initY };
         GlobalStore.subscribe(this.initialize);
     }
 
@@ -60,7 +60,7 @@ export class Player {
             (isDown(dir) && isDown(this.targetCellType())) ||
             (isUp(dir) && isUp(this.targetCellType())) ||
             (isRight(dir) && isRight(this.targetCellType())) ||
-            (isLeft(dir) && isLeft(this.targetCellType()))
+            (isLeft(dir) && isLeft(this.targetCellType()));
         if (allowQueueDirection) {
             this.nextDirection = dir;
         }
@@ -71,7 +71,7 @@ export class Player {
         p.line(this.targetLocation().x, this.targetLocation().y, this.location.x, this.location.y);
         p.push();
         p.translate(this.location.x, this.location.y);
-        p.text(this.debugInfo().join('\n'), 0, 20);
+        p.text(this.debugInfo().join("\n"), 0, 20);
         p.pop();
     }
 
@@ -102,8 +102,8 @@ export class Player {
     */
     protected moveTowardsTarget = () => {
         const target = this.targetLocation();
-        const snapX = Math.abs(this.location.x - target.x) < this.speed
-        const snapY = Math.abs(this.location.y - target.y) < this.speed
+        const snapX = Math.abs(this.location.x - target.x) < this.speed;
+        const snapY = Math.abs(this.location.y - target.y) < this.speed;
         if (snapX) {
             this.velocity.x = 0;
             this.location.x = target.x;
@@ -134,7 +134,7 @@ export class Player {
     }
 
     private targetLocation = () => {
-        return toLocationCoords(Player.targetCell(this.location, this.currentDirection))
+        return toLocationCoords(Player.targetCell(this.location, this.currentDirection));
     };
 
     private canMoveRight = () => isRight(this.currentCellType()) || this.location.x < toLocationCoords(this.currentCell()).x;
@@ -150,7 +150,7 @@ export class Player {
     static targetCell = (locationCoords: CoordPair,  direction: Directions) => {
         const currentCell = toGridCoords(locationCoords);
         const translation = toLocationCoords(currentCell);
-        const targetCell = { ...currentCell }
+        const targetCell = { ...currentCell };
         const currentCellType = getCellType(currentCell);
         switch (direction) {
             case Directions.UP:
@@ -174,7 +174,7 @@ export class Player {
                 }
                 break;
         }
-        return targetCell
+        return targetCell;
     }
 }
 

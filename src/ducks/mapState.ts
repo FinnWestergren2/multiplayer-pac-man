@@ -1,33 +1,33 @@
 import Directions from "../sketch/GameMap/directions";
 import { loadMap } from "../xhr/loader";
-import { ThunkAction, ThunkDispatch } from 'redux-thunk'
-import { AnyAction } from 'redux';
+import { ThunkAction, ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
 
 enum ActionTypes {
     REFRESH_MAP = "REFRESH_MAP",
     UPDATE_APP_DIMENSIONS = "UPDATE_APP_DIMENSIONS",
     UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS"
-};
+}
 
 export type AppDimensions = {
-    canvasHeight: number,
-    canvasWidth: number
+    canvasHeight: number;
+    canvasWidth: number;
 }
 
 export type CellDimensions = {
-    cellSize: number,
-    halfCellSize: number
+    cellSize: number;
+    halfCellSize: number;
 }
 
 type Action = 
-    {type: ActionTypes.REFRESH_MAP, payload: Directions[][]} |
-    {type: ActionTypes.UPDATE_APP_DIMENSIONS, payload: AppDimensions} | 
-    {type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: CellDimensions} 
+    {type: ActionTypes.REFRESH_MAP; payload: Directions[][]} |
+    {type: ActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions} | 
+    {type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions} 
 
 type mapState = {
     mapCells: Directions[][];
-    appDimensions: AppDimensions
-    cellDimensions: CellDimensions
+    appDimensions: AppDimensions;
+    cellDimensions: CellDimensions;
 }
 
 const initialState: mapState = {
@@ -54,23 +54,23 @@ export default (state: mapState = initialState, action: Action) => {
         default:
             return state;
     }
-}
+};
 
-export const refreshMap:() => ThunkAction<void, mapState, {}, AnyAction> = () => {
+export const refreshMap: () => ThunkAction<void, mapState, {}, AnyAction> = () => {
     return function(dispatch: ThunkDispatch<{}, {}, AnyAction>, getState: () => any) {
         loadMap().then(response => {
             dispatch({type: ActionTypes.REFRESH_MAP, payload: response});
             dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(response, getState().mapState.appDimensions)});
         });
-    }
-}
+    };
+};
 
 export const updateAppDimensions = (width: number, height: number) => {
     return function(dispatch: ThunkDispatch<{}, {}, AnyAction>) {
         console.log(width, height);
         dispatch({type: ActionTypes.UPDATE_APP_DIMENSIONS, payload: {canvasHeight: height, canvasWidth: width}});
-    }
-}
+    };
+};
 
 const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
     const size = Math.min(
@@ -80,5 +80,5 @@ const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensio
     return {
         cellSize: size,
         halfCellSize: size * 0.5
-    }
-}
+    };
+};

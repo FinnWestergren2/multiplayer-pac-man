@@ -58,19 +58,19 @@ export default class Cell {
 
     private drawWalls: (p: p5) => void = (p) => {
         if(!this.down){
-            p.line(-this.halfSize, this.halfSize, this.halfSize, this.halfSize)
+            p.line(-this.halfSize, this.halfSize, this.halfSize, this.halfSize);
         }
         
         if(!this.up){
-            p.line(-this.halfSize, -this.halfSize, this.halfSize, -this.halfSize)
+            p.line(-this.halfSize, -this.halfSize, this.halfSize, -this.halfSize);
         }
         
         if(!this.right){
-            p.line(this.halfSize, -this.halfSize, this.halfSize, this.halfSize)
+            p.line(this.halfSize, -this.halfSize, this.halfSize, this.halfSize);
         }
         
         if(!this.left){
-            p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize)
+            p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize);
         }
     }
 }

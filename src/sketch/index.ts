@@ -7,13 +7,13 @@ import { bindHumanPlayers } from "./Player/controller";
 import { RandomAi } from "./Player/RandomAI";
 
 export default function sketch(p: p5): void {
-	var gameMap: GameMap;
-	var players: Player[];
+	let gameMap: GameMap;
+	let players: Player[];
 
 	p.setup = function (): void {
 		// @ts-ignore
 		GlobalStore.dispatch(updateAppDimensions(600, 600));
-		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions
+		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions;
 		p.createCanvas(canvasWidth, canvasHeight);
 		gameMap = new GameMap();
 		players = [new Player(1,1), new RandomAi(2,2)];
