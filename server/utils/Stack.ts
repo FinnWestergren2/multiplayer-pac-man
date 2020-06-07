@@ -17,10 +17,9 @@ export default class Stack<T> {
         return toReturn;
     }
 
-    public peek: () => T | null = () => {
-        if (this.stack.length === 0) {
-            return null;
-        }
+    public peek: () => T = () => {
         return this.stack[this.stack.length - 1]
     }
+    
+    public isEmpty = () => this.stack.length === 0;
 }

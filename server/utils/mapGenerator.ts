@@ -1,13 +1,37 @@
 import Stack from "./Stack"
-import CoordPair, { zeroPair } from "./CoordPair"
-import Directions from "./directions";
+import CoordPair, { randomPair } from "./CoordPair"
+import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
 
 
 export const generateMapUsingRandomDFS = () => {
-    const startingLocation: CoordPair = {...zeroPair};
-    const dimensions: CoordPair = {x: 10, y: 10}
+    const dimensions: CoordPair = {x: 15, y: 15}
+    const stack: Stack<CoordPair> = new Stack<CoordPair>();
+    const startingLocation: CoordPair = randomPair(dimensions);
     const {mapDirections, visited} = emptyMap(dimensions);
-    const stack: Stack<{dir: Directions, visited: boolean}> = new Stack<{dir: Directions, visited: boolean}>();
+    const withinDimensions = (cell: CoordPair) => cell.x >= 0 && cell.y >= 0 && cell.x < dimensions.x && cell.y < dimensions.y;
+    const push = (cell: CoordPair) => {
+        stack.push(cell);
+        visited[cell.y][cell.x] = true;
+    }
+    push(startingLocation);
+    while (!stack.isEmpty()) {
+        const currentCell = stack.peek();
+        const firstDir = randomSingleDir();
+        let dir = firstDir;
+        let nextCell = {...currentCell};
+        let i = 0;
+        while( i < 4 && (!withinDimensions(nextCell) || visited[nextCell.y][nextCell.x])){
+            dir = rotateClockwise(dir);
+            nextCell = getAdjacentCell(currentCell, dir);
+            i++
+        }
+        if (i === 4 || !withinDimensions(nextCell) || visited[nextCell.y][nextCell.x]) { // we've exhausted all options
+            stack.pop();
+            continue;
+        }
+        destroyWall(currentCell, dir, mapDirections);
+        push(nextCell);
+    }
     return mapDirections;
 }
 
@@ -18,9 +42,31 @@ const emptyMap = (dimensions: CoordPair) => {
                 yield withWhat
             }
         }
-        for (let i = 0; i < dimensions.x; i++) {
-            yield Array.from(emptyRow(dimensions.y));
+        for (let i = 0; i < dimensions.y; i++) {
+            yield Array.from(emptyRow(dimensions.x));
         }
     }
     return {mapDirections : Array.from(fillEmptyMap<Directions>(Directions.NONE)), visited: Array.from(fillEmptyMap<boolean>(false)) }
 }
+
+const getAdjacentCell = (current: CoordPair, dir: Directions) => {
+    switch(dir){
+        case Directions.UP:
+            return { ...current, y: current.y - 1 };
+        case Directions.DOWN:
+            return { ...current, y: current.y + 1 };
+        case Directions.LEFT:
+            return { ...current, x: current.x - 1 };
+        case Directions.RIGHT:
+            return { ...current, x: current.x + 1 };
+        default:
+            return current;
+    }
+}
+
+const destroyWall = (cellA: CoordPair, dir: Directions, mapDirections: Directions[][]) => {
+    const cellB = getAdjacentCell(cellA, dir);
+    mapDirections[cellA.y][cellA.x] = dir | mapDirections[cellA.y][cellA.x];
+    mapDirections[cellB.y][cellB.x] = getOpposite(dir) | mapDirections[cellB.y][cellB.x];
+} 
+

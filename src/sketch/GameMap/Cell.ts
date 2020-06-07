@@ -29,7 +29,7 @@ export default class Cell {
         p.push();
         p.translate(this.xPos, this.yPos);
         // this.drawDebugLines(p);
-        this.drawDebugText(p);
+        // this.drawDebugText(p);
         this.drawWalls(p);
         p.pop();
     }
