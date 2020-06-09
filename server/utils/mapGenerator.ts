@@ -2,6 +2,7 @@ import Stack from "./Stack"
 import CoordPair, { randomPair } from "./CoordPair"
 import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
 
+const EXTRA_DESTRUCTION = 10; // extra walls to demo after maze completed
 
 export const generateMapUsingRandomDFS = () => {
     const dimensions: CoordPair = {x: 15, y: 15}
@@ -23,7 +24,7 @@ export const generateMapUsingRandomDFS = () => {
         while( i < 4 && (!withinDimensions(nextCell) || visited[nextCell.y][nextCell.x])){
             dir = rotateClockwise(dir);
             nextCell = getAdjacentCell(currentCell, dir);
-            i++
+            i++;
         }
         if (i === 4 || !withinDimensions(nextCell) || visited[nextCell.y][nextCell.x]) { // we've exhausted all options
             stack.pop();
@@ -31,6 +32,14 @@ export const generateMapUsingRandomDFS = () => {
         }
         destroyWall(currentCell, dir, mapDirections);
         push(nextCell);
+    }
+    for (var i = 0; i < EXTRA_DESTRUCTION; i++) {
+        const cell = randomPair(dimensions);
+        let dir: Directions;
+        do {
+            dir = randomSingleDir();
+        } while(!withinDimensions(getAdjacentCell(cell, dir)));
+        destroyWall(cell, dir, mapDirections);
     }
     return mapDirections;
 }
