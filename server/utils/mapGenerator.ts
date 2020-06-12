@@ -5,16 +5,20 @@ import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Dir
 const EXTRA_DESTRUCTION = 10; // extra walls to demo after maze completed
 
 export const generateMapUsingRandomDFS = () => {
-    const dimensions: CoordPair = {x: 15, y: 15}
+    const dimensions: CoordPair = {x: 50, y: 50}
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
-    const startingLocation: CoordPair = randomPair(dimensions);
+    const start: CoordPair = randomPair(dimensions);
     const {mapDirections, visited} = emptyMap(dimensions);
     const withinDimensions = (cell: CoordPair) => cell.x >= 0 && cell.y >= 0 && cell.x < dimensions.x && cell.y < dimensions.y;
+    let deepestNode: { depth: number; cell: CoordPair; } = { depth: 0, cell: start }
     const push = (cell: CoordPair) => {
         stack.push(cell);
         visited[cell.y][cell.x] = true;
+        if (deepestNode.depth < stack.size()){
+            deepestNode = {depth: stack.size(), cell};
+        }
     }
-    push(startingLocation);
+    push(start);
     while (!stack.isEmpty()) {
         const currentCell = stack.peek();
         const firstDir = randomSingleDir();
@@ -33,14 +37,7 @@ export const generateMapUsingRandomDFS = () => {
         destroyWall(currentCell, dir, mapDirections);
         push(nextCell);
     }
-    for (var i = 0; i < EXTRA_DESTRUCTION; i++) {
-        const cell = randomPair(dimensions);
-        let dir: Directions;
-        do {
-            dir = randomSingleDir();
-        } while(!withinDimensions(getAdjacentCell(cell, dir)));
-        destroyWall(cell, dir, mapDirections);
-    }
+    const startPoints = maxDistPair(mapDirections, deepestNode.cell, start);
     return mapDirections;
 }
 
@@ -78,4 +75,8 @@ const destroyWall = (cellA: CoordPair, dir: Directions, mapDirections: Direction
     mapDirections[cellA.y][cellA.x] = dir | mapDirections[cellA.y][cellA.x];
     mapDirections[cellB.y][cellB.x] = getOpposite(dir) | mapDirections[cellB.y][cellB.x];
 } 
+
+const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, start: CoordPair) => {
+    console.log(deepestCell, start);
+}
 

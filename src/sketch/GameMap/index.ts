@@ -18,7 +18,7 @@ export default class GameMap {
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
 		this.cells = mapCells.map((row: Directions[], y: number) =>
 			row.map((column: Directions, x) => 
-				new Cell(column, halfCellSize + x * cellSize, halfCellSize + y * cellSize)
+				new Cell(column, x, y)
 			)
         );
         this.shouldReDraw = true;        

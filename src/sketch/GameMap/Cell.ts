@@ -1,12 +1,14 @@
 import * as p5 from "p5";
 import Directions , { getString, isDown, isLeft, isRight, isUp } from "./directions";
 import { GlobalStore } from "../../containers/Game";
+import CoordPair from "./CoordPair";
 
 export default class Cell {
     public cellType: Directions;
-    private xPos: number;
-    private yPos: number;
+    private gridCoords: CoordPair;
+    private location: CoordPair;
     private halfSize: number;
+    private cellSize: number;
     private cellTypeName: string;
     private up: boolean;
     private down: boolean;
@@ -15,9 +17,10 @@ export default class Cell {
 
     public constructor(cellType: Directions, x: number, y: number){
         this.cellType = cellType;
-        this.xPos = x;
-        this.yPos = y;
+        this.gridCoords = {x, y};
         this.halfSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
+        this.cellSize = GlobalStore.getState().mapState.cellDimensions.cellSize;
+        this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
         this.cellTypeName = getString(cellType);
         this.up = isUp(cellType);
         this.down = isDown(cellType);
@@ -27,7 +30,7 @@ export default class Cell {
 
     public draw: (p: p5) => void = (p) => {
         p.push();
-        p.translate(this.xPos, this.yPos);
+        p.translate(this.location.x, this.location.y);
         // this.drawDebugLines(p);
         // this.drawDebugText(p);
         this.drawWalls(p);
@@ -36,7 +39,7 @@ export default class Cell {
 
     private drawDebugText(p: p5){
         p.textAlign("center","center");
-        p.text(this.cellTypeName, 0, 0);
+        p.text(`(${this.gridCoords.x}, ${this.gridCoords.y})`, 0, 0);
     }
 
     private drawDebugLines: (p: p5) => void = (p) => {
