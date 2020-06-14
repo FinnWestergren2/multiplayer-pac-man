@@ -10,4 +10,6 @@ export const randomPair: (dimensions: CoordPair) => CoordPair = (dimensions) => 
     return {x, y}
 }
 
+export const equal: (a: CoordPair, b: CoordPair) => boolean = (a,b) => a.x === b.x && a.y === b.y;
+
 export default CoordPair;

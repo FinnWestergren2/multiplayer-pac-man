@@ -76,7 +76,6 @@ export const refreshMap: () => ThunkAction<void, mapState, {}, AnyAction> = () =
             dispatch({type: ActionTypes.REFRESH_MAP, payload: response.mapDirections });
             dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(response.mapDirections, getState().mapState.appDimensions)});
             dispatch({type: ActionTypes.UPDATE_PLAYER_LOCATIONS, payload: response.startPoints});
-            console.log(response);
         });
     };
 };

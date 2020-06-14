@@ -17,24 +17,18 @@ export class Player {
     private currentFrame = 0;
 
     public constructor(initX: number, initY: number) {
-        console.log("player: ", initX, initY);
         this.initialPos = { x: initX, y: initY };
         const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
         this.size = SIZE_FACTOR * cellSize;
         this.speed = cellSize * SPEED_FACTOR;
-        this.location = { x: cellSize * this.initialPos.x - halfCellSize, y: cellSize * this.initialPos.y - halfCellSize };
+        this.location = { x: cellSize * this.initialPos.x + halfCellSize, y: cellSize * this.initialPos.y + halfCellSize };
         this.velocity = { ...zeroPair };
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
         this.currentFrame = 0;
     }
-
-    private initialize = () => {
-        console.log("player init");
-    };
-
+    
     public draw: (p: p5) => void = p => {
-        console.log("player size", this.size);
         this.handleUpdate();
         this.location = addPairs(this.location, this.velocity);
         p.push();

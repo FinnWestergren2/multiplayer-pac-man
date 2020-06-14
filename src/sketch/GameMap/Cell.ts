@@ -32,7 +32,7 @@ export default class Cell {
         p.push();
         p.translate(this.location.x, this.location.y);
         // this.drawDebugLines(p);
-        // this.drawDebugText(p);
+        this.drawDebugText(p);
         this.drawWalls(p);
         p.pop();
     }

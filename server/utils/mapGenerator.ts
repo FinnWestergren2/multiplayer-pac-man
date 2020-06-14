@@ -1,11 +1,9 @@
 import Stack from "./Stack"
-import CoordPair, { randomPair } from "./CoordPair"
+import CoordPair, { randomPair, equal } from "./CoordPair"
 import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
 
-const EXTRA_DESTRUCTION = 10; // extra walls to demo after maze completed
-
 export const generateMapUsingRandomDFS = () => {
-    const dimensions: CoordPair = {x: 10, y: 10}
+    const dimensions: CoordPair = {x: 5, y: 5}
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
     const start: CoordPair = randomPair(dimensions);
     const {mapDirections, visited} = emptyMap(dimensions);
@@ -80,16 +78,13 @@ const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair) => {
     let cellA = {...deepestCell};
     let cellB = findFarthest(cellA, mapDirections);
     while (true) {
-        const cellC = findFarthest(cellB, mapDirections);
-        if (cellC.x === cellA.x && cellC.y === cellA.y ) {
+        const cellANext = findFarthest(cellB, mapDirections);
+        const cellBNext = findFarthest(cellANext, mapDirections);
+        if (equal(cellA, cellANext) && equal(cellB, cellBNext)) {
             break;
         }
-        cellA = {...cellC}
-        const cellD = findFarthest(cellA, mapDirections);
-        if (cellD.x === cellB.x && cellD.y === cellB.y ) {
-            break;
-        }
-        cellB = {...cellD}
+        cellA = {...cellANext};
+        cellB = {...cellBNext};
     }
     return { cellA, cellB }
 }
@@ -98,7 +93,7 @@ const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {
     const stack = new Stack<CoordPair>();
     const dimensions = { y: mapDirections.length, x: mapDirections[0].length };
     const canMove = (cell: CoordPair, dir: Directions) => (dir === (mapDirections[cell.y][cell.x] & dir));
-    const {mapDirections: something, visited} = emptyMap(dimensions);
+    const visited = emptyMap(dimensions).visited;
     let deepestNode: { depth: number; cell: CoordPair; } = { depth: 0, cell: start }
     const push = (cell: CoordPair) => {
         stack.push(cell);

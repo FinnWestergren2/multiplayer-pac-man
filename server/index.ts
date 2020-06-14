@@ -52,7 +52,7 @@ app.get('/test2', async (err, res) => {
 
 app.get('/generateMap', async (err, res) => {
 	console.log('called generateMap');
-	const data = generateMapUsingRandomDFS()
+	const data = generateMapUsingRandomDFS();
 	res.status(200);
 	res.send(data);
 	res.end();
