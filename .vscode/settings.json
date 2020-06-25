@@ -1,7 +1,0 @@
-{
-    "files.exclude": {
-        "server-lib": false,
-        "node_modules": false,
-        "public": false
-    }
-}
