@@ -1,5 +1,5 @@
 import * as p5 from "p5";
-import Directions , { getString, isDown, isLeft, isRight, isUp } from "./Direction";
+import Directions , { isDown, isLeft, isRight, isUp } from "./Direction";
 import { GlobalStore } from "../../containers/GameWrapper";
 import CoordPair from "./CoordPair";
 

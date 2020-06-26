@@ -1,10 +1,7 @@
-import * as p5 from "p5";
+import p5 from "p5";
 import Game from "./Game";
-import { updateAppDimensions, refreshMap } from "../ducks/mapState";
+import { updateAppDimensions } from "../ducks/mapState";
 import { GlobalStore } from "../containers/GameWrapper";
-import { Player } from "./Player/Player";
-import { RandomAi } from "./Player/RandomAI";
-import Directions from "./GameMap/Direction";
 
 export default function sketch(p: p5): void {
 	let game: Game;

@@ -1,10 +1,9 @@
 import Cell from "./GameMap/Cell";
-import Directions from "./GameMap/Direction";
+import Directions, { randomSingleDir } from "./GameMap/Direction";
 import p5 from "p5";
 import { GlobalStore } from "../containers/GameWrapper";
 import { refreshMap } from "../ducks/mapState";
 import { Player } from "./Player/Player";
-import { RandomAi } from "./Player/RandomAI";
 
 export default class Game {
     private cells: Cell[][] =[];
@@ -23,7 +22,7 @@ export default class Game {
 			)
         );
 		const { cellA, cellB } = GlobalStore.getState().mapState.playerLocations;
-		this.players = [new Player(cellA.x, cellA.y), new RandomAi(cellB.x, cellB.y)];
+		this.players = [new Player(cellA.x, cellA.y), new Player(cellB.x, cellB.y)];
 		this.bindHumanPlayer(p, this.players[0]);
     }
 
@@ -34,8 +33,11 @@ export default class Game {
     }
 
     public update = (frame: number) => {
+		if (this.players[1] && this.players[1].isCentered()){
+			this.players[1].receiveInput(randomSingleDir());
+		}
         const shouldRollback: boolean = false;
-        this.players.forEach(p => p.updateState(frame, shouldRollback));
+		this.players.forEach(p => p.updateState(frame, shouldRollback));
     }
 
 	private bindHumanPlayer = (p: p5, player: Player) => {

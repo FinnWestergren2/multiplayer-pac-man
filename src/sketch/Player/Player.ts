@@ -79,7 +79,8 @@ export class Player {
     ];
 
     public updateState = (frame: number, rollback: boolean = false) => {
-        if (this.moveTowardsTarget()) { 
+        this.moveTowardsTarget()
+        if (this.isCentered()) { 
             if (this.nextDirection !== Directions.NONE) { // take the queued direction
                 this.currentDirection = this.nextDirection;
                 this.nextDirection = Directions.NONE;
@@ -91,10 +92,25 @@ export class Player {
         this.location = addPairs(this.location, this.velocity);
     }
 
+    private moveTowardsTarget = () => {
+        if (this.currentDirection === Directions.RIGHT && this.canMoveRight()) {
+            this.velocity = { x: this.speed, y: 0 };
+        }
+        if (this.currentDirection === Directions.LEFT && this.canMoveLeft()) {
+            this.velocity = { x: -this.speed, y: 0 };
+        }
+        if (this.currentDirection === Directions.UP && this.canMoveUp()) {
+            this.velocity = { x: 0, y: -this.speed };
+        }
+        if (this.currentDirection === Directions.DOWN && this.canMoveDown()) {
+            this.velocity = { x: 0, y: this.speed };
+        }
+    }
+
     /*
         returns true if the player has hit the center of the target cell
     */
-    protected moveTowardsTarget = () => {
+    public isCentered = () => {
         const target = this.targetLocation();
         const snapX = Math.abs(this.location.x - target.x) < this.speed;
         const snapY = Math.abs(this.location.y - target.y) < this.speed;
@@ -109,23 +125,7 @@ export class Player {
         if (snapX && snapY) {
             return true;
         }
-        if (this.currentDirection === Directions.RIGHT && this.canMoveRight()) {
-            this.velocity = { x: this.speed, y: 0 };
-            return false;
-        }
-        if (this.currentDirection === Directions.LEFT && this.canMoveLeft()) {
-            this.velocity = { x: -this.speed, y: 0 };
-            return false;
-        }
-        if (this.currentDirection === Directions.UP && this.canMoveUp()) {
-            this.velocity = { x: 0, y: -this.speed };
-            return false;
-        }
-        if (this.currentDirection === Directions.DOWN && this.canMoveDown()) {
-            this.velocity = { x: 0, y: this.speed };
-            return false;
-        }
-    }
+    } 
 
     private targetLocation = () => {
         return toLocationCoords(Player.targetCell(this.location, this.currentDirection));
