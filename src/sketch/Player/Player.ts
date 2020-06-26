@@ -29,7 +29,6 @@ export class Player {
     }
 
     public draw: (p: p5) => void = p => {
-        this.updateState();
         p.push();
         p.translate(this.location.x, this.location.y);
         p.fill(255, 0, 0);
