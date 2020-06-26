@@ -1,5 +1,5 @@
-import { GlobalStore } from "../../containers/Game";
-import Directions from "./directions";
+import { GlobalStore } from "../../containers/GameWrapper";
+import Directions from "./Direction";
 
 type CoordPair = { x: number; y: number }
 export const zeroPair = { x: 0, y: 0 };

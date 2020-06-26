@@ -26,7 +26,7 @@ const FlexContainer = styled.div`
 export const GlobalStore = createStore(Reducer, applyMiddleware(thunk));
 
 
-const Game: FunctionComponent = () => {
+const GameWrapper: FunctionComponent = () => {
     return (
         <FlexContainer>
             <P5Wrapper />
@@ -41,4 +41,4 @@ const Game: FunctionComponent = () => {
     );
 };
 
-export default Game;
+export default GameWrapper;

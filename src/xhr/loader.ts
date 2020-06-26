@@ -1,4 +1,4 @@
-import Directions from "../sketch/GameMap/directions";
+import Directions from "../sketch/GameMap/Direction";
 import $ from "jquery";
 import CoordPair from "../sketch/GameMap/CoordPair";
 

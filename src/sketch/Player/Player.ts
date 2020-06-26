@@ -1,6 +1,6 @@
 import p5 from "p5";
-import { GlobalStore } from "../../containers/Game";
-import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/directions";
+import { GlobalStore } from "../../containers/GameWrapper";
+import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/Direction";
 import CoordPair, { zeroPair, addPairs, toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPair";
 
 const SPEED_FACTOR = 0.035;
@@ -27,10 +27,9 @@ export class Player {
         this.nextDirection = Directions.NONE;
         this.currentFrame = 0;
     }
-    
+
     public draw: (p: p5) => void = p => {
-        this.handleUpdate();
-        this.location = addPairs(this.location, this.velocity);
+        this.updateState();
         p.push();
         p.translate(this.location.x, this.location.y);
         p.fill(255, 0, 0);
@@ -39,7 +38,6 @@ export class Player {
         this.currentFrame ++;
         // this.drawDebugInfo(p);
     };
-
 
     public receiveInput(dir: Directions) {
         const allowImediateOverride = 
@@ -81,7 +79,7 @@ export class Player {
         `CurrentDirection: ${getString(this.currentDirection)}`
     ];
 
-    protected handleUpdate = () => {
+    public updateState = (frame: number, rollback: boolean = false) => {
         if (this.moveTowardsTarget()) { 
             if (this.nextDirection !== Directions.NONE) { // take the queued direction
                 this.currentDirection = this.nextDirection;
@@ -91,6 +89,7 @@ export class Player {
                 this.receiveInput(this.currentDirection); // continue the way you were going
             }
         }
+        this.location = addPairs(this.location, this.velocity);
     }
 
     /*
