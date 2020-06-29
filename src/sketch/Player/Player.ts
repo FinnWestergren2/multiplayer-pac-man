@@ -26,7 +26,6 @@ export class Player {
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
         this.id = id;
-        console.log(id);
     }
 
     public draw: (p: p5) => void = p => {
