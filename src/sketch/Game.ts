@@ -11,7 +11,7 @@ export default class Game {
     public constructor(p: p5){
 		// @ts-ignore
 		MapStore.dispatch(refreshMap());
-        MapStore.subscribe(() => this.initialize(p));
+		MapStore.subscribe(() => this.initialize(p));
     }
 
     private initialize = (p: p5) => {
@@ -21,11 +21,12 @@ export default class Game {
 				new Cell(column, x, y)
 			)
         );
-		const { cellA, cellB } = MapStore.getState().playerLocations;
-		this.players = [new Player(cellA.x, cellA.y), new Player(cellB.x, cellB.y)];
+		this.players = Object.keys(MapStore.getState().playerStartPoints).map(key => {
+			const {x, y} = MapStore.getState().playerStartPoints[key];
+			return new Player(x, y, key);
+		})
 		this.bindHumanPlayer(p, this.players[0]);
     }
-
 
     public draw = (p: p5) => {
         this.cells.forEach(row => row.forEach(cell => cell.draw(p)));

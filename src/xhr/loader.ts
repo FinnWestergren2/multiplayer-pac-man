@@ -1,9 +1,9 @@
 import Directions from "../sketch/GameMap/Direction";
 import $ from "jquery";
-import CoordPair from "../sketch/GameMap/CoordPair";
+import { PlayerCoordMap } from "../ducks/sharedTypes";
 
-export const loadMap: () => Promise<{mapDirections: Directions[][], startPoints: {cellA: CoordPair; cellB: CoordPair } }> = async () => {
-    return await new Promise<{mapDirections: Directions[][], startPoints: {cellA: CoordPair; cellB: CoordPair }}>((resolve: any) => {
+export const loadMap: () => Promise<{mapDirections: Directions[][], startPoints: PlayerCoordMap }> = async () => {
+    return await new Promise<{mapDirections: Directions[][], startPoints: PlayerCoordMap}>((resolve: any) => {
         $.getJSON("http://localhost:8080/generateMap", "", resolve);
     });
 };

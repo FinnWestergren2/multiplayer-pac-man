@@ -86,7 +86,7 @@ const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair) => {
         cellA = {...cellANext};
         cellB = {...cellBNext};
     }
-    return { cellA, cellB }
+    return { 'p1': cellA, 'p2': cellB }
 }
 
 const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {

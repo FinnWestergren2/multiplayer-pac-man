@@ -2,13 +2,13 @@ import Directions from "../sketch/GameMap/Direction";
 import { loadMap } from "../xhr/loader";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
-import CoordPair, { zeroPair } from "../sketch/GameMap/CoordPair";
+import { PlayerCoordMap } from "./sharedTypes";
 
 enum ActionTypes {
     REFRESH_MAP = "REFRESH_MAP",
     UPDATE_APP_DIMENSIONS = "UPDATE_APP_DIMENSIONS",
     UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS",
-    UPDATE_PLAYER_LOCATIONS =  "UPDATE_PLAYER_LOCATIONS"
+    UPDATE_PLAYER_START_POINTS =  "UPDATE_PLAYER_START_POINTS"
 }
 
 export type AppDimensions = {
@@ -21,22 +21,17 @@ export type CellDimensions = {
     halfCellSize: number;
 }
 
-type CoordPairPair = {
-    cellA: CoordPair;
-    cellB: CoordPair;
-}
-
 type Action = 
     {type: ActionTypes.REFRESH_MAP; payload: Directions[][]} |
     {type: ActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions} | 
     {type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions} |
-    {type: ActionTypes.UPDATE_PLAYER_LOCATIONS; payload: CoordPairPair}
+    {type: ActionTypes.UPDATE_PLAYER_START_POINTS; payload: PlayerCoordMap}
 
 type mapState = {
     mapCells: Directions[][];
     appDimensions: AppDimensions;
     cellDimensions: CellDimensions;
-    playerLocations: CoordPairPair;
+    playerStartPoints: PlayerCoordMap;
 }
 
 const initialState: mapState = {
@@ -49,10 +44,7 @@ const initialState: mapState = {
         cellSize: 0,
         halfCellSize: 0
     },
-    playerLocations: {
-        cellA: {...zeroPair},
-        cellB: {...zeroPair}
-    }
+    playerStartPoints: {}
 };
 
 export default (state: mapState = initialState, action: Action) => {
@@ -63,8 +55,8 @@ export default (state: mapState = initialState, action: Action) => {
             return { ...state, appDimensions: action.payload };
         case ActionTypes.UPDATE_CELL_DIMENSIONS:
                 return { ...state, cellDimensions: action.payload };
-        case ActionTypes.UPDATE_PLAYER_LOCATIONS:
-            return { ...state, playerLocations: action.payload };
+        case ActionTypes.UPDATE_PLAYER_START_POINTS:
+            return { ...state, playerStartPoints: action.payload };
         default:
             return state;
     }
@@ -75,7 +67,7 @@ export const refreshMap: () => ThunkAction<void, mapState, {}, AnyAction> = () =
         loadMap().then(response => {
             dispatch({type: ActionTypes.REFRESH_MAP, payload: response.mapDirections });
             dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(response.mapDirections, getState().appDimensions)});
-            dispatch({type: ActionTypes.UPDATE_PLAYER_LOCATIONS, payload: response.startPoints});
+            dispatch({type: ActionTypes.UPDATE_PLAYER_START_POINTS, payload: response.startPoints});
         });
     };
 };

@@ -14,9 +14,9 @@ export class Player {
     private speed = 0;
     private currentDirection: Directions = Directions.NONE;
     private nextDirection: Directions = Directions.NONE;
-    private currentFrame = 0;
+    private id: string;
 
-    public constructor(initX: number, initY: number) {
+    public constructor(initX: number, initY: number, id: string) {
         this.initialPos = { x: initX, y: initY };
         const { cellSize, halfCellSize } = MapStore.getState().cellDimensions;
         this.size = SIZE_FACTOR * cellSize;
@@ -25,7 +25,8 @@ export class Player {
         this.velocity = { ...zeroPair };
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
-        this.currentFrame = 0;
+        this.id = id;
+        console.log(id);
     }
 
     public draw: (p: p5) => void = p => {
@@ -34,7 +35,6 @@ export class Player {
         p.fill(255, 0, 0);
         p.ellipse(0, 0, this.size);
         p.pop();
-        this.currentFrame ++;
         // this.drawDebugInfo(p);
     };
 
@@ -80,7 +80,7 @@ export class Player {
 
     public updateState = (frame: number, rollback: boolean = false) => {
         this.moveTowardsTarget()
-        if (this.isCentered()) { 
+        if (this.isCentered()) {
             if (this.nextDirection !== Directions.NONE) { // take the queued direction
                 this.currentDirection = this.nextDirection;
                 this.nextDirection = Directions.NONE;
