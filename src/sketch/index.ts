@@ -1,15 +1,15 @@
 import p5 from "p5";
 import Game from "./Game";
 import { updateAppDimensions } from "../ducks/mapState";
-import { GlobalStore } from "../containers/GameWrapper";
+import { MapStore } from "../containers/GameWrapper";
 
 export default function sketch(p: p5): void {
 	let game: Game;
 
 	p.setup = function (): void {
 		// @ts-ignore
-		GlobalStore.dispatch(updateAppDimensions(600, 600));
-		const {canvasHeight, canvasWidth} = GlobalStore.getState().mapState.appDimensions;
+		MapStore.dispatch(updateAppDimensions(600, 600));
+		const {canvasHeight, canvasWidth} = MapStore.getState().appDimensions;
 		p.createCanvas(canvasWidth, canvasHeight);
 		game = new Game(p);
 	};

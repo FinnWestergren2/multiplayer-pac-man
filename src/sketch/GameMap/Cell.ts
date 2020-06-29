@@ -1,6 +1,6 @@
 import * as p5 from "p5";
 import Directions , { isDown, isLeft, isRight, isUp } from "./Direction";
-import { GlobalStore } from "../../containers/GameWrapper";
+import { MapStore } from "../../containers/GameWrapper";
 import CoordPair from "./CoordPair";
 
 export default class Cell {
@@ -17,8 +17,8 @@ export default class Cell {
     public constructor(cellType: Directions, x: number, y: number){
         this.cellType = cellType;
         this.gridCoords = {x, y};
-        this.halfSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
-        this.cellSize = GlobalStore.getState().mapState.cellDimensions.cellSize;
+        this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
+        this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
         this.up = isUp(cellType);
         this.down = isDown(cellType);

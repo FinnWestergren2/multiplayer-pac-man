@@ -1,7 +1,7 @@
 import Cell from "./GameMap/Cell";
 import Directions, { randomSingleDir } from "./GameMap/Direction";
 import p5 from "p5";
-import { GlobalStore } from "../containers/GameWrapper";
+import { MapStore } from "../containers/GameWrapper";
 import { refreshMap } from "../ducks/mapState";
 import { Player } from "./Player/Player";
 
@@ -10,18 +10,18 @@ export default class Game {
     private players: Player[] = [];
     public constructor(p: p5){
 		// @ts-ignore
-		GlobalStore.dispatch(refreshMap());
-        GlobalStore.subscribe(() => this.initialize(p));
+		MapStore.dispatch(refreshMap());
+        MapStore.subscribe(() => this.initialize(p));
     }
 
     private initialize = (p: p5) => {
-        const mapCells = GlobalStore.getState().mapState.mapCells;
+        const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Directions[], y: number) =>
 			row.map((column: Directions, x) => 
 				new Cell(column, x, y)
 			)
         );
-		const { cellA, cellB } = GlobalStore.getState().mapState.playerLocations;
+		const { cellA, cellB } = MapStore.getState().playerLocations;
 		this.players = [new Player(cellA.x, cellA.y), new Player(cellB.x, cellB.y)];
 		this.bindHumanPlayer(p, this.players[0]);
     }

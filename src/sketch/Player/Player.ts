@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { GlobalStore } from "../../containers/GameWrapper";
+import { MapStore } from "../../containers/GameWrapper";
 import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/Direction";
 import CoordPair, { zeroPair, addPairs, toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPair";
 
@@ -18,7 +18,7 @@ export class Player {
 
     public constructor(initX: number, initY: number) {
         this.initialPos = { x: initX, y: initY };
-        const { cellSize, halfCellSize } = GlobalStore.getState().mapState.cellDimensions;
+        const { cellSize, halfCellSize } = MapStore.getState().cellDimensions;
         this.size = SIZE_FACTOR * cellSize;
         this.speed = cellSize * SPEED_FACTOR;
         this.location = { x: cellSize * this.initialPos.x + halfCellSize, y: cellSize * this.initialPos.y + halfCellSize };

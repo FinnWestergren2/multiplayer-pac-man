@@ -3,7 +3,7 @@ import P5Wrapper from "./P5Wrapper";
 import Octicon, {Sync} from "@primer/octicons-react";
 import styled from "@emotion/styled";
 import { createStore, applyMiddleware } from "redux";
-import Reducer from "../ducks";
+import MapStateReducer from "../ducks/mapState";
 import thunk from "redux-thunk";
 import { refreshMap } from "../ducks/mapState";
 
@@ -23,7 +23,7 @@ const FlexContainer = styled.div`
     }
 `;
 
-export const GlobalStore = createStore(Reducer, applyMiddleware(thunk));
+export const MapStore = createStore(MapStateReducer, applyMiddleware(thunk));
 
 
 const GameWrapper: FunctionComponent = () => {
@@ -32,7 +32,7 @@ const GameWrapper: FunctionComponent = () => {
             <P5Wrapper />
             <span onClick={() => 
                 // @ts-ignore
-                GlobalStore.dispatch(refreshMap())}>
+                MapStore.dispatch(refreshMap())}>
                 <Octicon
                     icon={Sync} 
                     size={20} />

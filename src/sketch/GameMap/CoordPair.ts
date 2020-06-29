@@ -1,4 +1,4 @@
-import { GlobalStore } from "../../containers/GameWrapper";
+import { MapStore } from "../../containers/GameWrapper";
 import Directions from "./Direction";
 
 type CoordPair = { x: number; y: number }
@@ -10,7 +10,7 @@ export const addPairs = (p1: CoordPair, p2: CoordPair) => {
 // these methods could get moved to reselect if we want a performance boost
 export const getCellType = (gridCoords: CoordPair) => {
     try {
-        return GlobalStore.getState().mapState.mapCells[gridCoords.y][gridCoords.x];
+        return MapStore.getState().mapCells[gridCoords.y][gridCoords.x];
     } catch (error) {
         return Directions.NONE;
     }
@@ -18,7 +18,7 @@ export const getCellType = (gridCoords: CoordPair) => {
 
 // returns the absolute center of a cell
 export const toLocationCoords = (gridCoords: CoordPair) => {
-    const halfCellSize = GlobalStore.getState().mapState.cellDimensions.halfCellSize;
+    const halfCellSize = MapStore.getState().cellDimensions.halfCellSize;
     return {
         x: (gridCoords.x) * (halfCellSize * 2) + halfCellSize,
         y: (gridCoords.y) * (halfCellSize * 2) + halfCellSize
@@ -27,7 +27,7 @@ export const toLocationCoords = (gridCoords: CoordPair) => {
 
 // definitely the most expensive method, memoize this first
 export const toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationCoords) => {
-    const factor = 1 / GlobalStore.getState().mapState.cellDimensions.cellSize;
+    const factor = 1 / MapStore.getState().cellDimensions.cellSize;
     return { x: Math.floor(locationCoords.x * factor), y: Math.floor(locationCoords.y * factor) };
 };
 
