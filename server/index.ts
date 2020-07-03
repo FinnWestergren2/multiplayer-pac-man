@@ -1,61 +1,44 @@
-import express from 'express';
-import { json, urlencoded } from 'body-parser';
-import { Server } from 'http';
-import { generateMapUsingRandomDFS } from './utils/mapGenerator';
-import helmet from 'helmet';
-import { promises } from 'fs';
+import http from 'http';
+import nodeStatic from 'node-static';
+import crypto from 'crypto';
 
-const app = express();
-const server = new Server(app);
+const file = new nodeStatic.Server('./');
+const serverId = '258EAFA5-E914–47DA-95CA-C5AB0DC85B11';
 const port = 8080;
-
-app.use(helmet());
-app.use(json());
-app.use(urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
+const server = http.createServer((req, res) => {
+	req.addListener('end', () => file.serve(req, res)).resume();
 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-	res.setHeader('Access-Control-Allow-Methods', 'GET');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept');
-	next();
+	res.setHeader('Access-Control-Allow-Methods', '*');
+	res.setHeader('Access-Control-Allow-Headers', '*');
 });
+server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 
-//pre-flight requests
-app.options('*', function(req, res) {
-	res.send(200);
-});
+const generateHash = (acceptKey: string) => crypto
+	.createHash('sha1')
+	// @ts-ignore
+	.update(acceptKey + serverId, 'binary')
+	.digest('base64');
 
-
-//@ts-ignore
-server.listen(port, (err) => {
-	if (err) {
-		throw err;
+server.on('upgrade', (req, socket) => {
+	// Make sure that we only handle WebSocket upgrade requests
+	if (req.headers['upgrade'] !== 'websocket') {
+		socket.end('HTTP/1.1 400 Bad Request');
+		return;
 	}
-	/* eslint-disable no-console */
-	console.log('Node Endpoints working :)');
+	const acceptKey = req.headers['sec-websocket-key']; // Read the websocket key provided by the client: 
+	const hash = generateHash(acceptKey); // Generate the response value to use in the response: 
+	// Write the HTTP response into an array of response lines: 
+	const responseHeaders = ['HTTP/1.1 101 Web Socket Protocol Handshake', 'Upgrade: WebSocket', 'Connection: Upgrade', `Sec-WebSocket-Accept: ${hash}`];
+	const protocol = req.headers['sec-websocket-protocol']; // Read the subprotocol from the client request headers:
+	const protocols = !protocol ? [] : protocol.split(',').map((s: string) => s.trim());
+	if (protocols.includes('json')) {
+		// Tell the client that we agree to communicate with JSON data
+		responseHeaders.push(`Sec-WebSocket-Protocol: json`);
+	}
+	// Write the response back to the client socket, being sure to append two 
+	// additional newlines so that the browser recognises the end of the response 
+	// header and doesn't continue to wait for more header data: 
+	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
 });
 
-
-app.get('/test1', async (err, res) => {
-	const data = await promises.readFile("./src/server/test/test1.json");
-	res.status(200);
-	res.send(data);
-	res.end();
-});
-
-app.get('/test2', async (err, res) => {
-	const data = await promises.readFile("./src/server/test/test2.json");
-	res.status(200);
-	res.send(data);
-	res.end();
-});
-
-app.get('/generateMap', async (err, res) => {
-	console.log('called generateMap');
-	const data = generateMapUsingRandomDFS();
-	res.status(200);
-	res.send(data);
-	res.end();
-});
-
-export { server };
+server.on('connection', () => console.log("connected"));

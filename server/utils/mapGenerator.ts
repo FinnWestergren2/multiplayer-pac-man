@@ -2,7 +2,7 @@ import Stack from "./Stack"
 import CoordPair, { randomPair, equal } from "./CoordPair"
 import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
 
-export const generateMapUsingRandomDFS = () => {
+export const generateMapUsingRandomDFS = (playerIds: string[]) => {
     const dimensions: CoordPair = {x: 5, y: 5}
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
     const start: CoordPair = randomPair(dimensions);
@@ -35,7 +35,7 @@ export const generateMapUsingRandomDFS = () => {
         destroyWall(currentCell, dir, mapDirections);
         push(nextCell);
     }
-    const startPoints = maxDistPair(mapDirections, deepestNode.cell);
+    const startPoints = maxDistPair(mapDirections, deepestNode.cell, playerIds);
     return { mapDirections, startPoints };
 }
 
@@ -74,7 +74,7 @@ const destroyWall = (cellA: CoordPair, dir: Directions, mapDirections: Direction
     mapDirections[cellB.y][cellB.x] = getOpposite(dir) | mapDirections[cellB.y][cellB.x];
 } 
 
-const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair) => {
+const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, playerIds: string[]) => {
     let cellA = {...deepestCell};
     let cellB = findFarthest(cellA, mapDirections);
     while (true) {
@@ -86,7 +86,7 @@ const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair) => {
         cellA = {...cellANext};
         cellB = {...cellBNext};
     }
-    return { 'p1': cellA, 'p2': cellB }
+    return (new Map([[playerIds[0], cellA], [playerIds[1], cellB]]))
 }
 
 const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {
