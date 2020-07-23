@@ -20,6 +20,9 @@ export default function sketch(p: p5): void {
 		p.background(255);
 		game.draw(p);
 		game.update(p.frameCount);
-		console.log(socket.readyState);
 	};
+
+	p.mouseClicked = () => {
+		socket.send(JSON.stringify({ message: 'test message' }));
+	}
 }

@@ -1,7 +1,7 @@
 import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
-import { handleData } from './serverExtensions';
+import { handleMessage } from './serverExtensions';
 
 const file = new nodeStatic.Server('./');
 const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -36,8 +36,73 @@ server.on('upgrade', function (req, socket) {
 	// additional newlines so that the browser recognises the end of the response 
 	// header and doesn't continue to wait for more header data: 
 	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
-	// socket.on('data', (buffer: Buffer) => handleData(socket, buffer));
+	socket.on('data', (buffer: Buffer) => handleData(socket, buffer));
 });
 
 server.on('connection', () => console.log("connected"));
 server.on('close', () => console.log("closed"));
+
+function handleData(socket: any, buffer: Buffer) {
+	const parsedBuffer: { message: string } = parseBuffer(buffer);
+	if (parsedBuffer) {
+		console.log(parsedBuffer)
+		socket.write(handleMessage(parsedBuffer));
+	} else if (parsedBuffer === null) {
+		console.log('WebSocket connection closed by the client.');
+	}
+}
+
+function parseBuffer (buffer: Buffer) {
+	const firstByte = buffer.readUInt8(0);
+	const isFinalFrame = Boolean((firstByte >>> 7) & 1); // keeping this here in case we need to persist data between frames (shouldn't need to as far as I know)
+	// we can generally ignore reserve bits
+	const [reserved1, reserved2, reserved3] = [Boolean((firstByte >>> 6) & 1), Boolean((firstByte >>> 5) & 1), Boolean((firstByte >>> 4) & 1)];
+	const opCode = firstByte & 15;
+	// This is a connection termination frame 
+	if (opCode === 8) {
+		return null;
+	}
+	// We only care about text frames from this point onward 
+	if (opCode !== 1) {
+		return undefined;
+	}
+	const secondByte = buffer.readUInt8(1);
+	const isMasked = Boolean((secondByte >>> 7) & 1);
+	// Keep track of our current position as we advance through the buffer 
+	let currentOffset = 2; 
+	let payloadLength = secondByte & 127;
+	if (payloadLength > 125) {
+		if (payloadLength === 126) {
+			payloadLength = buffer.readUInt16BE(currentOffset);
+			currentOffset += 2;
+		} else {
+			throw new Error('Large payloads not currently implemented');
+		}
+	}
+
+	// Allocate somewhere to store the final message data
+	// Only unmask the data if the masking bit was set to 1
+	const data = Buffer.alloc(payloadLength);
+
+	let maskingKey: number;
+	if (isMasked) {
+		maskingKey = buffer.readUInt32BE(currentOffset);
+		currentOffset += 4;
+		// Loop through the source buffer one byte at a time, keeping track of which
+		// byte in the masking key to use in the next XOR calculation
+		for (let i = 0, j = 0; i < payloadLength; ++i, j = i % 4) {
+			// Extract the correct byte mask from the masking key
+			const shift = j === 3 ? 0 : (3 - j) << 3;
+			const mask = (shift == 0 ? maskingKey : (maskingKey >>> shift)) & 0xFF;
+			// Read a byte from the source buffer 
+			const source = buffer.readUInt8(currentOffset++);
+			// XOR the source byte and write the result to the data 
+			data.writeUInt8(mask ^ source, i);
+		}
+	}
+	else {
+		buffer.copy(data, 0, currentOffset++);
+	}
+
+	return JSON.parse(data.toString('utf8'));
+}
