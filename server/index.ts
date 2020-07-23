@@ -1,25 +1,22 @@
 import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
+import { handleData } from './serverExtensions';
 
 const file = new nodeStatic.Server('./');
-const serverId = '258EAFA5-E914–47DA-95CA-C5AB0DC85B11';
+const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const port = 8080;
 const server = http.createServer((req, res) => {
 	req.addListener('end', () => file.serve(req, res)).resume();
-	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-	res.setHeader('Access-Control-Allow-Methods', '*');
-	res.setHeader('Access-Control-Allow-Headers', '*');
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
-	// @ts-ignore
-	.update(acceptKey + serverId, 'binary')
+	.update(acceptKey + serverId)
 	.digest('base64');
 
-server.on('upgrade', (req, socket) => {
+server.on('upgrade', function (req, socket) {
 	// Make sure that we only handle WebSocket upgrade requests
 	if (req.headers['upgrade'] !== 'websocket') {
 		socket.end('HTTP/1.1 400 Bad Request');
@@ -39,6 +36,8 @@ server.on('upgrade', (req, socket) => {
 	// additional newlines so that the browser recognises the end of the response 
 	// header and doesn't continue to wait for more header data: 
 	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
+	// socket.on('data', (buffer: Buffer) => handleData(socket, buffer));
 });
 
 server.on('connection', () => console.log("connected"));
+server.on('close', () => console.log("closed"));

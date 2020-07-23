@@ -12,5 +12,7 @@ export default () => {
         console.log(data);
     });
 
+    ws.onclose = () => console.log('closing...');
+
     return ws;
 };
