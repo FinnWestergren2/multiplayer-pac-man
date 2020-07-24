@@ -16,7 +16,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": false,
-    "outDir": "./lib/types",
+    "outDir": "./static/types",
     "declaration": true,
     "emitDeclarationOnly": true
   },

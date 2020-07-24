@@ -1,11 +1,10 @@
 import Stack from "./Stack"
-import { CoordPair, randomPair } from "multiplayer-pac-man-shared"
-import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils } from "multiplayer-pac-man-shared"
 
 export const generateMapUsingRandomDFS = (playerIds: string[]) => {
     const dimensions: CoordPair = {x: 5, y: 5}
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
-    const start: CoordPair = randomPair(dimensions);
+    const start: CoordPair = CoordPairUtils.randomPair(dimensions);
     const {mapDirections, visited} = emptyMap(dimensions);
     const withinDimensions = (cell: CoordPair) => cell.x >= 0 && cell.y >= 0 && cell.x < dimensions.x && cell.y < dimensions.y;
     let deepestNode: { depth: number; cell: CoordPair; } = { depth: 0, cell: start }
@@ -19,12 +18,12 @@ export const generateMapUsingRandomDFS = (playerIds: string[]) => {
     push(start);
     while (!stack.isEmpty()) {
         const currentCell = stack.peek();
-        const firstDir = randomSingleDir();
+        const firstDir = DirectionsUtils.randomSingleDirection();
         let dir = firstDir;
         let nextCell = {...currentCell};
         let i = 0;
         while( i < 4 && (!withinDimensions(nextCell) || visited[nextCell.y][nextCell.x])){
-            dir = rotateClockwise(dir);
+            dir = DirectionsUtils.rotateClockwise(dir);
             nextCell = getAdjacentCell(currentCell, dir);
             i++;
         }
@@ -71,7 +70,7 @@ const getAdjacentCell = (current: CoordPair, dir: Directions) => {
 const destroyWall = (cellA: CoordPair, dir: Directions, mapDirections: Directions[][]) => {
     const cellB = getAdjacentCell(cellA, dir);
     mapDirections[cellA.y][cellA.x] = dir | mapDirections[cellA.y][cellA.x];
-    mapDirections[cellB.y][cellB.x] = getOpposite(dir) | mapDirections[cellB.y][cellB.x];
+    mapDirections[cellB.y][cellB.x] = DirectionsUtils.getOpposite(dir) | mapDirections[cellB.y][cellB.x];
 } 
 
 const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, playerIds: string[]) => {
@@ -80,7 +79,7 @@ const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, play
     while (true) {
         const cellANext = findFarthest(cellB, mapDirections);
         const cellBNext = findFarthest(cellANext, mapDirections);
-        if (equal(cellA, cellANext) && equal(cellB, cellBNext)) {
+        if (CoordPairUtils.equalPairs(cellA, cellANext) && CoordPairUtils.equalPairs(cellB, cellBNext)) {
             break;
         }
         cellA = {...cellANext};
@@ -105,12 +104,12 @@ const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {
     push(start);
     while (!stack.isEmpty()) {
         const currentCell = stack.peek();
-        const firstDir = randomSingleDir();
+        const firstDir = DirectionsUtils.randomSingleDirection();
         let dir = firstDir;
         const nextCell = () => getAdjacentCell(currentCell, dir);
         let i = 0;
         while( i < 4 && (!canMove(currentCell, dir) || visited[nextCell().y][nextCell().x])){
-            dir = rotateClockwise(dir);
+            dir = DirectionsUtils.rotateClockwise(dir);
             i++;
         }
         if (!canMove(currentCell, dir) || visited[nextCell().y][nextCell().x]) { // we've exhausted all options

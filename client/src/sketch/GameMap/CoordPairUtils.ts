@@ -1,11 +1,5 @@
 import { MapStore } from "../../containers/GameWrapper";
-import Directions from "./Direction";
-
-type CoordPair = { x: number; y: number }
-export const zeroPair = { x: 0, y: 0 };
-export const addPairs = (p1: CoordPair, p2: CoordPair) => {
-    return { x: p1.x + p2.x, y: p1.y + p2.y };
-};
+import { CoordPair, Directions } from "shared";
 
 // these methods could get moved to reselect if we want a performance boost
 export const getCellType = (gridCoords: CoordPair) => {
@@ -30,5 +24,3 @@ export const toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationC
     const factor = 1 / MapStore.getState().cellDimensions.cellSize;
     return { x: Math.floor(locationCoords.x * factor), y: Math.floor(locationCoords.y * factor) };
 };
-
-export default CoordPair;

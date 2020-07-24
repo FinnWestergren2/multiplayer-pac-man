@@ -1,9 +1,9 @@
 import Cell from "./GameMap/Cell";
-import Directions, { randomSingleDir } from "./GameMap/Direction";
 import p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
 import { refreshMap } from "../ducks/mapState";
 import { Player } from "./Player/Player";
+import { Directions, DirectionsUtils } from "shared";
 
 export default class Game {
     private cells: Cell[][] =[];
@@ -35,7 +35,7 @@ export default class Game {
 
     public update = (frame: number) => {
 		if (this.players[1] && this.players[1].isCentered()){
-			this.players[1].receiveInput(randomSingleDir());
+			this.players[1].receiveInput(DirectionsUtils.randomSingleDirection());
 		}
         const shouldRollback: boolean = false;
 		this.players.forEach(p => p.updateState(frame, shouldRollback));

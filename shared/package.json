@@ -1,11 +1,11 @@
 {
-  "name": "multiplayer-pac-man-shared",
+  "name": "shared",
   "version": "0.1.0",
   "private": true,
-  "module": "./lib/src/index.js",
-  "types": "./lib/types/index.d.ts",
+  "module": "./static/js",
+  "types": "./static/types",
   "scripts": {
-    "build": "babel src -d lib/src -x .ts && tsc",
+    "build": "babel src -d static/js -x .ts && tsc",
     "tsc" : "tsc"
 
   },

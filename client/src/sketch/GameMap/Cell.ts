@@ -1,7 +1,6 @@
 import * as p5 from "p5";
-import Directions , { isDown, isLeft, isRight, isUp } from "./Direction";
 import { MapStore } from "../../containers/GameWrapper";
-import CoordPair from "./CoordPair";
+import { CoordPair, Directions, DirectionsUtils } from "shared";
 
 export default class Cell {
     public cellType: Directions;
@@ -20,10 +19,10 @@ export default class Cell {
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
-        this.up = isUp(cellType);
-        this.down = isDown(cellType);
-        this.left = isLeft(cellType);
-        this.right = isRight(cellType);
+        this.up = DirectionsUtils.isUp(cellType);
+        this.down = DirectionsUtils.isDown(cellType);
+        this.left = DirectionsUtils.isLeft(cellType);
+        this.right = DirectionsUtils.isRight(cellType);
     }
 
     public draw: (p: p5) => void = (p) => {

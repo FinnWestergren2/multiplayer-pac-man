@@ -1,4 +1,4 @@
-// There are probably libraries for this, but I wanted to see if I could do this myself
+// There are probably libraries for this, but I wanted to do this myself for fun
 
 export default class Stack<T> {
     private stack: T[] = [];

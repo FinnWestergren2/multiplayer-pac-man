@@ -1,15 +1,15 @@
 import p5 from "p5";
 import { MapStore } from "../../containers/GameWrapper";
-import Directions, { isRight, isLeft, isDown, isUp, getString } from "../GameMap/Direction";
-import CoordPair, { zeroPair, addPairs, toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPair";
+import { toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPairUtils";
+import { CoordPair, CoordPairUtils, Directions, DirectionsUtils } from "shared";
 
 const SPEED_FACTOR = 0.035;
 const SIZE_FACTOR = 0.9;
 
 export class Player {
     private initialPos: CoordPair;
-    private location: CoordPair = { ...zeroPair };
-    private velocity: CoordPair = { ...zeroPair };
+    private location: CoordPair = { ...CoordPairUtils.zeroPair };
+    private velocity: CoordPair = { ...CoordPairUtils.zeroPair };
     private size = 0;
     private speed = 0;
     private currentDirection: Directions = Directions.NONE;
@@ -22,7 +22,7 @@ export class Player {
         this.size = SIZE_FACTOR * cellSize;
         this.speed = cellSize * SPEED_FACTOR;
         this.location = { x: cellSize * this.initialPos.x + halfCellSize, y: cellSize * this.initialPos.y + halfCellSize };
-        this.velocity = { ...zeroPair };
+        this.velocity = { ...CoordPairUtils.zeroPair };
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
         this.id = id;
@@ -39,20 +39,20 @@ export class Player {
 
     public receiveInput(dir: Directions) {
         const allowImediateOverride = 
-            (isDown(dir) && this.canMoveDown() && (isUp(this.currentDirection) || this.notMoving()))  ||
-            (isUp(dir) && this.canMoveUp() && (isDown(this.currentDirection) || this.notMoving()))||
-            (isLeft(dir) && this.canMoveLeft() && (isRight(this.currentDirection) || this.notMoving()))||
-            (isRight(dir) && this.canMoveRight() && (isLeft(this.currentDirection) || this.notMoving()));
+            (DirectionsUtils.isDown(dir) && this.canMoveDown() && (DirectionsUtils.isUp(this.currentDirection) || this.notMoving()))  ||
+            (DirectionsUtils.isUp(dir) && this.canMoveUp() && (DirectionsUtils.isDown(this.currentDirection) || this.notMoving()))||
+            (DirectionsUtils.isLeft(dir) && this.canMoveLeft() && (DirectionsUtils.isRight(this.currentDirection) || this.notMoving()))||
+            (DirectionsUtils.isRight(dir) && this.canMoveRight() && (DirectionsUtils.isLeft(this.currentDirection) || this.notMoving()));
         if (allowImediateOverride) {
             this.currentDirection = dir;
             this.nextDirection = Directions.NONE;
             return;
         }
         const allowQueueDirection = 
-            (isDown(dir) && isDown(this.targetCellType())) ||
-            (isUp(dir) && isUp(this.targetCellType())) ||
-            (isRight(dir) && isRight(this.targetCellType())) ||
-            (isLeft(dir) && isLeft(this.targetCellType()));
+            (DirectionsUtils.isDown(dir) && DirectionsUtils.isDown(this.targetCellType())) ||
+            (DirectionsUtils.isUp(dir) && DirectionsUtils.isUp(this.targetCellType())) ||
+            (DirectionsUtils.isRight(dir) && DirectionsUtils.isRight(this.targetCellType())) ||
+            (DirectionsUtils.isLeft(dir) && DirectionsUtils.isLeft(this.targetCellType()));
         if (allowQueueDirection) {
             this.nextDirection = dir;
         }
@@ -74,7 +74,7 @@ export class Player {
         `Left:       ${this.canMoveLeft()}`,
         `Up:        ${this.canMoveUp()}`,
         `Down:   ${this.canMoveDown()}`,
-        `CurrentDirection: ${getString(this.currentDirection)}`
+        `CurrentDirection: ${DirectionsUtils.getString(this.currentDirection)}`
     ];
 
     public updateState = (frame: number, rollback: boolean = false) => {
@@ -88,7 +88,7 @@ export class Player {
                 this.receiveInput(this.currentDirection); // continue the way you were going
             }
         }
-        this.location = addPairs(this.location, this.velocity);
+        this.location = CoordPairUtils.addPairs(this.location, this.velocity);
     }
 
     private moveTowardsTarget = () => {
@@ -130,10 +130,10 @@ export class Player {
         return toLocationCoords(Player.targetCell(this.location, this.currentDirection));
     };
 
-    private canMoveRight = () => isRight(this.currentCellType()) || this.location.x < toLocationCoords(this.currentCell()).x;
-    private canMoveLeft = () => isLeft(this.currentCellType()) || this.location.x > toLocationCoords(this.currentCell()).x;
-    private canMoveUp = () => isUp(this.currentCellType()) || this.location.y > toLocationCoords(this.currentCell()).y;
-    private canMoveDown = () => isDown(this.currentCellType()) || this.location.y < toLocationCoords(this.currentCell()).y;
+    private canMoveRight = () => DirectionsUtils.isRight(this.currentCellType()) || this.location.x < toLocationCoords(this.currentCell()).x;
+    private canMoveLeft = () => DirectionsUtils.isLeft(this.currentCellType()) || this.location.x > toLocationCoords(this.currentCell()).x;
+    private canMoveUp = () => DirectionsUtils.isUp(this.currentCellType()) || this.location.y > toLocationCoords(this.currentCell()).y;
+    private canMoveDown = () => DirectionsUtils.isDown(this.currentCellType()) || this.location.y < toLocationCoords(this.currentCell()).y;
     private notMoving = () => this.velocity.x === 0 && this.velocity.y === 0;
     private currentCellType = () => getCellType(this.currentCell());
     private targetCellType = () => getCellType(Player.targetCell(this.location, this.currentDirection));
@@ -147,22 +147,22 @@ export class Player {
         const currentCellType = getCellType(currentCell);
         switch (direction) {
             case Directions.UP:
-                if (locationCoords.y <= translation.y && isUp(currentCellType)) {
+                if (locationCoords.y <= translation.y && DirectionsUtils.isUp(currentCellType)) {
                     targetCell.y--;
                 }
                 break;
             case Directions.DOWN:
-                if (locationCoords.y >= translation.y && isDown(currentCellType)) {
+                if (locationCoords.y >= translation.y && DirectionsUtils.isDown(currentCellType)) {
                     targetCell.y++;
                 }
                 break;
             case Directions.LEFT:
-                if (locationCoords.x <= translation.x && isLeft(currentCellType)) {
+                if (locationCoords.x <= translation.x && DirectionsUtils.isLeft(currentCellType)) {
                     targetCell.x--;
                 }
                 break;
             case Directions.RIGHT:
-                if (locationCoords.x >= translation.x && isRight(currentCellType)) {
+                if (locationCoords.x >= translation.x && DirectionsUtils.isRight(currentCellType)) {
                     targetCell.x++;
                 }
                 break;

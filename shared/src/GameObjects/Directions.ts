@@ -1,4 +1,4 @@
-enum Directions {
+export enum Directions {
     "NONE" = 0,
     "UP" = 1,
     "RIGHT" = 2,
@@ -6,18 +6,16 @@ enum Directions {
     "LEFT" = 8
 }
 
-export default Directions;
-
-export const isUp: (dir: Directions) => boolean = dir =>
+const isUp: (dir: Directions) => boolean = dir =>
     Directions.UP === (Directions.UP & dir);
-export const isDown: (dir: Directions) => boolean = dir =>
+const isDown: (dir: Directions) => boolean = dir =>
     Directions.DOWN === (Directions.DOWN & dir);
-export const isLeft: (dir: Directions) => boolean = dir =>
+const isLeft: (dir: Directions) => boolean = dir =>
     Directions.LEFT === (Directions.LEFT & dir);
-export const isRight: (dir: Directions) => boolean = dir =>
+const isRight: (dir: Directions) => boolean = dir =>
     Directions.RIGHT === (Directions.RIGHT & dir);
 
-export const getString: (dir: Directions) => string = dir => {
+const getString: (dir: Directions) => string = dir => {
     let out = "";
     if (dir === Directions.NONE) {
         return "NONE";
@@ -37,7 +35,7 @@ export const getString: (dir: Directions) => string = dir => {
     return out.trim();
 };
 
-export const randomSingleDir = () => {
+const randomSingleDirection = () => {
     const randomNum = Math.random() * 4;
     switch (Math.floor(randomNum)) {
         case 0:
@@ -53,7 +51,7 @@ export const randomSingleDir = () => {
     }
 };
 
-export const rotateClockwise = (dir: Directions) => {
+const rotateClockwise = (dir: Directions) => {
     switch (dir) {
         case Directions.UP:
             return Directions.RIGHT;
@@ -68,7 +66,7 @@ export const rotateClockwise = (dir: Directions) => {
     }
 };
 
-export const getOpposite = (dir: Directions) => {
+const getOpposite = (dir: Directions) => {
     switch (dir) {
         case Directions.UP:
             return Directions.DOWN;
@@ -81,5 +79,15 @@ export const getOpposite = (dir: Directions) => {
         default:
             return Directions.NONE;
     }
-}
+};
 
+export const DirectionsUtils = {  
+    isUp,
+    isDown,
+    isLeft,
+    isRight,
+    getString,
+    randomSingleDirection,
+    rotateClockwise,
+    getOpposite
+};

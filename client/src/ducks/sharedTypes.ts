@@ -1,5 +1,4 @@
-import CoordPair from "../sketch/GameMap/CoordPair";
-import Directions from "../sketch/GameMap/Direction";
+import { CoordPair, Directions }from "shared";
 
 type PlayerMap<T> = {
     [key: string]: T;
@@ -7,4 +6,3 @@ type PlayerMap<T> = {
 
 export type PlayerCoordMap = PlayerMap<CoordPair>
 export type PlayerDirectionMap = PlayerMap<Directions>
-

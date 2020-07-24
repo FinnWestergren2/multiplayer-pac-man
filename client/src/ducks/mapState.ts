@@ -1,7 +1,7 @@
-import Directions from "../sketch/GameMap/Direction";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
 import { PlayerCoordMap } from "./sharedTypes";
+import { Directions } from "shared";
 
 enum ActionTypes {
     REFRESH_MAP = "REFRESH_MAP",
