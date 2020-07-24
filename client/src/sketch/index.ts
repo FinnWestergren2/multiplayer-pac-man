@@ -2,7 +2,7 @@ import p5 from "p5";
 import Game from "./Game";
 import { updateAppDimensions } from "../ducks/mapState";
 import { MapStore } from "../containers/GameWrapper";
-import initializeSocket from "../client/socket";
+import initializeSocket from "../socket";
 
 export default function sketch(p: p5): void {
 	let game: Game;
