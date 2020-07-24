@@ -1,5 +1,5 @@
 import Stack from "./Stack"
-import CoordPair, { randomPair, equal } from "./CoordPair"
+import { CoordPair, randomPair } from "multiplayer-pac-man-shared"
 import Directions, { randomSingleDir, rotateClockwise, getOpposite } from "./Direction";
 
 export const generateMapUsingRandomDFS = (playerIds: string[]) => {

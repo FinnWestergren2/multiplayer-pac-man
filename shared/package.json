@@ -1,24 +1,20 @@
 {
-  "name": "multiplayer-pac-man-server",
+  "name": "multiplayer-pac-man-shared",
   "version": "0.1.0",
   "private": true,
+  "module": "./lib/src/index.js",
+  "types": "./lib/types/index.d.ts",
   "scripts": {
-    "build-server": "babel src -d lib -x .ts",
-    "debug-host": "npm run build-server && node --inspect lib",
-    "host": "npm run build-server && node lib"
+    "build": "babel src -d lib/src -x .ts && tsc",
+    "tsc" : "tsc"
+
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/plugin-transform-runtime": "^7.10.1",
     "@babel/preset-typescript": "^7.10.1",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/websocket": "^1.0.0",
-    "crypto": "^1.0.1",
     "eslint": "^6.6.0",
-    "multiplayer-pac-man-shared": "file:../shared",
-    "node-static": "^0.7.11",
-    "typescript": "^3.8.3",
-    "websocket": "^1.0.31"
+    "typescript": "^3.8.3"
   },
   "browserslist": {
     "production": [
