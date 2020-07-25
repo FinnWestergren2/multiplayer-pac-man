@@ -1,15 +1,17 @@
+import { ClientRequest, MessageType, ServerResponse } from "shared";
+
 export default () => {
     const ws = new WebSocket('ws://localhost:8080', ['json', 'xml']);
 
     ws.addEventListener('open', () => {
-        const data = { message: 'Hello from client' }
+        const data: ClientRequest = { type: MessageType.HELLO, payload: null }
         const json = JSON.stringify(data);
         ws.send(json);
     });
     
     ws.addEventListener('message', event => {
-        const data = JSON.parse(event.data);
-        console.log(data.message);
+        const data: ServerResponse = JSON.parse(event.data);
+        console.log(data);
         // TODO do something with this data. Move it to the global store.
     });
 

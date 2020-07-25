@@ -1,5 +1,5 @@
 import Stack from "./Stack"
-import { CoordPair, Directions, CoordPairUtils, DirectionsUtils } from "multiplayer-pac-man-shared"
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils } from "shared"
 
 export const generateMapUsingRandomDFS = (playerIds: string[]) => {
     const dimensions: CoordPair = {x: 5, y: 5}

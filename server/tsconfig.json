@@ -16,8 +16,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react"
+    "outDir": "./static",
+    "declaration": false
   },
   "include": [
     "src", "server"

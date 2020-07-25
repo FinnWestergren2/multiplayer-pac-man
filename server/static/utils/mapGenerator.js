@@ -13,7 +13,7 @@ var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/de
 
 var _Stack = _interopRequireDefault(require("./Stack"));
 
-var _multiplayerPacManShared = require("multiplayer-pac-man-shared");
+var _shared = require("shared");
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -26,7 +26,7 @@ var generateMapUsingRandomDFS = function generateMapUsingRandomDFS(playerIds) {
   };
   var stack = new _Stack.default();
 
-  var start = _multiplayerPacManShared.CoordPairUtils.randomPair(dimensions);
+  var start = _shared.CoordPairUtils.randomPair(dimensions);
 
   var _emptyMap = emptyMap(dimensions),
       mapDirections = _emptyMap.mapDirections,
@@ -58,7 +58,7 @@ var generateMapUsingRandomDFS = function generateMapUsingRandomDFS(playerIds) {
   while (!stack.isEmpty()) {
     var currentCell = stack.peek();
 
-    var firstDir = _multiplayerPacManShared.DirectionsUtils.randomSingleDirection();
+    var firstDir = _shared.DirectionsUtils.randomSingleDirection();
 
     var dir = firstDir;
 
@@ -67,7 +67,7 @@ var generateMapUsingRandomDFS = function generateMapUsingRandomDFS(playerIds) {
     var i = 0;
 
     while (i < 4 && (!withinDimensions(nextCell) || visited[nextCell.y][nextCell.x])) {
-      dir = _multiplayerPacManShared.DirectionsUtils.rotateClockwise(dir);
+      dir = _shared.DirectionsUtils.rotateClockwise(dir);
       nextCell = getAdjacentCell(currentCell, dir);
       i++;
     }
@@ -157,29 +157,29 @@ var emptyMap = function emptyMap(dimensions) {
   }
 
   return {
-    mapDirections: Array.from(fillEmptyMap(_multiplayerPacManShared.Directions.NONE)),
+    mapDirections: Array.from(fillEmptyMap(_shared.Directions.NONE)),
     visited: Array.from(fillEmptyMap(false))
   };
 };
 
 var getAdjacentCell = function getAdjacentCell(current, dir) {
   switch (dir) {
-    case _multiplayerPacManShared.Directions.UP:
+    case _shared.Directions.UP:
       return _objectSpread(_objectSpread({}, current), {}, {
         y: current.y - 1
       });
 
-    case _multiplayerPacManShared.Directions.DOWN:
+    case _shared.Directions.DOWN:
       return _objectSpread(_objectSpread({}, current), {}, {
         y: current.y + 1
       });
 
-    case _multiplayerPacManShared.Directions.LEFT:
+    case _shared.Directions.LEFT:
       return _objectSpread(_objectSpread({}, current), {}, {
         x: current.x - 1
       });
 
-    case _multiplayerPacManShared.Directions.RIGHT:
+    case _shared.Directions.RIGHT:
       return _objectSpread(_objectSpread({}, current), {}, {
         x: current.x + 1
       });
@@ -192,7 +192,7 @@ var getAdjacentCell = function getAdjacentCell(current, dir) {
 var destroyWall = function destroyWall(cellA, dir, mapDirections) {
   var cellB = getAdjacentCell(cellA, dir);
   mapDirections[cellA.y][cellA.x] = dir | mapDirections[cellA.y][cellA.x];
-  mapDirections[cellB.y][cellB.x] = _multiplayerPacManShared.DirectionsUtils.getOpposite(dir) | mapDirections[cellB.y][cellB.x];
+  mapDirections[cellB.y][cellB.x] = _shared.DirectionsUtils.getOpposite(dir) | mapDirections[cellB.y][cellB.x];
 };
 
 var maxDistPair = function maxDistPair(mapDirections, deepestCell, playerIds) {
@@ -204,7 +204,7 @@ var maxDistPair = function maxDistPair(mapDirections, deepestCell, playerIds) {
     var cellANext = findFarthest(cellB, mapDirections);
     var cellBNext = findFarthest(cellANext, mapDirections);
 
-    if (_multiplayerPacManShared.CoordPairUtils.equalPairs(cellA, cellANext) && _multiplayerPacManShared.CoordPairUtils.equalPairs(cellB, cellBNext)) {
+    if (_shared.CoordPairUtils.equalPairs(cellA, cellANext) && _shared.CoordPairUtils.equalPairs(cellB, cellBNext)) {
       break;
     }
 
@@ -249,7 +249,7 @@ var findFarthest = function findFarthest(start, mapDirections) {
   var _loop = function _loop() {
     var currentCell = stack.peek();
 
-    var firstDir = _multiplayerPacManShared.DirectionsUtils.randomSingleDirection();
+    var firstDir = _shared.DirectionsUtils.randomSingleDirection();
 
     var dir = firstDir;
 
@@ -260,7 +260,7 @@ var findFarthest = function findFarthest(start, mapDirections) {
     var i = 0;
 
     while (i < 4 && (!canMove(currentCell, dir) || visited[nextCell().y][nextCell().x])) {
-      dir = _multiplayerPacManShared.DirectionsUtils.rotateClockwise(dir);
+      dir = _shared.DirectionsUtils.rotateClockwise(dir);
       i++;
     }
 

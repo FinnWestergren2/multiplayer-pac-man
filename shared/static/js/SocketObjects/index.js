@@ -10,4 +10,5 @@ exports.MessageType = MessageType;
 (function (MessageType) {
   MessageType["PING"] = "PING";
   MessageType["PONG"] = "PONG";
+  MessageType["HELLO"] = "HELLO";
 })(MessageType || (exports.MessageType = MessageType = {}));

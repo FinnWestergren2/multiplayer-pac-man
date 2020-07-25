@@ -14,5 +14,12 @@ function handleMessage(message) {
         type: _shared.MessageType.PONG,
         payload: new Date().getTime() - message.payload
       };
+
+    case _shared.MessageType.HELLO:
+    default:
+      return {
+        type: _shared.MessageType.HELLO,
+        payload: null
+      };
   }
 }
