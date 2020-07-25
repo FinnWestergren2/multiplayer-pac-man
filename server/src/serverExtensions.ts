@@ -1,7 +1,8 @@
-type CustomSocketObject = { // todo: make custom protocol library with types and everything that can be shared between client and server
-	message: string
-}
+import { ClientRequest, MessageType, ServerResponse } from "shared";
 
-export function handleMessage(socketObject: CustomSocketObject){
-	return 'echo: ' + socketObject.message
+export function handleMessage(message: ClientRequest): ServerResponse {
+	switch(message.type) {
+		case MessageType.PING:
+			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload };
+	}
 }

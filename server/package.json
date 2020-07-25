@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build-server": "babel src -d lib -x .ts",
-    "debug-host": "npm run build-server && node --inspect lib",
-    "host": "npm run build-server && node lib"
+    "build-server": "babel src -d static -x .ts",
+    "debug-host": "npm run build-server && node --inspect static",
+    "host": "npm run build-server && node static"
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",
@@ -16,7 +16,6 @@
     "@types/websocket": "^1.0.0",
     "crypto": "^1.0.1",
     "eslint": "^6.6.0",
-    "multiplayer-pac-man-shared": "file:../shared",
     "node-static": "^0.7.11",
     "shared": "file:../shared",
     "typescript": "^3.8.3",

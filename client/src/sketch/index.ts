@@ -3,6 +3,7 @@ import Game from "./Game";
 import { updateAppDimensions } from "../ducks/mapState";
 import { MapStore } from "../containers/GameWrapper";
 import initializeSocket from "../socket";
+import { ClientRequest, MessageType } from "shared";
 
 export default function sketch(p: p5): void {
 	let game: Game;
@@ -23,6 +24,7 @@ export default function sketch(p: p5): void {
 	};
 
 	p.mouseClicked = () => {
-		socket.send(JSON.stringify({ message: 'test message' }));
+		const request: ClientRequest = { type: MessageType.PING, payload: (new Date()).getTime()}
+		socket.send(JSON.stringify(request));
 	}
 }

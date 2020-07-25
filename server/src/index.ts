@@ -2,6 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage } from './serverExtensions';
+import { ServerResponse, ClientRequest } from 'shared';
 
 const file = new nodeStatic.Server('./');
 const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -43,16 +44,16 @@ server.on('connection', () => console.log("connected"));
 server.on('close', () => console.log("closed"));
 
 function handleData(socket: any, buffer: Buffer) {
-	const parsedBuffer: { message: string } = parseBuffer(buffer);
+	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
 		console.log(parsedBuffer)
-		socket.write(constructReply({ message: handleMessage(parsedBuffer) }));
+		socket.write(constructReply(handleMessage(parsedBuffer)));
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 	}
 }
 
-function parseBuffer (buffer: Buffer) {
+function parseBuffer (buffer: Buffer): ClientRequest | null | undefined {
 	const firstByte = buffer.readUInt8(0);
 	const isFinalFrame = Boolean((firstByte >>> 7) & 1); // keeping this here in case we need to persist data between frames (shouldn't need to as far as I know)
 	// we can generally ignore reserve bits
@@ -108,9 +109,9 @@ function parseBuffer (buffer: Buffer) {
 
 
 	
-function constructReply(data: { message: string }) {
+function constructReply(message: ServerResponse) {
 	// Convert the data to JSON and copy it into a buffer
-	const json = JSON.stringify(data)
+	const json = JSON.stringify(message)
 	const jsonByteLength = Buffer.byteLength(json);
 	// Note: we're not supporting > 65535 byte payloads at this stage 
 	const lengthByteCount = jsonByteLength < 126 ? 0 : 2;
