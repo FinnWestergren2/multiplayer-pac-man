@@ -5,7 +5,7 @@
 
 # production
 /build
-server/lib
+server/static
 
 # misc
 .DS_Store
