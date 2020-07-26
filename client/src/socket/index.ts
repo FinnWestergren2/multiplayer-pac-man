@@ -1,4 +1,5 @@
 import { ClientRequest, MessageType, ServerResponse } from "shared";
+import { handleMessage } from "./clientExtensions";
 
 export default () => {
     const ws = new WebSocket('ws://localhost:8080', ['json', 'xml']);
@@ -11,8 +12,7 @@ export default () => {
     
     ws.addEventListener('message', event => {
         const data: ServerResponse = JSON.parse(event.data);
-        console.log(data);
-        // TODO do something with this data. Move it to the global store.
+        handleMessage(data);
     });
 
     ws.onclose = () => console.log('closing...');

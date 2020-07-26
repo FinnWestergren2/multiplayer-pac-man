@@ -7,6 +7,8 @@ exports.handleMessage = handleMessage;
 
 var _shared = require("shared");
 
+var _mapGenerator = require("./utils/mapGenerator");
+
 function handleMessage(message) {
   switch (message.type) {
     case _shared.MessageType.PING:
@@ -16,10 +18,25 @@ function handleMessage(message) {
       };
 
     case _shared.MessageType.HELLO:
-    default:
       return {
         type: _shared.MessageType.HELLO,
         payload: null
       };
+
+    case _shared.MessageType.MAP_REQUEST:
+      return {
+        type: _shared.MessageType.MAP_RESPONSE,
+        payload: getCurrentMap(message.payload)
+      };
+
+    default:
+      return {
+        type: _shared.MessageType.INVALID,
+        payload: null
+      };
   }
 }
+
+var getCurrentMap = function getCurrentMap(pIds) {
+  return (0, _mapGenerator.generateMapUsingRandomDFS)(pIds);
+};

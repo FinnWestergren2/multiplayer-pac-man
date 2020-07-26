@@ -8,7 +8,10 @@ var MessageType;
 exports.MessageType = MessageType;
 
 (function (MessageType) {
-  MessageType["PING"] = "PING";
-  MessageType["PONG"] = "PONG";
-  MessageType["HELLO"] = "HELLO";
+  MessageType[MessageType["HELLO"] = 0] = "HELLO";
+  MessageType[MessageType["PING"] = 1] = "PING";
+  MessageType[MessageType["PONG"] = 2] = "PONG";
+  MessageType[MessageType["MAP_REQUEST"] = 3] = "MAP_REQUEST";
+  MessageType[MessageType["MAP_RESPONSE"] = 4] = "MAP_RESPONSE";
+  MessageType[MessageType["INVALID"] = 5] = "INVALID";
 })(MessageType || (exports.MessageType = MessageType = {}));

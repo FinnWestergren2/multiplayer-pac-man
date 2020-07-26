@@ -21,8 +21,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 var generateMapUsingRandomDFS = function generateMapUsingRandomDFS(playerIds) {
   var dimensions = {
-    x: 5,
-    y: 5
+    x: 7,
+    y: 7
   };
   var stack = new _Stack.default();
 
@@ -82,10 +82,10 @@ var generateMapUsingRandomDFS = function generateMapUsingRandomDFS(playerIds) {
     push(nextCell);
   }
 
-  var startPoints = maxDistPair(mapDirections, deepestNode.cell, playerIds);
+  var startLocations = maxDistPair(mapDirections, deepestNode.cell, playerIds);
   return {
-    mapDirections: mapDirections,
-    startPoints: startPoints
+    map: mapDirections,
+    startLocations: startLocations
   };
 };
 
@@ -196,6 +196,8 @@ var destroyWall = function destroyWall(cellA, dir, mapDirections) {
 };
 
 var maxDistPair = function maxDistPair(mapDirections, deepestCell, playerIds) {
+  var _ref;
+
   var cellA = _objectSpread({}, deepestCell);
 
   var cellB = findFarthest(cellA, mapDirections);
@@ -212,7 +214,13 @@ var maxDistPair = function maxDistPair(mapDirections, deepestCell, playerIds) {
     cellB = _objectSpread({}, cellBNext);
   }
 
-  return new Map([[playerIds[0], cellA], [playerIds[1], cellB]]);
+  return _ref = {}, (0, _defineProperty2.default)(_ref, playerIds[0], {
+    location: cellA,
+    direction: _shared.Directions.NONE
+  }), (0, _defineProperty2.default)(_ref, playerIds[1], {
+    location: cellB,
+    direction: _shared.Directions.NONE
+  }), _ref;
 };
 
 var findFarthest = function findFarthest(start, mapDirections) {

@@ -9,8 +9,6 @@ export default class Game {
     private cells: Cell[][] =[];
     private players: Player[] = [];
     public constructor(p: p5){
-		// @ts-ignore
-		MapStore.dispatch(refreshMap());
 		MapStore.subscribe(() => this.initialize(p));
     }
 
@@ -22,7 +20,7 @@ export default class Game {
 			)
         );
 		this.players = Object.keys(MapStore.getState().playerStartPoints).map(key => {
-			const {x, y} = MapStore.getState().playerStartPoints[key];
+			const {x, y} = MapStore.getState().playerStartPoints[key].location;
 			return new Player(x, y, key);
 		})
 		this.bindHumanPlayer(p, this.players[0]);

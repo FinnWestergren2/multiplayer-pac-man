@@ -1,8 +1,8 @@
 import Stack from "./Stack"
-import { CoordPair, Directions, CoordPairUtils, DirectionsUtils } from "shared"
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatusMap, MapResponse } from "shared"
 
-export const generateMapUsingRandomDFS = (playerIds: string[]) => {
-    const dimensions: CoordPair = {x: 5, y: 5}
+export const generateMapUsingRandomDFS: (playerIds: string[]) => MapResponse = (playerIds) => {
+    const dimensions: CoordPair = {x: 7, y: 7}
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
     const start: CoordPair = CoordPairUtils.randomPair(dimensions);
     const {mapDirections, visited} = emptyMap(dimensions);
@@ -34,8 +34,8 @@ export const generateMapUsingRandomDFS = (playerIds: string[]) => {
         destroyWall(currentCell, dir, mapDirections);
         push(nextCell);
     }
-    const startPoints = maxDistPair(mapDirections, deepestNode.cell, playerIds);
-    return { mapDirections, startPoints };
+    const startLocations = maxDistPair(mapDirections, deepestNode.cell, playerIds);
+    return { map: mapDirections, startLocations };
 }
 
 const emptyMap = (dimensions: CoordPair) => {
@@ -85,7 +85,10 @@ const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, play
         cellA = {...cellANext};
         cellB = {...cellBNext};
     }
-    return (new Map([[playerIds[0], cellA], [playerIds[1], cellB]]))
+    return { 
+        [playerIds[0]]: { location: cellA, direction: Directions.NONE },
+        [playerIds[1]]: { location: cellB, direction: Directions.NONE }
+    }
 }
 
 const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {

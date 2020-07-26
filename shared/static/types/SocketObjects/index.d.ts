@@ -1,7 +1,11 @@
+import { Directions, PlayerStatusMap } from "../GameObjects";
 export declare enum MessageType {
-    PING = "PING",
-    PONG = "PONG",
-    HELLO = "HELLO"
+    HELLO = 0,
+    PING = 1,
+    PONG = 2,
+    MAP_REQUEST = 3,
+    MAP_RESPONSE = 4,
+    INVALID = 5
 }
 export declare type ClientRequest = {
     type: MessageType.PING;
@@ -9,6 +13,9 @@ export declare type ClientRequest = {
 } | {
     type: MessageType.HELLO;
     payload: null;
+} | {
+    type: MessageType.MAP_REQUEST;
+    payload: string[];
 };
 export declare type ServerResponse = {
     type: MessageType.PONG;
@@ -16,4 +23,14 @@ export declare type ServerResponse = {
 } | {
     type: MessageType.HELLO;
     payload: null;
+} | {
+    type: MessageType.MAP_RESPONSE;
+    payload: MapResponse;
+} | {
+    type: MessageType.INVALID;
+    payload: null;
+};
+export declare type MapResponse = {
+    map: Directions[][];
+    startLocations: PlayerStatusMap;
 };

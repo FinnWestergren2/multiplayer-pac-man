@@ -6,6 +6,8 @@ import { createStore, applyMiddleware } from "redux";
 import MapStateReducer from "../ducks/mapState";
 import thunk from "redux-thunk";
 import { refreshMap } from "../ducks/mapState";
+import initializeSocket from "../socket";
+import { requestMap } from "../socket/clientExtensions";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -24,15 +26,14 @@ const FlexContainer = styled.div`
 `;
 
 export const MapStore = createStore(MapStateReducer, applyMiddleware(thunk));
+export const ClientSocket = initializeSocket();
 
 
 const GameWrapper: FunctionComponent = () => {
     return (
         <FlexContainer>
             <P5Wrapper />
-            <span onClick={() => 
-                // @ts-ignore
-                MapStore.dispatch(refreshMap())}>
+            <span onClick={requestMap}>
                 <Octicon
                     icon={Sync} 
                     size={20} />
