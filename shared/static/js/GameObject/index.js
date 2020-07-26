@@ -4,38 +4,38 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _GameObject = require("./GameObject");
+var _CoordPair = require("./CoordPair");
 
-Object.keys(_GameObject).forEach(function (key) {
+Object.keys(_CoordPair).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _GameObject[key];
+      return _CoordPair[key];
     }
   });
 });
 
-var _SocketObject = require("./SocketObject");
+var _Directions = require("./Directions");
 
-Object.keys(_SocketObject).forEach(function (key) {
+Object.keys(_Directions).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _SocketObject[key];
+      return _Directions[key];
     }
   });
 });
 
-var _ducks = require("./ducks");
+var _PlayerStatus = require("./PlayerStatus");
 
-Object.keys(_ducks).forEach(function (key) {
+Object.keys(_PlayerStatus).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _ducks[key];
+      return _PlayerStatus[key];
     }
   });
 });

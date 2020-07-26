@@ -1,12 +1,11 @@
-import { AnyAction } from "redux";
-import { Directions, MapResponse, PlayerStatusMap } from "shared";
-import { Dispatch } from "react";
+import { AnyAction, Dispatch } from "redux";
+import { Directions, MapResponse, PlayerStatusMap } from "..";
 
 enum ActionTypes {
     REFRESH_MAP = "REFRESH_MAP",
     UPDATE_APP_DIMENSIONS = "UPDATE_APP_DIMENSIONS",
     UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS",
-    UPDATE_PLAYER_START_POINTS =  "UPDATE_PLAYER_START_POINTS"
+    UPDATE_PLAYER_STATUS =  "UPDATE_PLAYER_STATUS"
 }
 
 export type AppDimensions = {
@@ -23,7 +22,7 @@ type Action =
     {type: ActionTypes.REFRESH_MAP; payload: Directions[][]} |
     {type: ActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions} | 
     {type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions} |
-    {type: ActionTypes.UPDATE_PLAYER_START_POINTS; payload: PlayerStatusMap}
+    {type: ActionTypes.UPDATE_PLAYER_STATUS; payload: PlayerStatusMap}
 
 type mapState = {
     mapCells: Directions[][];
@@ -45,7 +44,7 @@ const initialState: mapState = {
     playerStartPoints: {}
 };
 
-export default (state: mapState = initialState, action: Action) => {
+export const mapStateReducer = (state: mapState = initialState, action: Action) => {
     switch (action.type) {
         case ActionTypes.REFRESH_MAP:
             return { ...state, mapCells: action.payload };
@@ -53,7 +52,7 @@ export default (state: mapState = initialState, action: Action) => {
             return { ...state, appDimensions: action.payload };
         case ActionTypes.UPDATE_CELL_DIMENSIONS:
                 return { ...state, cellDimensions: action.payload };
-        case ActionTypes.UPDATE_PLAYER_START_POINTS:
+        case ActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStartPoints: action.payload };
         default:
             return state;
@@ -64,7 +63,7 @@ export const refreshMap = (mapOnServer: MapResponse) => {
     return function(dispatch: Dispatch<AnyAction>, getState: () => mapState) {
         dispatch({type: ActionTypes.REFRESH_MAP, payload: mapOnServer.map });
         dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapOnServer.map, getState().appDimensions)});
-        dispatch({type: ActionTypes.UPDATE_PLAYER_START_POINTS, payload: mapOnServer.startLocations});
+        dispatch({type: ActionTypes.UPDATE_PLAYER_STATUS, payload: mapOnServer.startLocations});
     };
 };
 

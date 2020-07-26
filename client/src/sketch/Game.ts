@@ -1,7 +1,6 @@
 import Cell from "./GameMap/Cell";
 import p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { refreshMap } from "../ducks/mapState";
 import { Player } from "./Player/Player";
 import { Directions, DirectionsUtils } from "shared";
 

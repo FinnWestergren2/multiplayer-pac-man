@@ -3,11 +3,10 @@ import P5Wrapper from "./P5Wrapper";
 import Octicon, {Sync} from "@primer/octicons-react";
 import styled from "@emotion/styled";
 import { createStore, applyMiddleware } from "redux";
-import MapStateReducer from "../ducks/mapState";
 import thunk from "redux-thunk";
-import { refreshMap } from "../ducks/mapState";
 import initializeSocket from "../socket";
 import { requestMap } from "../socket/clientExtensions";
+import { mapStateReducer } from "shared";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -25,7 +24,7 @@ const FlexContainer = styled.div`
     }
 `;
 
-export const MapStore = createStore(MapStateReducer, applyMiddleware(thunk));
+export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const ClientSocket = initializeSocket();
 
 

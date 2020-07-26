@@ -1,6 +1,6 @@
 import { MessageType, ServerResponse, ClientRequest } from "shared";
 import { MapStore, ClientSocket } from "../containers/GameWrapper";
-import { refreshMap } from "../ducks/mapState";
+import { refreshMap } from "shared";
 
 export function handleMessage(message: ServerResponse): void {
     switch (message.type) {

@@ -1,2 +1,3 @@
-export * from './GameObjects';
-export * from './SocketObjects';
+export * from './GameObject';
+export * from './SocketObject';
+export * from './ducks';

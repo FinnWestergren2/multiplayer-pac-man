@@ -1,8 +1,7 @@
 import p5 from "p5";
 import Game from "./Game";
-import { updateAppDimensions } from "../ducks/mapState";
-import { MapStore, ClientSocket } from "../containers/GameWrapper";
-import { ClientRequest, MessageType } from "shared";
+import { updateAppDimensions } from "shared";
+import { MapStore } from "../containers/GameWrapper";
 import { pingServer } from "../socket/clientExtensions";
 
 export default function sketch(p: p5): void {

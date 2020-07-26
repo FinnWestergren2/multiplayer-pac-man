@@ -1,5 +1,5 @@
 import { ClientRequest, MessageType, ServerResponse, MapResponse } from "shared";
-import { generateMapUsingRandomDFS } from "./utils/mapGenerator";
+import { generateMapUsingRandomDFS } from "./mapGenerator";
 
 export function handleMessage(message: ClientRequest): ServerResponse {
 	switch(message.type) {

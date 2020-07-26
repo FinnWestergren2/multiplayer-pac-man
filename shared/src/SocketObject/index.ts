@@ -1,4 +1,4 @@
-import { Directions, PlayerStatusMap } from "../GameObjects"
+import { Directions, PlayerStatusMap } from "../GameObject"
 
 export enum MessageType {
     HELLO,
