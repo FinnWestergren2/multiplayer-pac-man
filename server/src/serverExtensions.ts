@@ -1,4 +1,4 @@
-import { ClientRequest, MessageType, ServerResponse, MapResponse, refreshMap } from "shared";
+import { ClientRequest, MessageType, ServerResponse, MapResponse, refreshMap, updatePlayerStatus } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore } from ".";
 
@@ -10,6 +10,10 @@ export function handleMessage(message: ClientRequest): ServerResponse {
 			return { type: MessageType.HELLO, payload: null };
 		case MessageType.MAP_REQUEST:
 			return { type: MessageType.MAP_RESPONSE, payload: getCurrentMap() };
+		case MessageType.PLAYER_STATUS_UPDATE:
+			//@ts-ignore
+			MapStore.dispatch(updatePlayerStatus(message.payload.playerId, message.payload.status));
+			return { type: MessageType.PLAYER_STATUS_UPDATE, payload: MapStore.getState().playerStatusMap };
 		default:
 			return { type: MessageType.INVALID, payload: null };
 	}

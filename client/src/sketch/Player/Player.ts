@@ -1,7 +1,7 @@
 import p5 from "p5";
 import { MapStore } from "../../containers/GameWrapper";
 import { toLocationCoords, getCellType, toGridCoords } from "../GameMap/CoordPairUtils";
-import { CoordPair, CoordPairUtils, Directions, DirectionsUtils } from "shared";
+import { CoordPair, CoordPairUtils, Directions, DirectionsUtils, updatePlayerStatus } from "shared";
 
 const SPEED_FACTOR = 0.035;
 const SIZE_FACTOR = 0.9;
@@ -17,6 +17,7 @@ export class Player {
     private id: string;
 
     public constructor(initX: number, initY: number, id: string) {
+        console.log('init');
         this.initialPos = { x: initX, y: initY };
         const { cellSize, halfCellSize } = MapStore.getState().cellDimensions;
         this.size = SIZE_FACTOR * cellSize;
@@ -56,7 +57,10 @@ export class Player {
         if (allowQueueDirection) {
             this.nextDirection = dir;
         }
-        
+        // @ts-ignore
+        MapStore.dispatch(updatePlayerStatus(this.id, {
+            location: this.location,
+            direction: this.currentDirection } ));
     }
 
     private drawDebugInfo(p: p5) {

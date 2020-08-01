@@ -1,4 +1,4 @@
-import { MessageType, ServerResponse, ClientRequest } from "shared";
+import { MessageType, ServerResponse, ClientRequest, updatePlayerStatus } from "shared";
 import { MapStore, ClientSocket } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
@@ -13,6 +13,10 @@ export function handleMessage(message: ServerResponse): void {
         case MessageType.MAP_RESPONSE:
             // @ts-ignore
             MapStore.dispatch(refreshMap(message.payload));
+            return;
+        case MessageType.PLAYER_STATUS_UPDATE:
+            // @ts-ignore
+            MapStore.dispatch(updatePlayerStatus(message.payload));
             return;
         case MessageType.INVALID:
             console.log('sent an invalid message to server')

@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateAppDimensions = exports.refreshMap = exports.mapStateReducer = void 0;
+exports.updatePlayerStatus = exports.updateAppDimensions = exports.refreshMap = exports.mapStateReducer = void 0;
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
@@ -34,7 +34,7 @@ var initialState = {
     cellSize: 0,
     halfCellSize: 0
   },
-  playerStatus: {}
+  playerStatusMap: {}
 };
 
 var mapStateReducer = function mapStateReducer() {
@@ -59,7 +59,7 @@ var mapStateReducer = function mapStateReducer() {
 
     case ActionTypes.UPDATE_PLAYER_STATUS:
       return _objectSpread(_objectSpread({}, state), {}, {
-        playerStartPoints: action.payload
+        playerStatusMap: _objectSpread(_objectSpread({}, state.playerStatusMap), {}, (0, _defineProperty2.default)({}, action.payload.playerId, action.payload.status))
       });
 
     default:
@@ -97,6 +97,20 @@ var updateAppDimensions = function updateAppDimensions(width, height) {
 };
 
 exports.updateAppDimensions = updateAppDimensions;
+
+var updatePlayerStatus = function updatePlayerStatus(playerId, newStatus) {
+  return function (dispatch) {
+    dispatch({
+      type: ActionTypes.UPDATE_PLAYER_STATUS,
+      payload: {
+        playerId: playerId,
+        status: newStatus
+      }
+    });
+  };
+};
+
+exports.updatePlayerStatus = updatePlayerStatus;
 
 var generateCellDimensions = function generateCellDimensions(data, appDimensions) {
   var size = Math.min((appDimensions.canvasWidth - 1) / Math.max.apply(Math, (0, _toConsumableArray2.default)(data.map(function (r) {

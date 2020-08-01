@@ -8,7 +8,7 @@ export default class Game {
     private cells: Cell[][] =[];
     private players: Player[] = [];
     public constructor(p: p5){
-		MapStore.subscribe(() => this.initialize(p));
+		this.initialize(p);
     }
 
     private initialize = (p: p5) => {
