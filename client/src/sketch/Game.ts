@@ -18,25 +18,18 @@ export default class Game {
 				new Cell(column, x, y)
 			)
         );
-		this.players = Object.keys(MapStore.getState().playerStartPoints).map(key => {
-			const {x, y} = MapStore.getState().playerStartPoints[key].location;
-			return new Player(x, y, key);
-		})
+		this.players = [new Player(0, 0, 'p1')];
 		this.bindHumanPlayer(p, this.players[0]);
-    }
+    };
 
     public draw = (p: p5) => {
         this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
 		this.players.forEach(pl => pl.draw(p));
-    }
+    };
 
-    public update = (frame: number) => {
-		if (this.players[1] && this.players[1].isCentered()){
-			this.players[1].receiveInput(DirectionsUtils.randomSingleDirection());
-		}
-        const shouldRollback: boolean = false;
-		this.players.forEach(p => p.updateState(frame, shouldRollback));
-    }
+    public update = () => {
+		this.players.forEach(p => p.updateState());
+    };
 
 	private bindHumanPlayer = (p: p5, player: Player) => {
 		p.keyPressed = function (): void {
@@ -54,4 +47,4 @@ export default class Game {
 			}
 		};
 	};
-}
+};

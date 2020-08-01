@@ -77,7 +77,7 @@ export class Player {
         `CurrentDirection: ${DirectionsUtils.getString(this.currentDirection)}`
     ];
 
-    public updateState = (frame: number, rollback: boolean = false) => {
+    public updateState = () => {
         this.moveTowardsTarget()
         if (this.isCentered()) {
             if (this.nextDirection !== Directions.NONE) { // take the queued direction

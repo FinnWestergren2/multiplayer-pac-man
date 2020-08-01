@@ -2,7 +2,9 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage } from './serverExtensions';
-import { ServerResponse, ClientRequest } from 'shared';
+import { ServerResponse, ClientRequest, mapStateReducer } from 'shared';
+import thunk from "redux-thunk";
+import { createStore, applyMiddleware } from "redux";
 
 const file = new nodeStatic.Server('./');
 const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -11,6 +13,8 @@ const server = http.createServer((req, res) => {
 	req.addListener('end', () => file.serve(req, res)).resume();
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
+
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')

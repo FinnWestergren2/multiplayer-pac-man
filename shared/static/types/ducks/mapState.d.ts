@@ -31,9 +31,15 @@ declare type mapState = {
     mapCells: Directions[][];
     appDimensions: AppDimensions;
     cellDimensions: CellDimensions;
-    playerStartPoints: PlayerStatusMap;
+    playerStatus: PlayerStatusMap;
 };
-export declare const mapStateReducer: (state: mapState | undefined, action: Action) => mapState;
-export declare const refreshMap: (mapOnServer: MapResponse) => (dispatch: Dispatch<AnyAction>, getState: () => mapState) => void;
+export declare const mapStateReducer: (state: mapState | undefined, action: Action) => mapState | {
+    playerStartPoints: PlayerStatusMap;
+    mapCells: Directions[][];
+    appDimensions: AppDimensions;
+    cellDimensions: CellDimensions;
+    playerStatus: PlayerStatusMap;
+};
+export declare const refreshMap: (mapResponse: MapResponse) => (dispatch: Dispatch<AnyAction>, getState: () => mapState) => void;
 export declare const updateAppDimensions: (width: number, height: number) => (dispatch: Dispatch<AnyAction>) => void;
 export {};

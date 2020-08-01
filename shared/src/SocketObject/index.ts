@@ -12,7 +12,7 @@ export enum MessageType {
 export type ClientRequest = 
     { type: MessageType.PING, payload: number} |
     { type: MessageType.HELLO, payload: null} |
-    { type: MessageType.MAP_REQUEST, payload: string[] }
+    { type: MessageType.MAP_REQUEST, payload: null }
 
 
 export type ServerResponse = 
@@ -21,8 +21,5 @@ export type ServerResponse =
     { type: MessageType.MAP_RESPONSE, payload: MapResponse } |
     { type: MessageType.INVALID, payload: null }
 
-export type MapResponse = {
-    map: Directions[][],
-    startLocations: PlayerStatusMap
-}
+export type MapResponse = Directions[][];
 

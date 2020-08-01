@@ -5,7 +5,7 @@ export default () => {
     const ws = new WebSocket('ws://localhost:8080', ['json', 'xml']);
 
     ws.addEventListener('open', () => {
-        const data: ClientRequest = { type: MessageType.HELLO, payload: null }
+        const data: ClientRequest = { type: MessageType.MAP_REQUEST, payload: null }
         const json = JSON.stringify(data);
         ws.send(json);
     });

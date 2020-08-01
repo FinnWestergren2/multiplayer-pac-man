@@ -34,7 +34,7 @@ var initialState = {
     cellSize: 0,
     halfCellSize: 0
   },
-  playerStartPoints: {}
+  playerStatus: {}
 };
 
 var mapStateReducer = function mapStateReducer() {
@@ -69,19 +69,15 @@ var mapStateReducer = function mapStateReducer() {
 
 exports.mapStateReducer = mapStateReducer;
 
-var refreshMap = function refreshMap(mapOnServer) {
+var refreshMap = function refreshMap(mapResponse) {
   return function (dispatch, getState) {
     dispatch({
       type: ActionTypes.REFRESH_MAP,
-      payload: mapOnServer.map
+      payload: mapResponse
     });
     dispatch({
       type: ActionTypes.UPDATE_CELL_DIMENSIONS,
-      payload: generateCellDimensions(mapOnServer.map, getState().appDimensions)
-    });
-    dispatch({
-      type: ActionTypes.UPDATE_PLAYER_STATUS,
-      payload: mapOnServer.startLocations
+      payload: generateCellDimensions(mapResponse, getState().appDimensions)
     });
   };
 };

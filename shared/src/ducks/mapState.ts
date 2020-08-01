@@ -28,7 +28,7 @@ type mapState = {
     mapCells: Directions[][];
     appDimensions: AppDimensions;
     cellDimensions: CellDimensions;
-    playerStartPoints: PlayerStatusMap;
+    playerStatus: PlayerStatusMap;
 }
 
 const initialState: mapState = {
@@ -41,7 +41,7 @@ const initialState: mapState = {
         cellSize: 0,
         halfCellSize: 0
     },
-    playerStartPoints: {}
+    playerStatus: {}
 };
 
 export const mapStateReducer = (state: mapState = initialState, action: Action) => {
@@ -51,7 +51,7 @@ export const mapStateReducer = (state: mapState = initialState, action: Action) 
         case ActionTypes.UPDATE_APP_DIMENSIONS:
             return { ...state, appDimensions: action.payload };
         case ActionTypes.UPDATE_CELL_DIMENSIONS:
-                return { ...state, cellDimensions: action.payload };
+            return { ...state, cellDimensions: action.payload };
         case ActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStartPoints: action.payload };
         default:
@@ -59,11 +59,10 @@ export const mapStateReducer = (state: mapState = initialState, action: Action) 
     }
 };
 
-export const refreshMap = (mapOnServer: MapResponse) => {
+export const refreshMap = (mapResponse: MapResponse) => {
     return function(dispatch: Dispatch<AnyAction>, getState: () => mapState) {
-        dispatch({type: ActionTypes.REFRESH_MAP, payload: mapOnServer.map });
-        dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapOnServer.map, getState().appDimensions)});
-        dispatch({type: ActionTypes.UPDATE_PLAYER_STATUS, payload: mapOnServer.startLocations});
+        dispatch({type: ActionTypes.REFRESH_MAP, payload: mapResponse });
+        dispatch({type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, getState().appDimensions)});
     };
 };
 

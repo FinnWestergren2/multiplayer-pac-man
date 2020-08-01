@@ -29,6 +29,6 @@ export const pingServer = () => {
 }
 
 export const requestMap = () => {
-	const request: ClientRequest = { type: MessageType.MAP_REQUEST, payload: ['p1', 'p2']}
+	const request: ClientRequest = { type: MessageType.MAP_REQUEST, payload: null }
 	ClientSocket.send(JSON.stringify(request));
 }
