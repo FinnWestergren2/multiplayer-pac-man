@@ -1,11 +1,10 @@
 import { AnyAction, Dispatch } from "redux";
-import { Directions, MapResponse, PlayerStatusMap, PlayerStatus } from "..";
+import { Directions, MapResponse } from "..";
 
 enum ActionTypes {
     REFRESH_MAP = "REFRESH_MAP",
     UPDATE_APP_DIMENSIONS = "UPDATE_APP_DIMENSIONS",
-    UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS",
-    UPDATE_PLAYER_STATUS = "UPDATE_PLAYER_STATUS"
+    UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS"
 }
 
 export type AppDimensions = {
@@ -21,14 +20,12 @@ export type CellDimensions = {
 type Action =
     { type: ActionTypes.REFRESH_MAP; payload: Directions[][] } |
     { type: ActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions } |
-    { type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions } |
-    { type: ActionTypes.UPDATE_PLAYER_STATUS; payload: { playerId: string, status: PlayerStatus } }
+    { type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions }
 
 type mapState = {
     mapCells: Directions[][];
     appDimensions: AppDimensions;
     cellDimensions: CellDimensions;
-    playerStatusMap: PlayerStatusMap;
 }
 
 const initialState: mapState = {
@@ -40,8 +37,7 @@ const initialState: mapState = {
     cellDimensions: {
         cellSize: 0,
         halfCellSize: 0
-    },
-    playerStatusMap: {}
+    }
 };
 
 export const mapStateReducer = (state: mapState = initialState, action: Action) => {
@@ -52,8 +48,6 @@ export const mapStateReducer = (state: mapState = initialState, action: Action) 
             return { ...state, appDimensions: action.payload };
         case ActionTypes.UPDATE_CELL_DIMENSIONS:
             return { ...state, cellDimensions: action.payload };
-        case ActionTypes.UPDATE_PLAYER_STATUS:
-            return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
         default:
             return state;
     }
@@ -71,12 +65,6 @@ export const updateAppDimensions = (width: number, height: number) => {
         dispatch({ type: ActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
     };
 };
-
-export const updatePlayerStatus = (playerId: string, newStatus: PlayerStatus) => {
-    return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.UPDATE_PLAYER_STATUS, payload: { playerId, status: newStatus } });
-    };
-}
 
 const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
     const size = Math.min(

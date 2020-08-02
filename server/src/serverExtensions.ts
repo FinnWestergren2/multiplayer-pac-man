@@ -1,19 +1,21 @@
-import { ClientRequest, MessageType, ServerResponse, MapResponse, refreshMap, updatePlayerStatus } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, updatePlayerStatus, addPlayerInput } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
-import { MapStore } from ".";
+import { MapStore, PlayerStore } from ".";
 
-export function handleMessage(message: ClientRequest): ServerResponse {
+export function handleMessage(message: ClientMessage): ServerMessage | null {
 	switch (message.type) {
 		case MessageType.PING:
 			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload };
-		case MessageType.HELLO:
-			return { type: MessageType.HELLO, payload: null };
 		case MessageType.MAP_REQUEST:
 			return { type: MessageType.MAP_RESPONSE, payload: getCurrentMap() };
 		case MessageType.PLAYER_STATUS_UPDATE:
 			//@ts-ignore
-			MapStore.dispatch(updatePlayerStatus(message.payload.playerId, message.payload.status));
-			return { type: MessageType.PLAYER_STATUS_UPDATE, payload: MapStore.getState().playerStatusMap };
+			PlayerStore.dispatch(updatePlayerStatus(message.payload.playerId, message.payload.status));
+			return { type: MessageType.PLAYER_STATUS_UPDATE, payload: PlayerStore.getState().playerStatusMap };
+		case MessageType.PLAYER_INPUT:
+			//@ts-ignore
+			PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
+			return null;
 		default:
 			return { type: MessageType.INVALID, payload: null };
 	}
@@ -27,4 +29,11 @@ const getCurrentMap: () => MapResponse = () => {
 		return newMap;
 	}
 	return MapStore.getState().mapCells;
-}
+};
+
+export const getMostRecentPlayerInputs = () => {
+	const playerHistory = PlayerStore.getState().playerInputHistory;
+	return Object.keys(playerHistory).filter(k => PlayerStore.getState().playerList.some(p => p === k)).map(k => { 
+		return { playerId: k, input: playerHistory[k][playerHistory[k].length] } 
+	});
+};

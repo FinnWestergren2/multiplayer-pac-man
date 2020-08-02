@@ -9,12 +9,14 @@ var MessageType;
 exports.MessageType = MessageType;
 
 (function (MessageType) {
-  MessageType[MessageType["HELLO"] = 0] = "HELLO";
+  MessageType[MessageType["SET_CURRENT_PLAYER"] = 0] = "SET_CURRENT_PLAYER";
   MessageType[MessageType["PING"] = 1] = "PING";
   MessageType[MessageType["PONG"] = 2] = "PONG";
   MessageType[MessageType["MAP_REQUEST"] = 3] = "MAP_REQUEST";
   MessageType[MessageType["MAP_RESPONSE"] = 4] = "MAP_RESPONSE";
   MessageType[MessageType["PLAYER_INPUT"] = 5] = "PLAYER_INPUT";
   MessageType[MessageType["PLAYER_STATUS_UPDATE"] = 6] = "PLAYER_STATUS_UPDATE";
-  MessageType[MessageType["INVALID"] = 7] = "INVALID";
+  MessageType[MessageType["ADD_PLAYER"] = 7] = "ADD_PLAYER";
+  MessageType[MessageType["REMOVE_PLAYER"] = 8] = "REMOVE_PLAYER";
+  MessageType[MessageType["INVALID"] = 9] = "INVALID";
 })(MessageType || (exports.MessageType = MessageType = {}));

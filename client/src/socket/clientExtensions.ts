@@ -1,14 +1,15 @@
-import { MessageType, ServerResponse, ClientRequest, updatePlayerStatus } from "shared";
-import { MapStore, ClientSocket } from "../containers/GameWrapper";
+import { MessageType, ServerMessage, ClientMessage, updatePlayerStatus, Directions, setCurrentPlayer, addPlayer, removePlayer } from "shared";
+import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
-export function handleMessage(message: ServerResponse): void {
+export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
             console.log(message.payload)
             return;
-        case MessageType.HELLO:
-            console.log('recieved a hello from server')
+        case MessageType.SET_CURRENT_PLAYER:
+            // @ts-ignore
+            PlayerStore.dispatch(setCurrentPlayer(message.payload));
             return;
         case MessageType.MAP_RESPONSE:
             // @ts-ignore
@@ -16,7 +17,15 @@ export function handleMessage(message: ServerResponse): void {
             return;
         case MessageType.PLAYER_STATUS_UPDATE:
             // @ts-ignore
-            MapStore.dispatch(updatePlayerStatus(message.payload));
+            PlayerStore.dispatch(updatePlayerStatus(message.payload));
+            return;
+        case MessageType.ADD_PLAYER:
+            // @ts-ignore
+            PlayerStore.dispatch(addPlayer(message.payload));
+            return;
+        case MessageType.REMOVE_PLAYER:
+            // @ts-ignore
+            PlayerStore.dispatch(removePlayer(message.payload));
             return;
         case MessageType.INVALID:
             console.log('sent an invalid message to server')
@@ -28,11 +37,16 @@ export function handleMessage(message: ServerResponse): void {
 }
 
 export const pingServer = () => {
-	const request: ClientRequest = { type: MessageType.PING, payload: (new Date()).getTime()}
-	ClientSocket.send(JSON.stringify(request));
+    const request: ClientMessage = { type: MessageType.PING, payload: (new Date()).getTime() }
+    ClientSocket.send(JSON.stringify(request));
 }
 
 export const requestMap = () => {
-	const request: ClientRequest = { type: MessageType.MAP_REQUEST, payload: null }
-	ClientSocket.send(JSON.stringify(request));
+    const request: ClientMessage = { type: MessageType.MAP_REQUEST, payload: null }
+    ClientSocket.send(JSON.stringify(request));
+}
+
+export const sendPlayerInput = (playerId: string, dir: Directions) => {
+    const request: ClientMessage = { type: MessageType.PLAYER_INPUT, payload: { playerId, input: { frame: (new Date()).getTime(), direction: dir } } }
+    ClientSocket.send(JSON.stringify(request));
 }

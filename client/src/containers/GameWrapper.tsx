@@ -6,7 +6,7 @@ import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import initializeSocket from "../socket";
 import { requestMap } from "../socket/clientExtensions";
-import { mapStateReducer } from "shared";
+import { mapStateReducer, playerStateReducer } from "shared";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -25,6 +25,7 @@ const FlexContainer = styled.div`
 `;
 
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
+export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
 export const ClientSocket = initializeSocket();
 
 

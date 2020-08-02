@@ -1,5 +1,5 @@
 import Stack from "./Stack"
-import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatusMap, MapResponse } from "shared"
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils,  MapResponse } from "shared"
 
 export const generateMapUsingRandomDFS: () => MapResponse = () => {
     const dimensions: CoordPair = { x: 7, y: 7 }
@@ -37,7 +37,7 @@ export const generateMapUsingRandomDFS: () => MapResponse = () => {
     return mapDirections;
 }
 
-const emptyMap = (dimensions: CoordPair) => {
+export const emptyMap = (dimensions: CoordPair) => {
     function* fillEmptyMap<T>(emptyValue: T) {
         function* emptyRow(length: number) {
             for (let j = 0; j < length; j++) {
@@ -51,7 +51,7 @@ const emptyMap = (dimensions: CoordPair) => {
     return { mapDirections: Array.from(fillEmptyMap<Directions>(Directions.NONE)), visited: Array.from(fillEmptyMap<boolean>(false)) }
 }
 
-const getAdjacentCell = (current: CoordPair, dir: Directions) => {
+export const getAdjacentCell = (current: CoordPair, dir: Directions) => {
     switch (dir) {
         case Directions.UP:
             return { ...current, y: current.y - 1 };
@@ -70,56 +70,5 @@ const destroyWall = (cellA: CoordPair, dir: Directions, mapDirections: Direction
     const cellB = getAdjacentCell(cellA, dir);
     mapDirections[cellA.y][cellA.x] = dir | mapDirections[cellA.y][cellA.x];
     mapDirections[cellB.y][cellB.x] = DirectionsUtils.getOpposite(dir) | mapDirections[cellB.y][cellB.x];
-}
-
-const maxDistPair = (mapDirections: Directions[][], deepestCell: CoordPair, playerIds: string[]) => {
-    let cellA = { ...deepestCell };
-    let cellB = findFarthest(cellA, mapDirections);
-    while (true) {
-        const cellANext = findFarthest(cellB, mapDirections);
-        const cellBNext = findFarthest(cellANext, mapDirections);
-        if (CoordPairUtils.equalPairs(cellA, cellANext) && CoordPairUtils.equalPairs(cellB, cellBNext)) {
-            break;
-        }
-        cellA = { ...cellANext };
-        cellB = { ...cellBNext };
-    }
-    return {
-        [playerIds[0]]: { location: cellA, direction: Directions.NONE },
-        [playerIds[1]]: { location: cellB, direction: Directions.NONE }
-    }
-}
-
-const findFarthest = (start: CoordPair, mapDirections: Directions[][]) => {
-    const stack = new Stack<CoordPair>();
-    const dimensions = { y: mapDirections.length, x: mapDirections[0].length };
-    const canMove = (cell: CoordPair, dir: Directions) => (dir === (mapDirections[cell.y][cell.x] & dir));
-    const visited = emptyMap(dimensions).visited;
-    let deepestNode: { depth: number; cell: CoordPair; } = { depth: 0, cell: start }
-    const push = (cell: CoordPair) => {
-        stack.push(cell);
-        visited[cell.y][cell.x] = true;
-        if (deepestNode.depth < stack.size()) {
-            deepestNode = { depth: stack.size(), cell };
-        }
-    }
-    push(start);
-    while (!stack.isEmpty()) {
-        const currentCell = stack.peek();
-        const firstDir = DirectionsUtils.randomSingleDirection();
-        let dir = firstDir;
-        const nextCell = () => getAdjacentCell(currentCell, dir);
-        let i = 0;
-        while (i < 4 && (!canMove(currentCell, dir) || visited[nextCell().y][nextCell().x])) {
-            dir = DirectionsUtils.rotateClockwise(dir);
-            i++;
-        }
-        if (!canMove(currentCell, dir) || visited[nextCell().y][nextCell().x]) { // we've exhausted all options
-            stack.pop();
-            continue;
-        }
-        push(nextCell());
-    }
-    return deepestNode.cell;
 }
 

@@ -6,4 +6,10 @@ export type PlayerStatus = {
     direction: Directions
 }
 
+export type StampedInput = {
+    frame: number;
+    direction: Directions;
+}
+
 export type PlayerStatusMap = { [playerId: string]: PlayerStatus }
+export type PlayerInputHistory = { [playerId: string]: StampedInput[] }

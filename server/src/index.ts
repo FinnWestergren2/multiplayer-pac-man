@@ -1,8 +1,8 @@
 import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
-import { handleMessage } from './serverExtensions';
-import { ServerResponse, ClientRequest, mapStateReducer } from 'shared';
+import { handleMessage, getMostRecentPlayerInputs } from './serverExtensions';
+import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer } from 'shared';
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
 
@@ -14,7 +14,8 @@ const server = http.createServer((req, res) => {
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
-
+export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
+const socketList: {[key: string]: any} = {};
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -41,23 +42,45 @@ server.on('upgrade', function (req, socket) {
 	// additional newlines so that the browser recognises the end of the response 
 	// header and doesn't continue to wait for more header data: 
 	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
-	socket.on('data', (buffer: Buffer) => handleData(socket, buffer));
+	const playerId = uuidv4();
+	socket.on('data', (buffer: Buffer) => handleData(socket, buffer, playerId));
+	socketList[playerId] = socket;
+	socket.write(constructMessage({ type: MessageType.SET_CURRENT_PLAYER, payload: playerId }));
+	// @ts-ignore
+	PlayerStore.dispatch(addPlayer(playerId));
+	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
 });
 
 server.on('connection', () => console.log("connected"));
-server.on('close', () => console.log("closed"));
 
-function handleData(socket: any, buffer: Buffer) {
+function handleData(socket: any, buffer: Buffer, playerId: string) {
 	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
-		console.log(parsedBuffer)
-		socket.write(constructReply(handleMessage(parsedBuffer)));
+		console.log(parsedBuffer);
+		const toClient = handleMessage(parsedBuffer);
+		if (toClient !== null){
+			socket.write(constructMessage(toClient));
+		}
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
+		writeToAllSockets({ type: MessageType.REMOVE_PLAYER, payload: playerId });
+		// @ts-ignore
+		PlayerStore.dispatch(removePlayer(playerId));
 	}
 }
 
-function parseBuffer (buffer: Buffer): ClientRequest | null | undefined {
+PlayerStore.subscribe(() => {
+	const recentInputsMessage: ServerMessage = { type: MessageType.PLAYER_INPUT, payload: getMostRecentPlayerInputs() };
+	writeToAllSockets(recentInputsMessage);
+});
+
+const writeToAllSockets = (message: ServerMessage) => {
+	Object.keys(socketList).forEach(playerId => {
+		socketList[playerId].write(constructMessage(message));
+	});
+};
+
+function parseBuffer (buffer: Buffer): ClientMessage | null | undefined {
 	const firstByte = buffer.readUInt8(0);
 	const isFinalFrame = Boolean((firstByte >>> 7) & 1); // keeping this here in case we need to persist data between frames (shouldn't need to as far as I know)
 	// we can generally ignore reserve bits
@@ -113,7 +136,7 @@ function parseBuffer (buffer: Buffer): ClientRequest | null | undefined {
 
 
 	
-function constructReply(message: ServerResponse) {
+function constructMessage(message: ServerMessage) {
 	// Convert the data to JSON and copy it into a buffer
 	const json = JSON.stringify(message)
 	const jsonByteLength = Buffer.byteLength(json);
@@ -134,3 +157,10 @@ function constructReply(message: ServerResponse) {
 	buffer.write(json, payloadOffset);
 	return buffer;
 };
+
+function uuidv4() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	  var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+	  return v.toString(16);
+	});
+  }
