@@ -1,34 +1,8 @@
 import { AnyAction, Dispatch } from "redux";
 import { Directions, MapResponse } from "..";
+import { MapState, MapStateAction, MapStateActionTypes, AppDimensions } from "../Types/ReduxTypes";
 
-enum ActionTypes {
-    REFRESH_MAP = "REFRESH_MAP",
-    UPDATE_APP_DIMENSIONS = "UPDATE_APP_DIMENSIONS",
-    UPDATE_CELL_DIMENSIONS = "UPDATE_CELL_DIMENSIONS"
-}
-
-export type AppDimensions = {
-    canvasHeight: number;
-    canvasWidth: number;
-}
-
-export type CellDimensions = {
-    cellSize: number;
-    halfCellSize: number;
-}
-
-type Action =
-    { type: ActionTypes.REFRESH_MAP; payload: Directions[][] } |
-    { type: ActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions } |
-    { type: ActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions }
-
-type mapState = {
-    mapCells: Directions[][];
-    appDimensions: AppDimensions;
-    cellDimensions: CellDimensions;
-}
-
-const initialState: mapState = {
+const initialState: MapState = {
     mapCells: [],
     appDimensions: {
         canvasHeight: 0,
@@ -40,13 +14,13 @@ const initialState: mapState = {
     }
 };
 
-export const mapStateReducer = (state: mapState = initialState, action: Action) => {
+export const mapStateReducer = (state: MapState = initialState, action: MapStateAction) => {
     switch (action.type) {
-        case ActionTypes.REFRESH_MAP:
+        case MapStateActionTypes.REFRESH_MAP:
             return { ...state, mapCells: action.payload };
-        case ActionTypes.UPDATE_APP_DIMENSIONS:
+        case MapStateActionTypes.UPDATE_APP_DIMENSIONS:
             return { ...state, appDimensions: action.payload };
-        case ActionTypes.UPDATE_CELL_DIMENSIONS:
+        case MapStateActionTypes.UPDATE_CELL_DIMENSIONS:
             return { ...state, cellDimensions: action.payload };
         default:
             return state;
@@ -54,15 +28,15 @@ export const mapStateReducer = (state: mapState = initialState, action: Action) 
 };
 
 export const refreshMap = (mapResponse: MapResponse) => {
-    return function (dispatch: Dispatch<AnyAction>, getState: () => mapState) {
-        dispatch({ type: ActionTypes.REFRESH_MAP, payload: mapResponse });
-        dispatch({ type: ActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, getState().appDimensions) });
+    return function (dispatch: Dispatch<AnyAction>, getState: () => MapState) {
+        dispatch({ type: MapStateActionTypes.REFRESH_MAP, payload: mapResponse });
+        dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, getState().appDimensions) });
     };
 };
 
 export const updateAppDimensions = (width: number, height: number) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
+        dispatch({ type: MapStateActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
     };
 };
 

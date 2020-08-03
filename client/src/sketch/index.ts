@@ -20,5 +20,6 @@ export default function sketch(p: p5): void {
 		game.draw(p);
 		game.update();
 	};
+	
 	p.mouseClicked = pingServer
 }

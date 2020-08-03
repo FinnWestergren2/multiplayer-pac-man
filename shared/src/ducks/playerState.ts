@@ -1,58 +1,34 @@
 import { AnyAction, Dispatch } from "redux";
 import { PlayerStatusMap, PlayerStatus, PlayerInputHistory } from "..";
-import { StampedInput } from "../GameObject";
+import { StampedInput } from "../Types";
+import { PlayerState, PlayerStateActionTypes, PlayerStateAction } from "../Types/ReduxTypes";
 
-enum ActionTypes {
-    UPDATE_PLAYER_STATUS = "UPDATE_PLAYER_STATUS",
-    ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
-    ADD_PLAYER = "ADD_PLAYER",
-    REMOVE_PLAYER = "REMOVE_PLAYER",
-    SET_CURRENT_PLAYER_ID = "SET_CURRENT_PLAYER_ID",
-    SET_PLAYER_LIST = "SET_PLAYER_LIST"
-};
-
-type Action =
-    { type: ActionTypes.UPDATE_PLAYER_STATUS; payload: { playerId: string, status: PlayerStatus } } |
-    { type: ActionTypes.ADD_PLAYER_INPUT; payload: { playerId: string, input: StampedInput } } |
-    { type: ActionTypes.ADD_PLAYER; payload: string } |
-    { type: ActionTypes.REMOVE_PLAYER; payload: string } |
-    { type: ActionTypes.SET_CURRENT_PLAYER_ID; payload: string } |
-    { type: ActionTypes.SET_PLAYER_LIST; payload: string[] }
-
-type State = {
-    playerStatusMap: PlayerStatusMap;
-    playerInputHistory: PlayerInputHistory;
-    playerList: string[];
-    currentPlayer?: string;
-    mostRecentInput: { playerId: string, input: StampedInput } | null;
-};
-
-const initialState: State = {
+const initialState: PlayerState = {
     playerStatusMap: {},
     playerInputHistory: {},
     playerList: [],
     mostRecentInput: null
 };
 
-export const playerStateReducer = (state: State = initialState, action: Action) => {
+export const playerStateReducer = (state: PlayerState = initialState, action: PlayerStateAction) => {
     switch (action.type) {
-        case ActionTypes.UPDATE_PLAYER_STATUS:
+        case PlayerStateActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
-        case ActionTypes.ADD_PLAYER_INPUT:
+        case PlayerStateActionTypes.ADD_PLAYER_INPUT:
             const newHistory = state.playerInputHistory[action.payload.playerId] 
                 ? [...state.playerInputHistory[action.payload.playerId], action.payload.input] 
                 : [action.payload.input];
             return { ...state, playerInputHistory: { ...state.playerInputHistory, [action.payload.playerId]: newHistory }, mostRecentInput: action.payload };
-        case ActionTypes.ADD_PLAYER:
+        case PlayerStateActionTypes.ADD_PLAYER:
             if (state.playerList.some(p => p === action.payload)) {
                 return state;
             }
             return { ...state, playerList: [...state.playerList, action.payload] };
-        case ActionTypes.REMOVE_PLAYER:
+        case PlayerStateActionTypes.REMOVE_PLAYER:
             return { ...state, playerList: state.playerList.filter(p => p != action.payload) };
-        case ActionTypes.SET_CURRENT_PLAYER_ID:
+        case PlayerStateActionTypes.SET_CURRENT_PLAYER_ID:
             return { ...state, currentPlayer: action.payload };
-        case ActionTypes.SET_PLAYER_LIST:
+        case PlayerStateActionTypes.SET_PLAYER_LIST:
             return { ...state, playerList: action.payload }
         default:
             return state;
@@ -61,31 +37,31 @@ export const playerStateReducer = (state: State = initialState, action: Action) 
 
 export const updatePlayerStatus = (playerId: string, newStatus: PlayerStatus) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.UPDATE_PLAYER_STATUS, payload: { playerId, status: newStatus } });
+        dispatch({ type: PlayerStateActionTypes.UPDATE_PLAYER_STATUS, payload: { playerId, status: newStatus } });
     };
 };
 
 export const addPlayerInput = (playerId: string, input: StampedInput) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.ADD_PLAYER_INPUT, payload: { playerId, input } });
+        dispatch({ type: PlayerStateActionTypes.ADD_PLAYER_INPUT, payload: { playerId, input } });
     };
 };
 
 export const addPlayer = (playerId: string) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.ADD_PLAYER, payload: playerId });
+        dispatch({ type: PlayerStateActionTypes.ADD_PLAYER, payload: playerId });
     };
 };
 
 export const removePlayer = (playerId: string) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.REMOVE_PLAYER, payload: playerId });
+        dispatch({ type: PlayerStateActionTypes.REMOVE_PLAYER, payload: playerId });
     };
 };
 
 export const setCurrentPlayers = (currentPlayerId: string, fullPlayerList: string[]) => {
     return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: ActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
-        dispatch({ type: ActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
+        dispatch({ type: PlayerStateActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
+        dispatch({ type: PlayerStateActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
     };
 };

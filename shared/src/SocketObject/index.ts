@@ -1,4 +1,4 @@
-import { Directions, PlayerStatus, PlayerStatusMap, StampedInput } from "../GameObject"
+import { Directions, PlayerStatus, PlayerStatusMap, StampedInput } from "../Types"
 
 // id keep these as numbers to keep the packet size low
 // export enum MessageType {
