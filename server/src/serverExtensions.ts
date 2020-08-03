@@ -8,10 +8,6 @@ export function handleMessage(message: ClientMessage): ServerMessage | null {
 			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload };
 		case MessageType.MAP_REQUEST:
 			return { type: MessageType.MAP_RESPONSE, payload: getCurrentMap() };
-		case MessageType.PLAYER_STATUS_UPDATE:
-			//@ts-ignore
-			PlayerStore.dispatch(updatePlayerStatus(message.payload.playerId, message.payload.status));
-			return { type: MessageType.PLAYER_STATUS_UPDATE, payload: PlayerStore.getState().playerStatusMap };
 		case MessageType.PLAYER_INPUT:
 			//@ts-ignore
 			PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
@@ -21,7 +17,7 @@ export function handleMessage(message: ClientMessage): ServerMessage | null {
 	}
 }
 
-const getCurrentMap: () => MapResponse = () => {
+export const getCurrentMap: () => MapResponse = () => {
 	if (MapStore.getState().mapCells.length === 0) {
 		const newMap = generateMapUsingRandomDFS();
 		// @ts-ignore
@@ -34,6 +30,6 @@ const getCurrentMap: () => MapResponse = () => {
 export const getMostRecentPlayerInputs = () => {
 	const playerHistory = PlayerStore.getState().playerInputHistory;
 	return Object.keys(playerHistory).filter(k => PlayerStore.getState().playerList.some(p => p === k)).map(k => { 
-		return { playerId: k, input: playerHistory[k][playerHistory[k].length] } 
+		return { playerId: k, input: playerHistory[k][playerHistory[k].length - 1] } 
 	});
 };

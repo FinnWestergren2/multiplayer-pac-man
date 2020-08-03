@@ -1,7 +1,7 @@
 import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
-import { handleMessage, getMostRecentPlayerInputs } from './serverExtensions';
+import { handleMessage, getMostRecentPlayerInputs, getCurrentMap } from './serverExtensions';
 import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer } from 'shared';
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
@@ -15,7 +15,10 @@ const server = http.createServer((req, res) => {
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
-const socketList: {[key: string]: any} = {};
+
+let socketList: {[key: string]: any} = {};
+let mostRecentInput = PlayerStore.getState().mostRecentInput;
+
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -45,9 +48,10 @@ server.on('upgrade', function (req, socket) {
 	const playerId = uuidv4();
 	socket.on('data', (buffer: Buffer) => handleData(socket, buffer, playerId));
 	socketList[playerId] = socket;
-	socket.write(constructMessage({ type: MessageType.SET_CURRENT_PLAYER, payload: playerId }));
 	// @ts-ignore
 	PlayerStore.dispatch(addPlayer(playerId));
+	socket.write(constructMessage({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() } ));
+	socket.write(constructMessage({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList } }));
 	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
 });
 
@@ -66,17 +70,26 @@ function handleData(socket: any, buffer: Buffer, playerId: string) {
 		writeToAllSockets({ type: MessageType.REMOVE_PLAYER, payload: playerId });
 		// @ts-ignore
 		PlayerStore.dispatch(removePlayer(playerId));
+		socketList = { ...socketList, [playerId]: undefined };
 	}
 }
 
 PlayerStore.subscribe(() => {
-	const recentInputsMessage: ServerMessage = { type: MessageType.PLAYER_INPUT, payload: getMostRecentPlayerInputs() };
-	writeToAllSockets(recentInputsMessage);
+	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame){
+		mostRecentInput = PlayerStore.getState().mostRecentInput;
+		const recentInputsMessage: ServerMessage = { type: MessageType.PLAYER_INPUT, payload: mostRecentInput! };
+		writeToAllSockets(recentInputsMessage);
+	}
 });
 
 const writeToAllSockets = (message: ServerMessage) => {
 	Object.keys(socketList).forEach(playerId => {
-		socketList[playerId].write(constructMessage(message));
+		try {
+			socketList[playerId]?.write(constructMessage(message));
+		}
+		catch (e) {
+			console.error(e);
+		}
 	});
 };
 

@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setCurrentPlayer = exports.removePlayer = exports.addPlayer = exports.addPlayerInput = exports.updatePlayerStatus = exports.playerStateReducer = void 0;
+exports.setCurrentPlayers = exports.removePlayer = exports.addPlayer = exports.addPlayerInput = exports.updatePlayerStatus = exports.playerStateReducer = void 0;
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
@@ -23,13 +23,15 @@ var ActionTypes;
   ActionTypes["ADD_PLAYER"] = "ADD_PLAYER";
   ActionTypes["REMOVE_PLAYER"] = "REMOVE_PLAYER";
   ActionTypes["SET_CURRENT_PLAYER_ID"] = "SET_CURRENT_PLAYER_ID";
+  ActionTypes["SET_PLAYER_LIST"] = "SET_PLAYER_LIST";
 })(ActionTypes || (ActionTypes = {}));
 
 ;
 var initialState = {
   playerStatusMap: {},
   playerInputHistory: {},
-  playerList: []
+  playerList: [],
+  mostRecentInput: null
 };
 
 var playerStateReducer = function playerStateReducer() {
@@ -45,7 +47,8 @@ var playerStateReducer = function playerStateReducer() {
     case ActionTypes.ADD_PLAYER_INPUT:
       var newHistory = state.playerInputHistory[action.payload.playerId] ? [].concat((0, _toConsumableArray2.default)(state.playerInputHistory[action.payload.playerId]), [action.payload.input]) : [action.payload.input];
       return _objectSpread(_objectSpread({}, state), {}, {
-        playerInputHistory: _objectSpread(_objectSpread({}, state.playerInputHistory), {}, (0, _defineProperty2.default)({}, action.payload.playerId, newHistory))
+        playerInputHistory: _objectSpread(_objectSpread({}, state.playerInputHistory), {}, (0, _defineProperty2.default)({}, action.payload.playerId, newHistory)),
+        mostRecentInput: action.payload
       });
 
     case ActionTypes.ADD_PLAYER:
@@ -69,6 +72,11 @@ var playerStateReducer = function playerStateReducer() {
     case ActionTypes.SET_CURRENT_PLAYER_ID:
       return _objectSpread(_objectSpread({}, state), {}, {
         currentPlayer: action.payload
+      });
+
+    case ActionTypes.SET_PLAYER_LIST:
+      return _objectSpread(_objectSpread({}, state), {}, {
+        playerList: action.payload
       });
 
     default:
@@ -128,13 +136,17 @@ var removePlayer = function removePlayer(playerId) {
 
 exports.removePlayer = removePlayer;
 
-var setCurrentPlayer = function setCurrentPlayer(playerId) {
+var setCurrentPlayers = function setCurrentPlayers(currentPlayerId, fullPlayerList) {
   return function (dispatch) {
     dispatch({
       type: ActionTypes.SET_CURRENT_PLAYER_ID,
-      payload: playerId
+      payload: currentPlayerId
+    });
+    dispatch({
+      type: ActionTypes.SET_PLAYER_LIST,
+      payload: fullPlayerList
     });
   };
 };
 
-exports.setCurrentPlayer = setCurrentPlayer;
+exports.setCurrentPlayers = setCurrentPlayers;

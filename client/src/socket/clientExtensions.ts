@@ -1,4 +1,4 @@
-import { MessageType, ServerMessage, ClientMessage, updatePlayerStatus, Directions, setCurrentPlayer, addPlayer, removePlayer } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
@@ -7,17 +7,13 @@ export function handleMessage(message: ServerMessage): void {
         case MessageType.PONG:
             console.log(message.payload)
             return;
-        case MessageType.SET_CURRENT_PLAYER:
+        case MessageType.INIT_PLAYER:
             // @ts-ignore
-            PlayerStore.dispatch(setCurrentPlayer(message.payload));
+            PlayerStore.dispatch(setCurrentPlayers(message.payload.currentPlayerId, message.payload.fullPlayerList));
             return;
         case MessageType.MAP_RESPONSE:
             // @ts-ignore
             MapStore.dispatch(refreshMap(message.payload));
-            return;
-        case MessageType.PLAYER_STATUS_UPDATE:
-            // @ts-ignore
-            PlayerStore.dispatch(updatePlayerStatus(message.payload));
             return;
         case MessageType.ADD_PLAYER:
             // @ts-ignore
@@ -26,6 +22,10 @@ export function handleMessage(message: ServerMessage): void {
         case MessageType.REMOVE_PLAYER:
             // @ts-ignore
             PlayerStore.dispatch(removePlayer(message.payload));
+            return;
+        case MessageType.PLAYER_INPUT:
+            // @ts-ignore
+            PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
             return;
         case MessageType.INVALID:
             console.log('sent an invalid message to server')

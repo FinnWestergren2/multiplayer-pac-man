@@ -8,20 +8,31 @@ import { sendPlayerInput } from "../socket/clientExtensions";
 export default class Game {
 	private cells: Cell[][] = [];
 	private players: Player[] = [];
+	private playerList: string[] = [];
 	public constructor(p: p5) {
-		MapStore.subscribe(() => this.initialize(p));
+		MapStore.subscribe(() => this.initializeMap(p));
+		PlayerStore.subscribe(() => {
+			const previousPlayerList = [...this.playerList];
+			this.playerList = PlayerStore.getState().playerList;
+			if (JSON.stringify(previousPlayerList) !== JSON.stringify(this.playerList)) {
+				this.initializePlayers(p);
+			}
+		})
 	}
 
-	private initialize = (p: p5) => {
+	private initializeMap = (p: p5) => {
 		const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Directions[], y: number) =>
 			row.map((column: Directions, x) =>
 				new Cell(column, x, y)
 			)
 		);
-		this.players = [new Player(0, 0, PlayerStore.getState().currentPlayer!)];
-		this.bindHumanPlayer(p, this.players[0]);
 	};
+
+	private initializePlayers = (p: p5) => {
+		this.players = PlayerStore.getState().playerList.map(pId => new Player(0, 0, pId));
+		this.bindHumanPlayer(p, this.players.find(player => player.id === PlayerStore.getState().currentPlayer!)!);
+	}
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));

@@ -14,6 +14,7 @@ export class Player {
     private speed = 0;
     private currentDirection: Directions = Directions.NONE;
     private nextDirection: Directions = Directions.NONE;
+    private mostRecentUpdate: number = 0;
     public id: string;
 
     public constructor(initX: number, initY: number, id: string) {
@@ -27,6 +28,15 @@ export class Player {
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
         this.id = id;
+        PlayerStore.subscribe(() => {
+            console.log('updating', PlayerStore.getState().playerInputHistory[id]);
+            const previousUpdate = this.mostRecentUpdate;
+            const myInputHistory = PlayerStore.getState().playerInputHistory[id];
+            this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;
+            if (previousUpdate != this.mostRecentUpdate){
+                this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
+            }
+        })
     }
 
     public draw: (p: p5) => void = p => {

@@ -5,18 +5,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MessageType = void 0;
 // id keep these as numbers to keep the packet size low
+// export enum MessageType {
+//     SET_CURRENT_PLAYER,
+//     PING,
+//     PONG,
+//     MAP_REQUEST,
+//     MAP_RESPONSE,
+//     PLAYER_INPUT,
+//     PLAYER_STATUS_UPDATE,
+//     ADD_PLAYER,
+//     REMOVE_PLAYER,
+//     INVALID
+// }
+// for debug
 var MessageType;
 exports.MessageType = MessageType;
 
 (function (MessageType) {
-  MessageType[MessageType["SET_CURRENT_PLAYER"] = 0] = "SET_CURRENT_PLAYER";
-  MessageType[MessageType["PING"] = 1] = "PING";
-  MessageType[MessageType["PONG"] = 2] = "PONG";
-  MessageType[MessageType["MAP_REQUEST"] = 3] = "MAP_REQUEST";
-  MessageType[MessageType["MAP_RESPONSE"] = 4] = "MAP_RESPONSE";
-  MessageType[MessageType["PLAYER_INPUT"] = 5] = "PLAYER_INPUT";
-  MessageType[MessageType["PLAYER_STATUS_UPDATE"] = 6] = "PLAYER_STATUS_UPDATE";
-  MessageType[MessageType["ADD_PLAYER"] = 7] = "ADD_PLAYER";
-  MessageType[MessageType["REMOVE_PLAYER"] = 8] = "REMOVE_PLAYER";
-  MessageType[MessageType["INVALID"] = 9] = "INVALID";
+  MessageType["INIT_PLAYER"] = "INIT_PLAYER";
+  MessageType["PING"] = "PING";
+  MessageType["PONG"] = "PONG";
+  MessageType["MAP_REQUEST"] = "MAP_REQUEST";
+  MessageType["MAP_RESPONSE"] = "MAP_RESPONSE";
+  MessageType["PLAYER_INPUT"] = "PLAYER_INPUT";
+  MessageType["ADD_PLAYER"] = "ADD_PLAYER";
+  MessageType["REMOVE_PLAYER"] = "REMOVE_PLAYER";
+  MessageType["INVALID"] = "INVALID";
 })(MessageType || (exports.MessageType = MessageType = {}));
