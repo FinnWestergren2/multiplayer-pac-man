@@ -1,4 +1,4 @@
-import { Directions, StampedInput } from "../GameObject";
+import { Directions, StampedInput } from "../Types";
 export declare enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
     PING = "PING",

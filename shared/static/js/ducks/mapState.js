@@ -11,17 +11,11 @@ var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers
 
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
+var _ReduxTypes = require("../Types/ReduxTypes");
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-var ActionTypes;
-
-(function (ActionTypes) {
-  ActionTypes["REFRESH_MAP"] = "REFRESH_MAP";
-  ActionTypes["UPDATE_APP_DIMENSIONS"] = "UPDATE_APP_DIMENSIONS";
-  ActionTypes["UPDATE_CELL_DIMENSIONS"] = "UPDATE_CELL_DIMENSIONS";
-})(ActionTypes || (ActionTypes = {}));
 
 var initialState = {
   mapCells: [],
@@ -40,17 +34,17 @@ var mapStateReducer = function mapStateReducer() {
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
-    case ActionTypes.REFRESH_MAP:
+    case _ReduxTypes.MapStateActionTypes.REFRESH_MAP:
       return _objectSpread(_objectSpread({}, state), {}, {
         mapCells: action.payload
       });
 
-    case ActionTypes.UPDATE_APP_DIMENSIONS:
+    case _ReduxTypes.MapStateActionTypes.UPDATE_APP_DIMENSIONS:
       return _objectSpread(_objectSpread({}, state), {}, {
         appDimensions: action.payload
       });
 
-    case ActionTypes.UPDATE_CELL_DIMENSIONS:
+    case _ReduxTypes.MapStateActionTypes.UPDATE_CELL_DIMENSIONS:
       return _objectSpread(_objectSpread({}, state), {}, {
         cellDimensions: action.payload
       });
@@ -65,11 +59,11 @@ exports.mapStateReducer = mapStateReducer;
 var refreshMap = function refreshMap(mapResponse) {
   return function (dispatch, getState) {
     dispatch({
-      type: ActionTypes.REFRESH_MAP,
+      type: _ReduxTypes.MapStateActionTypes.REFRESH_MAP,
       payload: mapResponse
     });
     dispatch({
-      type: ActionTypes.UPDATE_CELL_DIMENSIONS,
+      type: _ReduxTypes.MapStateActionTypes.UPDATE_CELL_DIMENSIONS,
       payload: generateCellDimensions(mapResponse, getState().appDimensions)
     });
   };
@@ -80,7 +74,7 @@ exports.refreshMap = refreshMap;
 var updateAppDimensions = function updateAppDimensions(width, height) {
   return function (dispatch) {
     dispatch({
-      type: ActionTypes.UPDATE_APP_DIMENSIONS,
+      type: _ReduxTypes.MapStateActionTypes.UPDATE_APP_DIMENSIONS,
       payload: {
         canvasHeight: height,
         canvasWidth: width

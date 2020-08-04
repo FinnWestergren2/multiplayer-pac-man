@@ -1,7 +1,7 @@
 import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
-import { handleMessage, getMostRecentPlayerInputs, getCurrentMap } from './serverExtensions';
+import { handleMessage, getCurrentMap } from './serverExtensions';
 import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer } from 'shared';
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
@@ -16,9 +16,8 @@ server.listen(port, () => console.log(`Server running at http://localhost:${port
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
 
-let socketList: {[key: string]: any} = {};
+let socketList: { [key: string]: any } = {};
 let mostRecentInput = PlayerStore.getState().mostRecentInput;
-
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -50,7 +49,7 @@ server.on('upgrade', function (req, socket) {
 	socketList[playerId] = socket;
 	// @ts-ignore
 	PlayerStore.dispatch(addPlayer(playerId));
-	socket.write(constructMessage({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() } ));
+	socket.write(constructMessage({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }));
 	socket.write(constructMessage({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList } }));
 	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
 });
@@ -62,7 +61,7 @@ function handleData(socket: any, buffer: Buffer, playerId: string) {
 	if (parsedBuffer) {
 		console.log(parsedBuffer);
 		const toClient = handleMessage(parsedBuffer);
-		if (toClient !== null){
+		if (toClient !== null) {
 			socket.write(constructMessage(toClient));
 		}
 	} else if (parsedBuffer === null) {
@@ -75,25 +74,27 @@ function handleData(socket: any, buffer: Buffer, playerId: string) {
 }
 
 PlayerStore.subscribe(() => {
-	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame){
+	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame) {
 		mostRecentInput = PlayerStore.getState().mostRecentInput;
 		const recentInputsMessage: ServerMessage = { type: MessageType.PLAYER_INPUT, payload: mostRecentInput! };
-		writeToAllSockets(recentInputsMessage);
+		writeToAllSockets(recentInputsMessage, mostRecentInput?.playerId);
 	}
 });
 
-const writeToAllSockets = (message: ServerMessage) => {
+const writeToAllSockets = (message: ServerMessage, excludeId?: string) => {
 	Object.keys(socketList).forEach(playerId => {
-		try {
-			socketList[playerId]?.write(constructMessage(message));
-		}
-		catch (e) {
-			console.error(e);
+		if (playerId !== excludeId) {
+			try {
+				socketList[playerId]?.write(constructMessage(message));
+			}
+			catch (e) {
+				console.error(e);
+			}
 		}
 	});
 };
 
-function parseBuffer (buffer: Buffer): ClientMessage | null | undefined {
+function parseBuffer(buffer: Buffer): ClientMessage | null | undefined {
 	const firstByte = buffer.readUInt8(0);
 	const isFinalFrame = Boolean((firstByte >>> 7) & 1); // keeping this here in case we need to persist data between frames (shouldn't need to as far as I know)
 	// we can generally ignore reserve bits
@@ -110,7 +111,7 @@ function parseBuffer (buffer: Buffer): ClientMessage | null | undefined {
 	const secondByte = buffer.readUInt8(1);
 	const isMasked = Boolean((secondByte >>> 7) & 1);
 	// Keep track of our current position as we advance through the buffer 
-	let currentOffset = 2; 
+	let currentOffset = 2;
 	let payloadLength = secondByte & 127;
 	if (payloadLength > 125) {
 		if (payloadLength === 126) {
@@ -147,8 +148,6 @@ function parseBuffer (buffer: Buffer): ClientMessage | null | undefined {
 	return JSON.parse(data.toString('utf8'));
 }
 
-
-	
 function constructMessage(message: ServerMessage) {
 	// Convert the data to JSON and copy it into a buffer
 	const json = JSON.stringify(message)
@@ -172,8 +171,8 @@ function constructMessage(message: ServerMessage) {
 };
 
 function uuidv4() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-	  var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-	  return v.toString(16);
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
 	});
-  }
+}

@@ -1,5 +1,5 @@
 import * as p5 from "p5";
-import { MapStore } from "../../containers/GameWrapper";
+import { MapStore } from "../containers/GameWrapper";
 import { CoordPair, Directions, DirectionsUtils } from "shared";
 
 export default class Cell {

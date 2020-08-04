@@ -12,12 +12,12 @@ export default class Game {
 			if (JSON.stringify(previousPlayerList) !== JSON.stringify(this.playerList)) {
 				this.initializePlayers(mapStore, playerStore);
 			}
-		})
-	}
+		});
+	};
 
 	private initializePlayers = (mapStore: MapStore, playerStore: PlayerStore) => {
 		this.players = playerStore.getState().playerList.map(pId => new Player(0, 0, pId, mapStore, playerStore));
-    }
+    };
     
 	public update = () => {
 		this.players.forEach(p => {

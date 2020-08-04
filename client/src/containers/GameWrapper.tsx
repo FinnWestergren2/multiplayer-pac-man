@@ -6,7 +6,7 @@ import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import initializeSocket from "../socket";
 import { requestMap } from "../socket/clientExtensions";
-import { mapStateReducer, playerStateReducer } from "shared";
+import { mapStateReducer, playerStateReducer, runGame } from "shared";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -28,8 +28,8 @@ export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
 export const ClientSocket = initializeSocket();
 
-
 const GameWrapper: FunctionComponent = () => {
+    runGame(MapStore, PlayerStore);
     return (
         <FlexContainer>
             <P5Wrapper />

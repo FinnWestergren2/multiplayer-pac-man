@@ -1,4 +1,4 @@
-import { Directions, PlayerStatusMap, PlayerInputHistory, StampedInput } from ".";
+import { Directions, PlayerStatusMap, PlayerInputHistory, StampedInput, PlayerStatus } from ".";
 import { Store } from "redux";
 
 export type MapStore = Store<MapState, MapStateAction>;

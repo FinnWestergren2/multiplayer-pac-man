@@ -1,26 +1,28 @@
-import Cell from "./GameMap/Cell";
+import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
-import { Player } from "./Player/Player";
-import { Directions } from "shared";
+import { Directions, addPlayerInput } from "shared";
 import { sendPlayerInput } from "../socket/clientExtensions";
+
+const SIZE_FACTOR = 0.9;
 
 export default class Game {
 	private cells: Cell[][] = [];
-	private players: Player[] = [];
-	private playerList: string[] = [];
+	private playerSize: number = 0;
+	private currentPlayer?: string;
 	public constructor(p: p5) {
 		MapStore.subscribe(() => this.initializeMap(p));
 		PlayerStore.subscribe(() => {
-			const previousPlayerList = [...this.playerList];
-			this.playerList = PlayerStore.getState().playerList;
-			if (JSON.stringify(previousPlayerList) !== JSON.stringify(this.playerList)) {
-				this.initializePlayers(p);
+			const oldAssignment = this.currentPlayer;
+			this.currentPlayer = PlayerStore.getState().currentPlayer;
+			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
+				this.bindHumanPlayer(p, this.currentPlayer);
 			}
-		})
+		});
 	}
 
 	private initializeMap = (p: p5) => {
+		this.playerSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
 		const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Directions[], y: number) =>
 			row.map((column: Directions, x) =>
@@ -29,39 +31,38 @@ export default class Game {
 		);
 	};
 
-	private initializePlayers = (p: p5) => {
-		this.players = PlayerStore.getState().playerList.map(pId => new Player(0, 0, pId));
-		this.bindHumanPlayer(p, this.players.find(player => player.id === PlayerStore.getState().currentPlayer!)!);
-	}
-
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
-		this.players.forEach(pl => pl.draw(p));
-	};
-
-	public update = () => {
-		this.players.forEach(p => {
-			p.updateState();
+		PlayerStore.getState().playerList.filter(pl => PlayerStore.getState().playerStatusMap[pl]).forEach(pl => {
+			p.push();
+			p.translate(PlayerStore.getState().playerStatusMap[pl].location.x, PlayerStore.getState().playerStatusMap[pl].location.y);
+			p.fill(255, 0, 0);
+			p.ellipse(0, 0, this.playerSize);
+			p.pop();
 		});
 	};
 
-	private bindHumanPlayer = (p: p5, player: Player) => {
+	private bindHumanPlayer = (p: p5, playerId: string) => {
 		p.keyPressed = function (): void {
 			if (p.keyCode === p.RIGHT_ARROW) {
-				player.receiveInput(Directions.RIGHT);
-				sendPlayerInput(player.id, Directions.RIGHT);
+				// @ts-ignore
+				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.RIGHT }));
+				sendPlayerInput(playerId, Directions.RIGHT);
 			}
 			if (p.keyCode === p.LEFT_ARROW) {
-				player.receiveInput(Directions.LEFT);
-				sendPlayerInput(player.id, Directions.LEFT);
+				// @ts-ignore
+				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.LEFT }));
+				sendPlayerInput(playerId, Directions.LEFT);
 			}
 			if (p.keyCode === p.UP_ARROW) {
-				player.receiveInput(Directions.UP);
-				sendPlayerInput(player.id, Directions.UP);
+				// @ts-ignore
+				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.UP }));
+				sendPlayerInput(playerId, Directions.UP);
 			}
 			if (p.keyCode === p.DOWN_ARROW) {
-				player.receiveInput(Directions.DOWN);
-				sendPlayerInput(player.id, Directions.DOWN);
+				// @ts-ignore
+				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.DOWN }));
+				sendPlayerInput(playerId, Directions.DOWN);
 			}
 		};
 	};

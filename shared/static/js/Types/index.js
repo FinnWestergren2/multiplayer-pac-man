@@ -39,3 +39,15 @@ Object.keys(_PlayerStatus).forEach(function (key) {
     }
   });
 });
+
+var _ReduxTypes = require("./ReduxTypes");
+
+Object.keys(_ReduxTypes).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _ReduxTypes[key];
+    }
+  });
+});

@@ -1,4 +1,5 @@
 import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatus, MapStore, PlayerStore } from "../Types";
+import { updatePlayerStatus } from "../ducks/playerState";
 const SPEED_FACTOR = 0.035;
 
 export class Player {
@@ -69,11 +70,13 @@ export class Player {
             }
         }
         this.location = CoordPairUtils.addPairs(this.location, this.velocity);
-    }
+        // @ts-ignore
+        this.playerStore.dispatch(updatePlayerStatus(this.id, { location: this.location, direction: this.currentDirection }));
+    };
 
     public getCurrentState: () => PlayerStatus = () => {
         return { location: this.location, direction: this.currentDirection }
-    }
+    };
 
     private moveTowardsTarget = () => {
         if (this.currentDirection === Directions.RIGHT && this.canMoveRight()) {
@@ -88,11 +91,9 @@ export class Player {
         if (this.currentDirection === Directions.DOWN && this.canMoveDown()) {
             this.velocity = { x: 0, y: this.speed };
         }
-    }
+    };
 
-    /*
-        returns true if the player has hit the center of the target cell
-    */
+    // returns true if the player has hit the center of the target cell
     public isCentered = () => {
         const target = this.targetLocation();
         const snapX = Math.abs(this.location.x - target.x) < this.speed;
@@ -108,7 +109,7 @@ export class Player {
         if (snapX && snapY) {
             return true;
         }
-    } 
+    };
 
     private targetLocation = () => {
         return this.toLocationCoords(this.targetCell(this.location, this.currentDirection));

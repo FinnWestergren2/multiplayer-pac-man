@@ -18,7 +18,6 @@ export default function sketch(p: p5): void {
 	p.draw = function (): void {
 		p.background(255);
 		game.draw(p);
-		game.update();
 	};
 	
 	p.mouseClicked = pingServer

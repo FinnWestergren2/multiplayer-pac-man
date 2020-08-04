@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "static": true,
+        "static": false,
         "node_modules": true
     }
 }
