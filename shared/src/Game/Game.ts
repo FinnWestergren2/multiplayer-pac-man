@@ -5,7 +5,9 @@ import { playerStore } from ".";
 export default class Game {
 	private players: { [key: string]: Player } = {};
 	private playerIdList: string[] = [];
-	public constructor() {
+	private currentFrame: number
+	public constructor(currentFrame: number) {
+		this.currentFrame = currentFrame;
 		playerStore.subscribe(() => {
 			const previousPlayerList = [...this.playerIdList];
 			this.playerIdList = playerStore.getState().playerList;
@@ -22,7 +24,7 @@ export default class Game {
 			}
 		})
 		this.playerIdList.filter(pId => !this.players[pId]).forEach(pId => {
-			this.players[pId] = new Player(0, 0, pId);
+			this.players[pId] = new Player(pId);
 		})
 	};
 
@@ -30,5 +32,6 @@ export default class Game {
 		Object.keys(this.players).forEach(key => {
 			this.players[key].updateState();
 		});
+		this.currentFrame++;
 	};
 };

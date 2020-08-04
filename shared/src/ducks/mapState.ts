@@ -5,8 +5,8 @@ import { MapState, MapStateAction, MapStateActionTypes, AppDimensions } from "..
 const initialState: MapState = {
     mapCells: [],
     appDimensions: {
-        canvasHeight: 0,
-        canvasWidth: 0
+        canvasHeight: 600,
+        canvasWidth: 600
     },
     cellDimensions: {
         cellSize: 0,

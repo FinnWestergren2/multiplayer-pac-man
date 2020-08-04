@@ -3,7 +3,8 @@ import { Directions } from "./Directions"
 
 export type PlayerStatus = { 
     location: CoordPair,
-    direction: Directions
+    direction: Directions,
+    nextDirection: Directions
 }
 
 export type StampedInput = {

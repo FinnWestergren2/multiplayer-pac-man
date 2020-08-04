@@ -2,7 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
-import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer } from 'shared';
+import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer, runGame } from 'shared';
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
 import {Socket} from "net"
@@ -19,6 +19,7 @@ export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk
 
 let socketList: { [key: string]: Socket } = {};
 let mostRecentInput = PlayerStore.getState().mostRecentInput;
+runGame(MapStore, PlayerStore, (new Date()).getTime(), setInterval);
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -52,7 +53,7 @@ server.on('upgrade', function (req, socket: Socket) {
 	// @ts-ignore
 	PlayerStore.dispatch(addPlayer(playerId));
 	tryWrite({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	tryWrite({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList } }, playerId);
+	tryWrite({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, playerStatusMap: PlayerStore.getState().playerStatusMap } }, playerId);
 	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
 });
 
@@ -102,7 +103,7 @@ const tryWrite = (message: ServerMessage, socketId: string, isRetry: boolean = f
 		console.log(e);
 		if (e.code === 'ERR_STREAM_DESTROYED') {
 			// @ts-ignore
-			PlayerStore.dispatch(removePlayer(playerId));
+			PlayerStore.dispatch(removePlayer(socketId));
 			delete socketList[socketId];
 		}
 		else if (!isRetry) {

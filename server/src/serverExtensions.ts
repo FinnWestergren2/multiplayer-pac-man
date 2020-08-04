@@ -1,11 +1,11 @@
-import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, updatePlayerStatus, addPlayerInput } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, addPlayerInput, updateAppDimensions } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore } from ".";
 
 export function handleMessage(message: ClientMessage): ServerMessage | null {
 	switch (message.type) {
 		case MessageType.PING:
-			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload };
+			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload.time };
 		case MessageType.MAP_REQUEST:
 			return { type: MessageType.MAP_RESPONSE, payload: getCurrentMap() };
 		case MessageType.PLAYER_INPUT:

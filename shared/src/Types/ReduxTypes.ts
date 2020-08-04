@@ -41,6 +41,7 @@ export type PlayerState = {
 
 export enum PlayerStateActionTypes {
     UPDATE_PLAYER_STATUS = "UPDATE_PLAYER_STATUS",
+    SET_PLAYER_STATUS = "SET_PLAYER_STATUS",
     ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
     ADD_PLAYER = "ADD_PLAYER",
     REMOVE_PLAYER = "REMOVE_PLAYER",
@@ -50,8 +51,10 @@ export enum PlayerStateActionTypes {
 
 export type PlayerStateAction =
     { type: PlayerStateActionTypes.UPDATE_PLAYER_STATUS; payload: { playerId: string, status: PlayerStatus } } |
+    { type: PlayerStateActionTypes.SET_PLAYER_STATUS; payload: PlayerStatusMap } |
     { type: PlayerStateActionTypes.ADD_PLAYER_INPUT; payload: { playerId: string, input: StampedInput } } |
     { type: PlayerStateActionTypes.ADD_PLAYER; payload: string } |
     { type: PlayerStateActionTypes.REMOVE_PLAYER; payload: string } |
     { type: PlayerStateActionTypes.SET_CURRENT_PLAYER_ID; payload: string } |
     { type: PlayerStateActionTypes.SET_PLAYER_LIST; payload: string[] }
+ 

@@ -1,4 +1,4 @@
-import { Directions, StampedInput } from "../Types"
+import { Directions, StampedInput, PlayerStatusMap } from "../Types"
 
 // id keep these as numbers to keep the packet size low
 // export enum MessageType {
@@ -30,12 +30,12 @@ export enum MessageType {
 
 
 export type ClientMessage =
-    { type: MessageType.PING, payload: number } |
+    { type: MessageType.PING, payload: { time: number, playerId: string } } |
     { type: MessageType.MAP_REQUEST, payload: null } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 type PlayerListUpdate =
-    { type: MessageType.INIT_PLAYER, payload: { currentPlayerId: string, fullPlayerList: string[] } }|
+    { type: MessageType.INIT_PLAYER, payload: { currentPlayerId: string, fullPlayerList: string[], playerStatusMap: PlayerStatusMap } }|
     { type: MessageType.REMOVE_PLAYER, payload: string } |
     { type: MessageType.ADD_PLAYER, payload: string }
 

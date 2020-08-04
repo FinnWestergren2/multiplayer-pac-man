@@ -12,11 +12,13 @@ const initialState: PlayerState = {
 
 export const playerStateReducer = (state: PlayerState = initialState, action: PlayerStateAction) => {
     switch (action.type) {
+        case PlayerStateActionTypes.SET_PLAYER_STATUS:
+            return { ...state, playerStatusMap: action.payload };
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
         case PlayerStateActionTypes.ADD_PLAYER_INPUT:
-            const newHistory = state.playerInputHistory[action.payload.playerId] 
-                ? [...state.playerInputHistory[action.payload.playerId], action.payload.input] 
+            const newHistory = state.playerInputHistory[action.payload.playerId]
+                ? [...state.playerInputHistory[action.payload.playerId], action.payload.input]
                 : [action.payload.input];
             return { ...state, playerInputHistory: { ...state.playerInputHistory, [action.payload.playerId]: newHistory }, mostRecentInput: action.payload };
         case PlayerStateActionTypes.ADD_PLAYER:
@@ -25,14 +27,23 @@ export const playerStateReducer = (state: PlayerState = initialState, action: Pl
             }
             return { ...state, playerList: [...state.playerList, action.payload] };
         case PlayerStateActionTypes.REMOVE_PLAYER:
-            return { ...state, playerList: state.playerList.filter(p => p != action.payload) };
+            const newState = { ...state };
+            delete newState.playerStatusMap[action.payload];
+            delete newState.playerInputHistory[action.payload];
+            return { ...newState, playerList: state.playerList.filter(p => p != action.payload) };
         case PlayerStateActionTypes.SET_CURRENT_PLAYER_ID:
             return { ...state, currentPlayer: action.payload };
         case PlayerStateActionTypes.SET_PLAYER_LIST:
-            return { ...state, playerList: action.payload }
+            return { ...state, playerList: action.payload };
         default:
             return state;
     }
+};
+
+export const setPlayerStatus = (playerStatusMap: PlayerStatusMap) => {
+    return function (dispatch: Dispatch<AnyAction>) {
+        dispatch({ type: PlayerStateActionTypes.SET_PLAYER_STATUS, payload: playerStatusMap });
+    };
 };
 
 export const updatePlayerStatus = (playerId: string, newStatus: PlayerStatus) => {

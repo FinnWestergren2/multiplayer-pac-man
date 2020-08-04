@@ -13,9 +13,9 @@ export default class Cell {
     private left: boolean;
     private right: boolean;
 
-    public constructor(cellType: Directions, x: number, y: number){
+    public constructor(cellType: Directions, x: number, y: number) {
         this.cellType = cellType;
-        this.gridCoords = {x, y};
+        this.gridCoords = { x, y };
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
@@ -34,13 +34,13 @@ export default class Cell {
         p.pop();
     }
 
-    private drawDebugText(p: p5){
-        p.textAlign("center","center");
+    private drawDebugText(p: p5) {
+        p.textAlign("center", "center");
         p.text(`(${this.gridCoords.x}, ${this.gridCoords.y})`, 0, 0);
     }
 
     private drawDebugLines: (p: p5) => void = (p) => {
-        p.stroke(0,255,0);
+        p.stroke(0, 255, 0);
         if (this.up) {
             p.line(0, 0, 0, -this.halfSize);
         }
@@ -57,19 +57,19 @@ export default class Cell {
     }
 
     private drawWalls: (p: p5) => void = (p) => {
-        if(!this.down){
+        if (!this.down) {
             p.line(-this.halfSize, this.halfSize, this.halfSize, this.halfSize);
         }
-        
-        if(!this.up){
+
+        if (!this.up) {
             p.line(-this.halfSize, -this.halfSize, this.halfSize, -this.halfSize);
         }
-        
-        if(!this.right){
+
+        if (!this.right) {
             p.line(this.halfSize, -this.halfSize, this.halfSize, this.halfSize);
         }
-        
-        if(!this.left){
+
+        if (!this.left) {
             p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize);
         }
     }

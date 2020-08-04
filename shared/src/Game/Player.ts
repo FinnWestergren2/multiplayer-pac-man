@@ -1,27 +1,27 @@
 import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatus} from "../Types";
 import { updatePlayerStatus } from "../ducks/playerState";
 import { mapStore, playerStore } from ".";
-const SPEED_FACTOR = 0.035;
+const SPEED_FACTOR = 0.08;
 
 export class Player {
-    private initialPos: CoordPair;
-    private location: CoordPair = { ...CoordPairUtils.zeroPair };
+    private location: CoordPair;
     private velocity: CoordPair = { ...CoordPairUtils.zeroPair };
-    private speed = 0;
+    private speed: number;
     private currentDirection: Directions = Directions.NONE;
     private nextDirection: Directions = Directions.NONE;
     private mostRecentUpdate: number = 0;
     public id: string;
 
-    public constructor(initX: number, initY: number, id: string) {
-        this.initialPos = { x: initX, y: initY };
+    public constructor(id: string) {
+        console.log('psm', playerStore.getState().playerStatusMap);
+        console.log('cellSize', mapStore.getState().cellDimensions.cellSize);
         const { cellSize, halfCellSize } = mapStore.getState().cellDimensions;
         this.speed = cellSize * SPEED_FACTOR;
-        this.location = { x: cellSize * this.initialPos.x + halfCellSize, y: cellSize * this.initialPos.y + halfCellSize };
         this.velocity = { ...CoordPairUtils.zeroPair };
-        this.currentDirection = Directions.NONE;
-        this.nextDirection = Directions.NONE;
+        this.currentDirection = playerStore.getState().playerStatusMap[id]?.direction ?? Directions.NONE;
+        this.nextDirection = playerStore.getState().playerStatusMap[id]?.nextDirection ?? Directions.NONE;
         this.id = id;
+        this.location = playerStore.getState().playerStatusMap[id]?.location ??  { x: halfCellSize, y: halfCellSize }
         playerStore.subscribe(() => {
             const previousUpdate = this.mostRecentUpdate;
             const myInputHistory = playerStore.getState().playerInputHistory[id];
@@ -66,11 +66,7 @@ export class Player {
         }
         this.location = CoordPairUtils.addPairs(this.location, this.velocity);
         // @ts-ignore
-        playerStore.dispatch(updatePlayerStatus(this.id, { location: this.location, direction: this.currentDirection }));
-    };
-
-    public getCurrentState: () => PlayerStatus = () => {
-        return { location: this.location, direction: this.currentDirection }
+        playerStore.dispatch(updatePlayerStatus(this.id, { location: this.location, direction: this.currentDirection, nextDirection: this.nextDirection }));
     };
 
     private moveTowardsTarget = () => {

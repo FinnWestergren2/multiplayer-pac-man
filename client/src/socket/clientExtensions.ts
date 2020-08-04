@@ -1,4 +1,4 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatus, setPlayerStatus } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
@@ -10,6 +10,8 @@ export function handleMessage(message: ServerMessage): void {
         case MessageType.INIT_PLAYER:
             // @ts-ignore
             PlayerStore.dispatch(setCurrentPlayers(message.payload.currentPlayerId, message.payload.fullPlayerList));
+            // @ts-ignore
+            PlayerStore.dispatch(setPlayerStatus(message.payload.playerStatusMap));
             return;
         case MessageType.MAP_RESPONSE:
             // @ts-ignore
@@ -37,7 +39,7 @@ export function handleMessage(message: ServerMessage): void {
 }
 
 export const pingServer = () => {
-    const request: ClientMessage = { type: MessageType.PING, payload: (new Date()).getTime() }
+    const request: ClientMessage = { type: MessageType.PING, payload: { time: (new Date()).getTime(), playerId: PlayerStore.getState().currentPlayer! } }
     ClientSocket.send(JSON.stringify(request));
 }
 
