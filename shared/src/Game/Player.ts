@@ -14,7 +14,6 @@ export class Player {
     public id: string;
 
     public constructor(initX: number, initY: number, id: string) {
-        console.log('init');
         this.initialPos = { x: initX, y: initY };
         const { cellSize, halfCellSize } = mapStore.getState().cellDimensions;
         this.speed = cellSize * SPEED_FACTOR;
@@ -24,7 +23,6 @@ export class Player {
         this.nextDirection = Directions.NONE;
         this.id = id;
         playerStore.subscribe(() => {
-            console.log('updating', playerStore.getState().playerInputHistory[id]);
             const previousUpdate = this.mostRecentUpdate;
             const myInputHistory = playerStore.getState().playerInputHistory[id];
             this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;

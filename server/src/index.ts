@@ -100,7 +100,12 @@ const tryWrite = (message: ServerMessage, socketId: string, isRetry: boolean = f
 	}
 	catch (e) {
 		console.log(e);
-		if (!isRetry) {
+		if (e.code === 'ERR_STREAM_DESTROYED') {
+			// @ts-ignore
+			PlayerStore.dispatch(removePlayer(playerId));
+			delete socketList[socketId];
+		}
+		else if (!isRetry) {
 			console.log('retrying send');
 			tryWrite(message, socketId, true);
 		}
