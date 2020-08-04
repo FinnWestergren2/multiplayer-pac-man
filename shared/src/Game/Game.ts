@@ -1,6 +1,6 @@
 
 import { Player } from "./Player";
-import { mapStore, playerStore } from ".";
+import { playerStore } from ".";
 
 export default class Game {
 	private players: Player[] = [];

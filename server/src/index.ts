@@ -5,6 +5,7 @@ import { handleMessage, getCurrentMap } from './serverExtensions';
 import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer } from 'shared';
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
+import {Socket} from "net"
 
 const file = new nodeStatic.Server('./');
 const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -16,7 +17,7 @@ server.listen(port, () => console.log(`Server running at http://localhost:${port
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
 
-let socketList: { [key: string]: any } = {};
+let socketList: { [key: string]: Socket } = {};
 let mostRecentInput = PlayerStore.getState().mostRecentInput;
 
 const generateHash = (acceptKey: string) => crypto
@@ -24,7 +25,7 @@ const generateHash = (acceptKey: string) => crypto
 	.update(acceptKey + serverId)
 	.digest('base64');
 
-server.on('upgrade', function (req, socket) {
+server.on('upgrade', function (req, socket: Socket) {
 	// Make sure that we only handle WebSocket upgrade requests
 	if (req.headers['upgrade'] !== 'websocket') {
 		socket.end('HTTP/1.1 400 Bad Request');
@@ -45,33 +46,37 @@ server.on('upgrade', function (req, socket) {
 	// header and doesn't continue to wait for more header data: 
 	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
 	const playerId = uuidv4();
-	socket.on('data', (buffer: Buffer) => handleData(socket, buffer, playerId));
+	socket.on('data', (buffer: Buffer) => handleData(buffer, playerId));
+	socket.on('close', () => console.log("closing from socket"));
 	socketList[playerId] = socket;
 	// @ts-ignore
 	PlayerStore.dispatch(addPlayer(playerId));
-	socket.write(constructMessage({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }));
-	socket.write(constructMessage({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList } }));
+	tryWrite({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
+	tryWrite({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList } }, playerId);
 	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
 });
 
 server.on('connection', () => console.log("connected"));
+server.on('close', () => console.log("closing"));
 
-function handleData(socket: any, buffer: Buffer, playerId: string) {
+function handleData(buffer: Buffer, playerId: string) {
 	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
 		console.log(parsedBuffer);
 		const toClient = handleMessage(parsedBuffer);
 		if (toClient !== null) {
-			socket.write(constructMessage(toClient));
+			tryWrite(toClient, playerId);
 		}
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 		writeToAllSockets({ type: MessageType.REMOVE_PLAYER, payload: playerId });
 		// @ts-ignore
 		PlayerStore.dispatch(removePlayer(playerId));
-		socketList = { ...socketList, [playerId]: undefined };
+		socketList[playerId].end();
+		socketList[playerId].destroy();
+		delete socketList[playerId];
 	}
-;}
+};
 
 PlayerStore.subscribe(() => {
 	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame) {
@@ -84,15 +89,23 @@ PlayerStore.subscribe(() => {
 const writeToAllSockets = (message: ServerMessage, excludeId?: string) => {
 	Object.keys(socketList).forEach(playerId => {
 		if (playerId !== excludeId) {
-			try {
-				socketList[playerId]?.write(constructMessage(message));
-			}
-			catch (e) {
-				console.error(e);
-			}
+			tryWrite(message, playerId);
 		}
 	});
 };
+
+const tryWrite = (message: ServerMessage, socketId: string, isRetry: boolean = false ) => {
+	try {
+		socketList[socketId].write(constructMessage(message));
+	}
+	catch (e) {
+		console.log(e);
+		if (!isRetry) {
+			console.log('retrying send');
+			tryWrite(message, socketId, true);
+		}
+	}
+}
 
 function parseBuffer(buffer: Buffer): ClientMessage | null | undefined {
 	const firstByte = buffer.readUInt8(0);
