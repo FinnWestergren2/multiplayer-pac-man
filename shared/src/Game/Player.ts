@@ -1,5 +1,6 @@
-import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatus, MapStore, PlayerStore } from "../Types";
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatus} from "../Types";
 import { updatePlayerStatus } from "../ducks/playerState";
+import { mapStore, playerStore } from ".";
 const SPEED_FACTOR = 0.035;
 
 export class Player {
@@ -10,26 +11,22 @@ export class Player {
     private currentDirection: Directions = Directions.NONE;
     private nextDirection: Directions = Directions.NONE;
     private mostRecentUpdate: number = 0;
-    private mapStore: MapStore;
-    private playerStore: PlayerStore;
     public id: string;
 
-    public constructor(initX: number, initY: number, id: string, mapStore: MapStore, playerStore: PlayerStore) {
+    public constructor(initX: number, initY: number, id: string) {
         console.log('init');
-        this.mapStore = mapStore;
-        this.playerStore = playerStore;
         this.initialPos = { x: initX, y: initY };
-        const { cellSize, halfCellSize } = this.mapStore.getState().cellDimensions;
+        const { cellSize, halfCellSize } = mapStore.getState().cellDimensions;
         this.speed = cellSize * SPEED_FACTOR;
         this.location = { x: cellSize * this.initialPos.x + halfCellSize, y: cellSize * this.initialPos.y + halfCellSize };
         this.velocity = { ...CoordPairUtils.zeroPair };
         this.currentDirection = Directions.NONE;
         this.nextDirection = Directions.NONE;
         this.id = id;
-        this.playerStore.subscribe(() => {
-            console.log('updating', this.playerStore.getState().playerInputHistory[id]);
+        playerStore.subscribe(() => {
+            console.log('updating', playerStore.getState().playerInputHistory[id]);
             const previousUpdate = this.mostRecentUpdate;
-            const myInputHistory = this.playerStore.getState().playerInputHistory[id];
+            const myInputHistory = playerStore.getState().playerInputHistory[id];
             this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;
             if (previousUpdate !== this.mostRecentUpdate){
                 this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
@@ -71,7 +68,7 @@ export class Player {
         }
         this.location = CoordPairUtils.addPairs(this.location, this.velocity);
         // @ts-ignore
-        this.playerStore.dispatch(updatePlayerStatus(this.id, { location: this.location, direction: this.currentDirection }));
+        playerStore.dispatch(updatePlayerStatus(this.id, { location: this.location, direction: this.currentDirection }));
     };
 
     public getCurrentState: () => PlayerStatus = () => {
@@ -157,7 +154,7 @@ export class Player {
     // these methods could get moved to reselect if we want a performance boost
     private getCellType = (gridCoords: CoordPair) => {
         try {
-            return this.mapStore.getState().mapCells[gridCoords.y][gridCoords.x];
+            return mapStore.getState().mapCells[gridCoords.y][gridCoords.x];
         } catch (error) {
             return Directions.NONE;
         }
@@ -165,7 +162,7 @@ export class Player {
 
     // returns the absolute center of a cell
     private toLocationCoords = (gridCoords: CoordPair) => {
-        const halfCellSize = this.mapStore.getState().cellDimensions.halfCellSize;
+        const halfCellSize = mapStore.getState().cellDimensions.halfCellSize;
         return {
             x: (gridCoords.x) * (halfCellSize * 2) + halfCellSize,
             y: (gridCoords.y) * (halfCellSize * 2) + halfCellSize
@@ -174,7 +171,7 @@ export class Player {
 
     // definitely the most expensive method, memoize this first
     private toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationCoords) => {
-        const factor = 1 / this.mapStore.getState().cellDimensions.cellSize;
+        const factor = 1 / mapStore.getState().cellDimensions.cellSize;
         return { x: Math.floor(locationCoords.x * factor), y: Math.floor(locationCoords.y * factor) };
     };
 }

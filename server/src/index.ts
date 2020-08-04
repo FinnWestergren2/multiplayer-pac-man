@@ -71,7 +71,7 @@ function handleData(socket: any, buffer: Buffer, playerId: string) {
 		PlayerStore.dispatch(removePlayer(playerId));
 		socketList = { ...socketList, [playerId]: undefined };
 	}
-}
+;}
 
 PlayerStore.subscribe(() => {
 	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame) {
