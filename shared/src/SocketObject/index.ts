@@ -47,4 +47,3 @@ export type ServerMessage =
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 export type MapResponse = Directions[][];
-

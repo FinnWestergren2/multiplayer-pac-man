@@ -34,8 +34,11 @@ export default class Game {
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
 		PlayerStore.getState().playerList.filter(pl => PlayerStore.getState().playerStatusMap[pl]).forEach(pl => {
+			const location = PlayerStore.getState().playerStatusMap[pl].location;
+			const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
+
 			p.push();
-			p.translate(PlayerStore.getState().playerStatusMap[pl].location.x, PlayerStore.getState().playerStatusMap[pl].location.y);
+			p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 			(pl === this.currentPlayer) ? p.fill(0, 0, 255) : p.fill(255, 0, 0);
 			p.ellipse(0, 0, this.playerSize);
 			p.pop();

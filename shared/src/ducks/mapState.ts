@@ -5,8 +5,8 @@ import { MapState, MapStateAction, MapStateActionTypes, AppDimensions } from "..
 const initialState: MapState = {
     mapCells: [],
     appDimensions: {
-        canvasHeight: 600,
-        canvasWidth: 600
+        canvasHeight: 0,
+        canvasWidth: 0
     },
     cellDimensions: {
         cellSize: 0,
@@ -35,12 +35,16 @@ export const refreshMap = (mapResponse: MapResponse) => {
 };
 
 export const updateAppDimensions = (width: number, height: number) => {
-    return function (dispatch: Dispatch<AnyAction>) {
+    return function (dispatch: Dispatch<AnyAction>, getState: () => MapState) {
         dispatch({ type: MapStateActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
+        if (getState().mapCells.length > 0) {
+            dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(getState().mapCells, { canvasHeight: height, canvasWidth: width }) });
+        }
     };
 };
 
 const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
+
     const size = Math.min(
         (appDimensions.canvasWidth - 1) / Math.max(...(data.map(r => r.length))),
         (appDimensions.canvasHeight - 1) / data.length);

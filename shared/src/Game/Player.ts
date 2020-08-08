@@ -13,23 +13,20 @@ export class Player {
     public id: string;
 
     public constructor(id: string) {
-        console.log('psm', playerStore.getState().playerStatusMap);
-        console.log('cellSize', mapStore.getState().cellDimensions.cellSize);
-        const { cellSize, halfCellSize } = mapStore.getState().cellDimensions;
-        this.speed = cellSize * SPEED_FACTOR;
+        this.speed = SPEED_FACTOR;
         this.velocity = { ...CoordPairUtils.zeroPair };
         this.currentDirection = playerStore.getState().playerStatusMap[id]?.direction ?? Directions.NONE;
         this.nextDirection = playerStore.getState().playerStatusMap[id]?.nextDirection ?? Directions.NONE;
         this.id = id;
-        this.location = playerStore.getState().playerStatusMap[id]?.location ??  { x: halfCellSize, y: halfCellSize }
+        this.location = playerStore.getState().playerStatusMap[id]?.location ??  { x: 0, y: 0 }
         playerStore.subscribe(() => {
             const previousUpdate = this.mostRecentUpdate;
             const myInputHistory = playerStore.getState().playerInputHistory[id];
             this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;
-            if (previousUpdate !== this.mostRecentUpdate){
+            if (myInputHistory && previousUpdate !== this.mostRecentUpdate){
                 this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
             }
-        })
+        });
     }
 
     public receiveInput(dir: Directions) {
@@ -103,13 +100,13 @@ export class Player {
     };
 
     private targetLocation = () => {
-        return this.toLocationCoords(this.targetCell(this.location, this.currentDirection));
+        return this.targetCell(this.location, this.currentDirection);
     };
 
-    private canMoveRight = () => DirectionsUtils.isRight(this.currentCellType()) || this.location.x < this.toLocationCoords(this.currentCell()).x;
-    private canMoveLeft = () => DirectionsUtils.isLeft(this.currentCellType()) || this.location.x > this.toLocationCoords(this.currentCell()).x;
-    private canMoveUp = () => DirectionsUtils.isUp(this.currentCellType()) || this.location.y > this.toLocationCoords(this.currentCell()).y;
-    private canMoveDown = () => DirectionsUtils.isDown(this.currentCellType()) || this.location.y < this.toLocationCoords(this.currentCell()).y;
+    private canMoveRight = () => DirectionsUtils.isRight(this.currentCellType()) || this.location.x < this.currentCell().x;
+    private canMoveLeft = () => DirectionsUtils.isLeft(this.currentCellType()) || this.location.x > this.currentCell().x;
+    private canMoveUp = () => DirectionsUtils.isUp(this.currentCellType()) || this.location.y > this.currentCell().y;
+    private canMoveDown = () => DirectionsUtils.isDown(this.currentCellType()) || this.location.y < this.currentCell().y;
     private notMoving = () => this.velocity.x === 0 && this.velocity.y === 0;
     private currentCellType = () => this.getCellType(this.currentCell());
     private targetCellType = () => this.getCellType(this.targetCell(this.location, this.currentDirection));
@@ -117,27 +114,26 @@ export class Player {
 
     private targetCell = (locationCoords: CoordPair,  direction: Directions) => {
         const currentCell = this.toGridCoords(locationCoords);
-        const translation = this.toLocationCoords(currentCell);
         const targetCell = { ...currentCell };
         const currentCellType = this.getCellType(currentCell);
         switch (direction) {
             case Directions.UP:
-                if (locationCoords.y <= translation.y && DirectionsUtils.isUp(currentCellType)) {
+                if (locationCoords.y <= currentCell.y && DirectionsUtils.isUp(currentCellType)) {
                     targetCell.y--;
                 }
                 break;
             case Directions.DOWN:
-                if (locationCoords.y >= translation.y && DirectionsUtils.isDown(currentCellType)) {
+                if (locationCoords.y >= currentCell.y && DirectionsUtils.isDown(currentCellType)) {
                     targetCell.y++;
                 }
                 break;
             case Directions.LEFT:
-                if (locationCoords.x <= translation.x && DirectionsUtils.isLeft(currentCellType)) {
+                if (locationCoords.x <= currentCell.x && DirectionsUtils.isLeft(currentCellType)) {
                     targetCell.x--;
                 }
                 break;
             case Directions.RIGHT:
-                if (locationCoords.x >= translation.x && DirectionsUtils.isRight(currentCellType)) {
+                if (locationCoords.x >= currentCell.x && DirectionsUtils.isRight(currentCellType)) {
                     targetCell.x++;
                 }
                 break;
@@ -145,27 +141,9 @@ export class Player {
         return targetCell;
     }
         
-    // these methods could get moved to reselect if we want a performance boost
-    private getCellType = (gridCoords: CoordPair) => {
-        try {
-            return mapStore.getState().mapCells[gridCoords.y][gridCoords.x];
-        } catch (error) {
-            return Directions.NONE;
-        }
-    };
-
-    // returns the absolute center of a cell
-    private toLocationCoords = (gridCoords: CoordPair) => {
-        const halfCellSize = mapStore.getState().cellDimensions.halfCellSize;
-        return {
-            x: (gridCoords.x) * (halfCellSize * 2) + halfCellSize,
-            y: (gridCoords.y) * (halfCellSize * 2) + halfCellSize
-        };
-    };
-
-    // definitely the most expensive method, memoize this first
+    private getCellType = (gridCoords: CoordPair) => mapStore.getState().mapCells[gridCoords.y][gridCoords.x];
+    
     private toGridCoords: (locationCoords: CoordPair) => CoordPair = (locationCoords) => {
-        const factor = 1 / mapStore.getState().cellDimensions.cellSize;
-        return { x: Math.floor(locationCoords.x * factor), y: Math.floor(locationCoords.y * factor) };
+        return { x: Math.floor(locationCoords.x), y: Math.floor(locationCoords.y) };
     };
 }
