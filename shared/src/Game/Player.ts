@@ -20,12 +20,7 @@ export class Player {
         this.id = id;
         this.location = playerStore.getState().playerStatusMap[id]?.location ??  { x: 0, y: 0 }
         playerStore.subscribe(() => {
-            const previousUpdate = this.mostRecentUpdate;
-            const myInputHistory = playerStore.getState().playerInputHistory[id];
-            this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;
-            if (myInputHistory && previousUpdate !== this.mostRecentUpdate){
-                this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
-            }
+            this.handleInput();
         });
     }
 
@@ -99,10 +94,16 @@ export class Player {
         }
     };
 
-    private targetLocation = () => {
-        return this.targetCell(this.location, this.currentDirection);
-    };
+    private handleInput = () => {
+        const previousUpdate = this.mostRecentUpdate;
+        const myInputHistory = playerStore.getState().playerInputHistory[this.id];
+        this.mostRecentUpdate = myInputHistory ? myInputHistory[myInputHistory.length-1].frame : 0;
+        if (myInputHistory && previousUpdate !== this.mostRecentUpdate){
+            this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
+        }
+    }
 
+    private targetLocation = () => this.targetCell(this.location, this.currentDirection);
     private canMoveRight = () => DirectionsUtils.isRight(this.currentCellType()) || this.location.x < this.currentCell().x;
     private canMoveLeft = () => DirectionsUtils.isLeft(this.currentCellType()) || this.location.x > this.currentCell().x;
     private canMoveUp = () => DirectionsUtils.isUp(this.currentCellType()) || this.location.y > this.currentCell().y;
