@@ -63,7 +63,6 @@ server.on('close', () => console.log("closing"));
 function handleData(buffer: Buffer, playerId: string) {
 	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
-		console.log(parsedBuffer);
 		const toClient = handleMessage(parsedBuffer);
 		if (toClient !== null) {
 			tryWrite(toClient, playerId);

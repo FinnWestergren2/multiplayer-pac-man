@@ -1,4 +1,4 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatus, setPlayerStatus } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatus, setPlayerStatus, CoordPair } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
@@ -32,6 +32,9 @@ export function handleMessage(message: ServerMessage): void {
         case MessageType.INVALID:
             console.log('sent an invalid message to server')
             return;
+        case MessageType.STATE_OVERRIDE:
+            // @ts-ignore
+            PlayerStore.dispatch(setPlayerStatus(message.payload));
         default:
             console.log('recieved an invalid message type from server')
             return;
@@ -50,5 +53,15 @@ export const requestMap = () => {
 
 export const sendPlayerInput = (playerId: string, dir: Directions) => {
     const request: ClientMessage = { type: MessageType.PLAYER_INPUT, payload: { playerId, input: { frame: (new Date()).getTime(), direction: dir } } }
+    ClientSocket.send(JSON.stringify(request));
+}
+
+export const sendPerceptionUpdate = () => { 
+    const currentState = PlayerStore.getState().playerStatusMap
+    let payload = {};
+    Object.keys(currentState).forEach(playerId => {
+        payload = {...payload, [playerId]: currentState[playerId].location }
+    });
+    const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload };
     ClientSocket.send(JSON.stringify(request));
 }

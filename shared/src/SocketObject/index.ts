@@ -1,21 +1,5 @@
-import { Directions, StampedInput, PlayerStatusMap } from "../Types"
+import { Directions, StampedInput, PlayerStatusMap, CoordPair } from "../Types"
 
-// id keep these as numbers to keep the packet size low
-// export enum MessageType {
-//     SET_CURRENT_PLAYER,
-//     PING,
-//     PONG,
-//     MAP_REQUEST,
-//     MAP_RESPONSE,
-//     PLAYER_INPUT,
-//     PLAYER_STATUS_UPDATE,
-//     ADD_PLAYER,
-//     REMOVE_PLAYER,
-//     INVALID
-// }
-
-
-// for debug
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
     PING = "PING",
@@ -25,13 +9,16 @@ export enum MessageType {
     PLAYER_INPUT = "PLAYER_INPUT",
     ADD_PLAYER = "ADD_PLAYER",
     REMOVE_PLAYER = "REMOVE_PLAYER",
-    INVALID = "INVALID"
+    INVALID = "INVALID",
+    CLIENT_PERCEPTION_UPDATE = "CLIENT_PERCEPTION_UPDATE",
+    STATE_OVERRIDE = "STATE_OVERRIDE" 
 }
 
 
 export type ClientMessage =
     { type: MessageType.PING, payload: { time: number, playerId: string } } |
     { type: MessageType.MAP_REQUEST, payload: null } |
+    { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: { [playerId: string]: CoordPair } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 type PlayerListUpdate =
@@ -44,6 +31,7 @@ export type ServerMessage =
     { type: MessageType.PONG, payload: number } |
     { type: MessageType.MAP_RESPONSE, payload: MapResponse } |
     { type: MessageType.INVALID, payload: null } |
+    { type: MessageType.STATE_OVERRIDE, payload: PlayerStatusMap } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 export type MapResponse = Directions[][];
