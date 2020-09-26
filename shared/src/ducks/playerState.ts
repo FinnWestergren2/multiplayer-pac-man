@@ -1,4 +1,4 @@
-import { AnyAction, Dispatch } from "redux";
+import { AnyAction, Dispatch, Reducer } from "redux";
 import { PlayerStatusMap, PlayerStatus, PlayerInputHistory } from "..";
 import { StampedInput } from "../Types";
 import { PlayerState, PlayerStateActionTypes, PlayerStateAction } from "../Types/ReduxTypes";
@@ -7,13 +7,14 @@ const initialState: PlayerState = {
     playerStatusMap: {},
     playerInputHistory: {},
     playerList: [],
-    mostRecentInput: null
+    mostRecentInput: null,
+    lastOverrideTime: 0
 };
 
-export const playerStateReducer = (state: PlayerState = initialState, action: PlayerStateAction) => {
+export const playerStateReducer: Reducer<PlayerState,PlayerStateAction> = (state: PlayerState = initialState, action: PlayerStateAction) => {
     switch (action.type) {
         case PlayerStateActionTypes.SET_PLAYER_STATUS:
-            return { ...state, playerStatusMap: action.payload };
+            return { ...state, playerStatusMap: action.payload, lastOverrideTime: (new Date()).getTime() };
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
         case PlayerStateActionTypes.ADD_PLAYER_INPUT:

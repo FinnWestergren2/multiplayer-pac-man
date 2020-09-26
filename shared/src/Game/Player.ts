@@ -4,7 +4,7 @@ import { mapStore, playerStore } from ".";
 const SPEED_FACTOR = 0.08;
 
 export class Player {
-    private location: CoordPair;
+    private location: CoordPair = { ...CoordPairUtils.zeroPair };
     private velocity: CoordPair = { ...CoordPairUtils.zeroPair };
     private speed: number;
     private currentDirection: Directions = Directions.NONE;
@@ -93,7 +93,7 @@ export class Player {
         return snapX && snapY;
     };
 
-    private setCurrentStatus = (status: PlayerStatus) => {
+    public setCurrentStatus = (status: PlayerStatus) => {
         this.currentDirection = status.direction;
         this.nextDirection = status.nextDirection;
         this.location = status.location;

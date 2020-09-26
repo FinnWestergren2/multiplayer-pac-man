@@ -37,6 +37,7 @@ export type PlayerState = {
     playerList: string[];
     currentPlayer?: string;
     mostRecentInput: { playerId: string, input: StampedInput } | null;
+    lastOverrideTime: number;
 };
 
 export enum PlayerStateActionTypes {
