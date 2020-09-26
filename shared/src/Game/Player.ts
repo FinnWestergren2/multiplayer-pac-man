@@ -15,10 +15,11 @@ export class Player {
     public constructor(id: string) {
         this.speed = SPEED_FACTOR;
         this.velocity = { ...CoordPairUtils.zeroPair };
-        this.currentDirection = playerStore.getState().playerStatusMap[id]?.direction ?? Directions.NONE;
-        this.nextDirection = playerStore.getState().playerStatusMap[id]?.nextDirection ?? Directions.NONE;
         this.id = id;
-        this.location = playerStore.getState().playerStatusMap[id]?.location ??  { x: 0, y: 0 }
+        const currentStatus = playerStore.getState().playerStatusMap[id];
+        if (currentStatus) {
+            this.setCurrentStatus(currentStatus);
+        }
         playerStore.subscribe(() => {
             this.handleInput();
         });
@@ -77,7 +78,7 @@ export class Player {
     };
 
     // returns true if the player has hit the center of the target cell
-    public isCentered = () => {
+    private isCentered = () => {
         const target = this.targetLocation();
         const snapX = Math.abs(this.location.x - target.x) < this.speed;
         const snapY = Math.abs(this.location.y - target.y) < this.speed;
@@ -89,9 +90,13 @@ export class Player {
             this.velocity.y = 0;
             this.location.y = target.y;
         }
-        if (snapX && snapY) {
-            return true;
-        }
+        return snapX && snapY;
+    };
+
+    private setCurrentStatus = (status: PlayerStatus) => {
+        this.currentDirection = status.direction;
+        this.nextDirection = status.nextDirection;
+        this.location = status.location;
     };
 
     private handleInput = () => {
@@ -101,7 +106,7 @@ export class Player {
         if (myInputHistory && previousUpdate !== this.mostRecentUpdate){
             this.receiveInput(myInputHistory[myInputHistory.length-1].direction);
         }
-    }
+    };
 
     private targetLocation = () => this.targetCell(this.location, this.currentDirection);
     private canMoveRight = () => DirectionsUtils.isRight(this.currentCellType()) || this.location.x < this.currentCell().x;
