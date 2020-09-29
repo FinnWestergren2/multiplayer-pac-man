@@ -35,6 +35,7 @@ export function handleMessage(message: ServerMessage): void {
         case MessageType.STATE_OVERRIDE:
             // @ts-ignore
             PlayerStore.dispatch(setPlayerStatus(message.payload));
+            return;
         default:
             console.log('recieved an invalid message type from server')
             return;
@@ -58,10 +59,10 @@ export const sendPlayerInput = (playerId: string, dir: Directions) => {
 
 export const sendPerceptionUpdate = () => { 
     const currentState = PlayerStore.getState().playerStatusMap
-    let payload = {};
+    let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
-        payload = {...payload, [playerId]: currentState[playerId].location }
+        locationMap = {...locationMap, [playerId]: currentState[playerId].location }
     });
-    const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload };
+    const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp: (new Date()).getTime() } };
     ClientSocket.send(JSON.stringify(request));
 }

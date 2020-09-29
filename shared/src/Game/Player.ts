@@ -1,7 +1,7 @@
 import { CoordPair, Directions, CoordPairUtils, DirectionsUtils, PlayerStatus} from "../Types";
 import { updatePlayerStatus } from "../ducks/playerState";
-import { mapStore, playerStore } from ".";
-const SPEED_FACTOR = 0.08;
+import { mapStore, playerStore, SPEED_FACTOR } from ".";
+
 
 export class Player {
     private location: CoordPair = { ...CoordPairUtils.zeroPair };

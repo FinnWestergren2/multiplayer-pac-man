@@ -11,14 +11,14 @@ export enum MessageType {
     REMOVE_PLAYER = "REMOVE_PLAYER",
     INVALID = "INVALID",
     CLIENT_PERCEPTION_UPDATE = "CLIENT_PERCEPTION_UPDATE",
-    STATE_OVERRIDE = "STATE_OVERRIDE" 
+    STATE_OVERRIDE = "STATE_OVERRIDE"
 }
 
 
 export type ClientMessage =
     { type: MessageType.PING, payload: { time: number, playerId: string } } |
     { type: MessageType.MAP_REQUEST, payload: null } |
-    { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: { [playerId: string]: CoordPair } } |
+    { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: { locationMap: { [playerId: string]: CoordPair }, timeStamp: number } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 type PlayerListUpdate =
