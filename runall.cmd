@@ -1,0 +1,1 @@
+start runserver.cmd && start runclient.cmd
