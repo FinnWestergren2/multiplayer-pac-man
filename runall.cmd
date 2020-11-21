@@ -1,1 +1,1 @@
-start runserver.cmd && start runclient.cmd
+start runserver.cmd && runclient.cmd
