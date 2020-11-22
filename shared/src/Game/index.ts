@@ -1,7 +1,7 @@
 import Game from "./Game";
 import { MapStore, PlayerStore } from "../Types/ReduxTypes";
 
-const FRAME_LENGTH = 20;
+const FRAME_LENGTH = 16;
 
 export const UPDATE_FREQUENCY = 1/FRAME_LENGTH;
 export const SPEED_FACTOR = 0.08;

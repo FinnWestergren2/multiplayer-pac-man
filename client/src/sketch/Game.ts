@@ -36,7 +36,6 @@ export default class Game {
 		PlayerStore.getState().playerList.filter(pl => PlayerStore.getState().playerStatusMap[pl]).forEach(pl => {
 			const location = PlayerStore.getState().playerStatusMap[pl].location;
 			const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
-
 			p.push();
 			p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 			(pl === this.currentPlayer) ? p.fill(0, 0, 255) : p.fill(255, 0, 0);

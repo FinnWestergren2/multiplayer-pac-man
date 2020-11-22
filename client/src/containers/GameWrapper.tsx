@@ -32,7 +32,7 @@ const GameWrapper: FunctionComponent = () => {
     runGame(MapStore, PlayerStore, (new Date()).getTime(), window.setInterval);
     return (
         <FlexContainer>
-            <P5Wrapper />
+            <P5Wrapper log={console.log}/>
             <span onClick={requestMap}>
                 <Octicon
                     icon={Sync} 

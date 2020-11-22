@@ -1,11 +1,11 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatus, setPlayerStatus, CoordPair } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatuses, setPlayerStatus, softUpdatePlayerStatus } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
-            console.log(message.payload)
+            console.log("pong", message.payload)
             return;
         case MessageType.INIT_PLAYER:
             // @ts-ignore
@@ -30,14 +30,20 @@ export function handleMessage(message: ServerMessage): void {
             PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
             return;
         case MessageType.INVALID:
-            console.log('sent an invalid message to server')
+            console.error('sent an invalid message to server')
             return;
         case MessageType.STATE_OVERRIDE:
             // @ts-ignore
             PlayerStore.dispatch(setPlayerStatus(message.payload));
             return;
+        case MessageType.STATE_CORRECTION:
+            // @ts-ignore
+            PlayerStore.dispatch(softUpdatePlayerStatus(message.payload.soft));
+            // @ts-ignore
+            PlayerStore.dispatch(updatePlayerStatuses(message.payload.hard));
+            return
         default:
-            console.log('recieved an invalid message type from server')
+            console.error('recieved an invalid message type from server')
             return;
     }
 }

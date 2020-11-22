@@ -1,5 +1,4 @@
 import { ClientMessage, MessageType, ServerMessage } from "shared";
-import { PlayerStore } from "../containers/GameWrapper";
 import { handleMessage, pingServer, sendPerceptionUpdate } from "./clientExtensions";
 
 export default () => {
@@ -9,7 +8,7 @@ export default () => {
         const data: ClientMessage = { type: MessageType.MAP_REQUEST, payload: null }
         const json = JSON.stringify(data);
         ws.send(json);
-        setInterval(sendPerceptionUpdate, 100)
+        setInterval(sendPerceptionUpdate, 20)
         setInterval(pingServer, 1000)
     });
     

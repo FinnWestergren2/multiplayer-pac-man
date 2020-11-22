@@ -8,7 +8,8 @@ const initialState: PlayerState = {
     playerInputHistory: {},
     playerList: [],
     mostRecentInput: null,
-    lastOverrideTime: 0
+    lastOverrideTime: 0,
+    unresolvedSoftUpdates: {}
 };
 
 export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (state: PlayerState = initialState, action: PlayerStateAction) => {
@@ -36,6 +37,16 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
             return { ...state, currentPlayer: action.payload };
         case PlayerStateActionTypes.SET_PLAYER_LIST:
             return { ...state, playerList: action.payload };
+        case PlayerStateActionTypes.UPDATE_PLAYER_STATUSES:
+            const unresolved = state.unresolvedSoftUpdates;
+            Object.keys(action.payload).forEach(k => {
+                if (unresolved[k]) {
+                    delete unresolved[k]
+                }
+            })
+            return { ...state, playerStatusMap: {...state.playerStatusMap, ...action.payload }, lastOverrideTime: (new Date()).getTime(), unresolvedSoftUpdates: unresolved };
+        case PlayerStateActionTypes.SOFT_UPDATE_PLAYER_STATUSES:
+            return {...state, unresolvedSoftUpdates: { ...state.unresolvedSoftUpdates, ... action.payload }}
         default:
             return state;
     }
@@ -52,6 +63,7 @@ export const updatePlayerStatus = (playerId: string, newStatus: PlayerStatus) =>
         dispatch({ type: PlayerStateActionTypes.UPDATE_PLAYER_STATUS, payload: { playerId, status: newStatus } });
     };
 };
+
 
 export const addPlayerInput = (playerId: string, input: StampedInput) => {
     return function (dispatch: Dispatch<AnyAction>) {
@@ -75,5 +87,17 @@ export const setCurrentPlayers = (currentPlayerId: string, fullPlayerList: strin
     return function (dispatch: Dispatch<AnyAction>) {
         dispatch({ type: PlayerStateActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
         dispatch({ type: PlayerStateActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
+    };
+};
+
+export const updatePlayerStatuses = (playerStatusMap: PlayerStatusMap) => {
+    return function (dispatch: Dispatch<AnyAction>) {
+        dispatch({ type: PlayerStateActionTypes.UPDATE_PLAYER_STATUSES, payload: playerStatusMap });
+    };
+};
+
+export const softUpdatePlayerStatus = (playerStatusMap: PlayerStatusMap) => {
+    return function (dispatch: Dispatch<AnyAction>) {
+        dispatch({ type: PlayerStateActionTypes.SOFT_UPDATE_PLAYER_STATUSES, payload: playerStatusMap });
     };
 };
