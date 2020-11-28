@@ -3,7 +3,7 @@ import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore } from ".";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposited direction by now.
-const smoothOverrideTriggerDist = 0.15;
+const smoothOverrideTriggerDist = 0.05;
 const snapOverrideTriggerDist = 0.25;
 
 export function handleMessage(message: ClientMessage): ServerMessage | null {
@@ -40,34 +40,35 @@ export const getMostRecentPlayerInputs = () => {
 	});
 };
 
-const perceptionDifferenceSquared = (playerId: string, percievedLocation: CoordPair ) => {
-	const internalLocation = PlayerStore.getState().playerStatusMap[playerId]?.location;
-	if (!internalLocation) {
-		return 0;
-	}
-	const xDiff = Math.abs(percievedLocation.x - internalLocation.x);
-	const yDiff = Math.abs(percievedLocation.y - internalLocation.y);
-	return Math.pow(xDiff, 2) + Math.pow(yDiff, 2)
-}
-
 const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number) => ServerMessage | null = (locationMap, timeStamp) => {
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
 	const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
-	let snapMap: PlayerStatusMap = {};
-	let smoothMap: PlayerStatusMap = {};
+	let correctionMap: PlayerStatusMap = {};
 	const fullMap = PlayerStore.getState().playerStatusMap;
-	Object.keys(locationMap).forEach(pId => {
-		const distSquared = perceptionDifferenceSquared(pId, locationMap[pId]);
-		if(distSquared > snapOverrideSquared){
-			snapMap = { ...snapMap, [pId]: fullMap[pId] }
+	Object.keys(locationMap).filter(pId => !!fullMap[pId]).forEach(pId => {
+		const serverPerception = fullMap[pId].location;
+		const clientPerception = locationMap[pId];
+		const distSquared = perceptionDifferenceSquared(serverPerception, clientPerception);
+		if (distSquared > snapOverrideSquared) {
+			correctionMap[pId] = fullMap[pId];
 		}
-		else if(distSquared > smoothOverrideSquared){
-			smoothMap = { ...smoothMap, [pId]: fullMap[pId] }
+		else if (distSquared > smoothOverrideSquared){
+			correctionMap[pId] = { ...fullMap[pId], location: interpolate(serverPerception, clientPerception)}
 		}
 	});
-	if (Object.keys(snapMap).length + Object.keys(smoothMap).length > 0) {
-		return { type: MessageType.STATE_CORRECTION, payload: { hard: snapMap, soft: smoothMap }};
+	if (Object.keys(correctionMap).length > 0) {
+		return { type: MessageType.STATE_CORRECTION, payload: correctionMap};
 	}
 	return null;
+}
+
+const perceptionDifferenceSquared = (serverPerception: CoordPair, clientPerception: CoordPair ) => {
+	const xDiff = Math.abs(clientPerception.x - serverPerception.x);
+	const yDiff = Math.abs(clientPerception.y - serverPerception.y);
+	return Math.pow(xDiff, 2) + Math.pow(yDiff, 2)
+}
+
+const interpolate: (serverPerception: CoordPair, clientPerception: CoordPair) => CoordPair = (serverPerception, clientPerception) => {
+	return { x: (serverPerception.x + clientPerception.x) * 0.5, y: (serverPerception.y + clientPerception.y) * 0.5 }
 }

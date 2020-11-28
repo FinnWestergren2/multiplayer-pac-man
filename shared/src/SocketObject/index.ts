@@ -33,7 +33,7 @@ export type ServerMessage =
     { type: MessageType.MAP_RESPONSE, payload: MapResponse } |
     { type: MessageType.INVALID, payload: null } |
     { type: MessageType.STATE_OVERRIDE, payload: PlayerStatusMap } |
-    { type: MessageType.STATE_CORRECTION, payload: { hard: PlayerStatusMap, soft: PlayerStatusMap } } |
+    { type: MessageType.STATE_CORRECTION, payload: PlayerStatusMap } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 export type MapResponse = Directions[][];

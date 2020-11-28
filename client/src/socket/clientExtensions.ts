@@ -1,4 +1,4 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatuses, setPlayerStatus, softUpdatePlayerStatus } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatuses, setPlayerStatus } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 
@@ -38,9 +38,7 @@ export function handleMessage(message: ServerMessage): void {
             return;
         case MessageType.STATE_CORRECTION:
             // @ts-ignore
-            PlayerStore.dispatch(softUpdatePlayerStatus(message.payload.soft));
-            // @ts-ignore
-            PlayerStore.dispatch(updatePlayerStatuses(message.payload.hard));
+            PlayerStore.dispatch(updatePlayerStatuses(message.payload));
             return
         default:
             console.error('recieved an invalid message type from server')

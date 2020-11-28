@@ -5,7 +5,7 @@ import { playerStore } from ".";
 export default class Game {
 	private players: { [key: string]: Player } = {};
 	private playerIdList: string[] = [];
-	private lastOverrideTime = 0
+	private lastOverrideTime = 0;
 	public constructor() {
 		playerStore.subscribe(() => {
 			this.handleUpdatePlayerList();
@@ -24,7 +24,7 @@ export default class Game {
 	private handleStatusOverride = () => {
 		const previousOverrideTime = this.lastOverrideTime;
 		this.lastOverrideTime = playerStore.getState().lastOverrideTime;
-		if (this.lastOverrideTime > previousOverrideTime) {
+		if (this.lastOverrideTime !== previousOverrideTime) {
 			Object.keys(this.players).filter(id => playerStore.getState().playerStatusMap[id]).forEach(id => {
 				this.players[id].setCurrentStatus(playerStore.getState().playerStatusMap[id]);
 			})
