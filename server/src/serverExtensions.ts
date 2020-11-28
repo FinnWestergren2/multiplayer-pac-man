@@ -70,5 +70,13 @@ const perceptionDifferenceSquared = (serverPerception: CoordPair, clientPercepti
 }
 
 const interpolate: (serverPerception: CoordPair, clientPerception: CoordPair) => CoordPair = (serverPerception, clientPerception) => {
-	return { x: (serverPerception.x + clientPerception.x) * 0.5, y: (serverPerception.y + clientPerception.y) * 0.5 }
+	const average = { x: (serverPerception.x + clientPerception.x) * 0.5, y: (serverPerception.y + clientPerception.y) * 0.5 }
+	const roundedDiff = {x: Math.abs(Math.round(average.x) - average.x), y: Math.abs(Math.round(average.y) - average.y)}
+	if (roundedDiff.x > roundedDiff.y) {
+		average.y = Math.round(average.y);
+	}
+	else {
+		average.x = Math.round(average.x);
+	}
+	return average;
 }
