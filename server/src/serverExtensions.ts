@@ -59,7 +59,7 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 		}
 	});
 	if (Object.keys(correctionMap).length > 0) {
-		return { type: MessageType.STATE_CORRECTION, payload: correctionMap};
+		return { type: MessageType.STATE_CORRECTION, payload: correctionMap };
 	}
 	return null;
 }
