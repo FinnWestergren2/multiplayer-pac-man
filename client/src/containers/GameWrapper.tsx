@@ -29,7 +29,7 @@ export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk
 export const ClientSocket = initializeSocket();
 
 const GameWrapper: FunctionComponent = () => {
-    runGame(MapStore, PlayerStore, (new Date()).getTime(), window.setInterval);
+    runGame(MapStore, PlayerStore, window.setInterval);
     return (
         <FlexContainer>
             <P5Wrapper log={console.log}/>

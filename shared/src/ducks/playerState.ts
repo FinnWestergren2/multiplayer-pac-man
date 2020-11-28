@@ -5,9 +5,7 @@ import { PlayerState, PlayerStateActionTypes, PlayerStateAction } from "../Types
 
 const initialState: PlayerState = {
     playerStatusMap: {},
-    playerInputHistory: {},
     playerList: [],
-    mostRecentInput: null,
     lastOverrideTime: 0,
     unresolvedSoftUpdates: {}
 };
@@ -18,11 +16,6 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
             return { ...state, playerStatusMap: action.payload, lastOverrideTime: (new Date()).getTime() };
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
-        case PlayerStateActionTypes.ADD_PLAYER_INPUT:
-            const newHistory = state.playerInputHistory[action.payload.playerId]
-                ? [...state.playerInputHistory[action.payload.playerId], action.payload.input]
-                : [action.payload.input];
-            return { ...state, playerInputHistory: { ...state.playerInputHistory, [action.payload.playerId]: newHistory }, mostRecentInput: action.payload };
         case PlayerStateActionTypes.ADD_PLAYER:
             if (state.playerList.some(p => p === action.payload)) {
                 return state;
@@ -31,7 +24,6 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
         case PlayerStateActionTypes.REMOVE_PLAYER:
             const newState = { ...state };
             delete newState.playerStatusMap[action.payload];
-            delete newState.playerInputHistory[action.payload];
             return { ...newState, playerList: state.playerList.filter(p => p != action.payload) };
         case PlayerStateActionTypes.SET_CURRENT_PLAYER_ID:
             return { ...state, currentPlayer: action.payload };

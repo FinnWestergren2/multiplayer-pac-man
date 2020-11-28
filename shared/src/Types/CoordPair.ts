@@ -16,4 +16,8 @@ const roundedPair = (p: CoordPair) => {
     return { x: Math.round(p.x), y: Math.round(p.y) } 
 }
 
-export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair };
+const flooredPair = (p: CoordPair) => { 
+    return { x: Math.floor(p.x), y: Math.floor(p.y) } 
+}
+
+export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair, flooredPair };

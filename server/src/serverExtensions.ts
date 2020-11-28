@@ -33,13 +33,6 @@ export const getCurrentMap: () => MapResponse = () => {
 	return MapStore.getState().mapCells;
 };
 
-export const getMostRecentPlayerInputs = () => {
-	const playerHistory = PlayerStore.getState().playerInputHistory;
-	return Object.keys(playerHistory).filter(k => PlayerStore.getState().playerList.some(p => p === k)).map(k => { 
-		return { playerId: k, input: playerHistory[k][playerHistory[k].length - 1] }
-	});
-};
-
 const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number) => ServerMessage | null = (locationMap, timeStamp) => {
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
 	console.log(potentialDrift);

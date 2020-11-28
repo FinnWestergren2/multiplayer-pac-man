@@ -19,7 +19,7 @@ export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk
 
 let socketList: { [key: string]: Socket } = {};
 let mostRecentInput = PlayerStore.getState().mostRecentInput;
-runGame(MapStore, PlayerStore, (new Date()).getTime(), setInterval);
+runGame(MapStore, PlayerStore, setInterval);
 
 const simulatedLag = 15;
 

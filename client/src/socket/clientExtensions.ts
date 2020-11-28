@@ -63,10 +63,6 @@ export const sendPlayerInput = (playerId: string, dir: Directions) => {
 
 export const sendPerceptionUpdate = () => { 
     const timeStamp = (new Date()).getTime();
-    const mostRecentInput = PlayerStore.getState().mostRecentInput;
-    if (mostRecentInput && (mostRecentInput.input.frame - timeStamp) >= PERCEPTION_UPDATE_PERIOD) {
-        return;
-    }
     const currentState = PlayerStore.getState().playerStatusMap
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {

@@ -1,4 +1,4 @@
-import { Directions, PlayerStatusMap, PlayerInputHistory, StampedInput, PlayerStatus } from ".";
+import { Directions, PlayerStatusMap, StampedInput, PlayerStatus } from ".";
 import { Store } from "redux";
 
 export type MapStore = Store<MapState, MapStateAction>;
@@ -33,10 +33,8 @@ export type MapStateAction =
 
 export type PlayerState = {
     playerStatusMap: PlayerStatusMap;
-    playerInputHistory: PlayerInputHistory;
     playerList: string[];
     currentPlayer?: string;
-    mostRecentInput: { playerId: string, input: StampedInput } | null;
     lastOverrideTime: number;
     unresolvedSoftUpdates: PlayerStatusMap;
 };
