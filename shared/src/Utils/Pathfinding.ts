@@ -12,45 +12,43 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
         const branches: CoordPair[] = []
         const x = Math.floor(location.x);
         const y = Math.floor(location.y);
-        const directions = mapCells[x][y].dir;
-        console.log(location, directions);
-        if (mapCells[x] && mapCells[x][y + 1] && DirectionsUtils.isDown(directions) && !mapCells[x][y + 1].isVisited){
+        const directions = mapCells[y][x].dir;
+        if (mapCells[y + 1] && mapCells[y + 1][x] && DirectionsUtils.isDown(directions) && !mapCells[y + 1][x].isVisited){
             branches.push({x: x, y: y + 1});
-            console.log("DOWN", x, y + 1);
-            mapCells[x][y + 1].isVisited = true;
-            mapCells[x][y + 1].parentCell = location;
+            mapCells[y + 1][x].isVisited = true;
+            mapCells[y + 1][x].parentCell = location;
         }
-        if (mapCells[x] && mapCells[x][y - 1] && DirectionsUtils.isUp(directions) && !mapCells[x][y - 1].isVisited){
+        if (mapCells[y - 1] && mapCells[y - 1][x] && DirectionsUtils.isUp(directions) && !mapCells[y - 1][x].isVisited){
             branches.push({x: x, y: y - 1});
-            console.log("UP", x, y - 1);
-            mapCells[x][y - 1].isVisited = true;
-            mapCells[x][y - 1].parentCell = location;
+            mapCells[y - 1][x].isVisited = true;
+            mapCells[y - 1][x].parentCell = location;
         }
-        if (mapCells[x + 1] && mapCells[x + 1][y] && DirectionsUtils.isRight(directions) && !mapCells[x + 1][y].isVisited){
+        if (mapCells[y] && mapCells[y][x + 1] && DirectionsUtils.isRight(directions) && !mapCells[y][x + 1].isVisited){
             branches.push({x: x + 1, y: y});
-            console.log("RIGHT", x + 1, y);
-            mapCells[x + 1][y].isVisited = true;
-            mapCells[x + 1][y].parentCell = location;
+            mapCells[y][x + 1].isVisited = true;
+            mapCells[y][x + 1].parentCell = location;
         }
-        
-        if (mapCells[x - 1] && mapCells[x - 1][y] && DirectionsUtils.isLeft(directions) && !mapCells[x - 1][y].isVisited){
+        if (mapCells[y] && mapCells[y][x - 1] && DirectionsUtils.isLeft(directions) && !mapCells[y][x - 1].isVisited){
             branches.push({x: x - 1, y: y});
-            console.log("LEFT", x - 1, y);
-            mapCells[x - 1][y].isVisited = true;
-            mapCells[x - 1][y].parentCell = location;
+            mapCells[y][x - 1].isVisited = true;
+            mapCells[y][x - 1].parentCell = location;
         }
         return branches;
     }
 
-    while (!CoordPairUtils.equalPairs(queue[queue.length - 1], endCell)){
-        queue = [...queue, ...getAllBranches(queue[popIndex])];
+    while (true){
+        const branches = getAllBranches(queue[popIndex]);
+        if (branches.some(b => CoordPairUtils.equalPairs(b, endCell))){
+            break;
+        }
+        queue = [...queue, ...branches];
         popIndex++;
     }
 
     let output = [endCell]
-    while(!CoordPairUtils.equalPairs(queue[output.length - 1], startCell)){
+    while(!CoordPairUtils.equalPairs(output[output.length - 1], startCell)){
         const currentCell = output[output.length - 1];
-        output = [...output, mapCells[currentCell.x][currentCell.y].parentCell];
+        output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
     }
 
     return output.reverse();
