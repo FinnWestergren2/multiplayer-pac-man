@@ -7,6 +7,7 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     let queue = [startCell];
     let popIndex = 0;
     const mapCells = mapStore.getState().mapCells.map(row => row.map(col => { return { dir: col, isVisited: false, parentCell: {x: -1, y: -1}, depth: 0 }} ));
+    mapCells[startCell.y][startCell.x].isVisited = true;
 
     const getAllBranches = (location: CoordPair) => {
         const branches: CoordPair[] = []
@@ -36,7 +37,7 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
         return branches;
     }
 
-    while (true){
+    while (true) {
         const branches = getAllBranches(queue[popIndex]);
         if (branches.some(b => CoordPairUtils.equalPairs(b, endCell))){
             break;

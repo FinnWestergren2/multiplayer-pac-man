@@ -29,20 +29,6 @@ export default class Game {
 				new Cell(column, x, y)
 			)
 		);
-		
-		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
-		p.mouseClicked = (e: any) => { 
-			const element = document.getElementById("app-p5_container");
-			if (!element || !this.currentPlayer){
-				return;
-			}
-			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
-			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
-			const start = PlayerStore.getState().playerStatusMap[this.currentPlayer].location;
-
-			console.log(start, { x: xDest, y: yDest });
-			console.log(BFS(start, { x: xDest, y: yDest }));
-		}
 	};
 
 	public draw = (p: p5) => {
@@ -81,5 +67,18 @@ export default class Game {
 				sendPlayerInput(playerId, Directions.DOWN);
 			}
 		};
+		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
+		p.mouseClicked = (e: any) => { 
+			const element = document.getElementById("app-p5_container");
+			if (!element){
+				return;
+			}
+			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
+			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
+			const start = PlayerStore.getState().playerStatusMap[playerId].location;
+			const end = { x: xDest, y: yDest };
+
+			console.log(BFS(start, end));
+		}
 	};
 };
