@@ -1,10 +1,10 @@
-import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, addPlayerInput, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, addPlayerInput, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap, Directions } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore } from ".";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposited direction by now.
-const smoothOverrideTriggerDist = 0.05;
-const snapOverrideTriggerDist = 0.25;
+const smoothOverrideTriggerDist = 0.10;
+const snapOverrideTriggerDist = 0.30;
 
 export function handleMessage(message: ClientMessage): ServerMessage | null {
 	switch (message.type) {
@@ -42,6 +42,7 @@ export const getMostRecentPlayerInputs = () => {
 
 const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number) => ServerMessage | null = (locationMap, timeStamp) => {
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
+	console.log(potentialDrift);
 	const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
 	let correctionMap: PlayerStatusMap = {};
@@ -53,8 +54,8 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 		if (distSquared > snapOverrideSquared) {
 			correctionMap[pId] = fullMap[pId];
 		}
-		else if (distSquared > smoothOverrideSquared){
-			correctionMap[pId] = { ...fullMap[pId], location: interpolate(serverPerception, clientPerception)}
+		else if (distSquared > smoothOverrideSquared) {
+			correctionMap[pId] = { ...fullMap[pId], location: interpolate(serverPerception, clientPerception, fullMap[pId].direction)}
 		}
 	});
 	if (Object.keys(correctionMap).length > 0) {
@@ -69,14 +70,15 @@ const perceptionDifferenceSquared = (serverPerception: CoordPair, clientPercepti
 	return Math.pow(xDiff, 2) + Math.pow(yDiff, 2)
 }
 
-const interpolate: (serverPerception: CoordPair, clientPerception: CoordPair) => CoordPair = (serverPerception, clientPerception) => {
+const interpolate: (serverPerception: CoordPair, clientPerception: CoordPair, direction: Directions) => CoordPair = (serverPerception, clientPerception, direction) => {
 	const average = { x: (serverPerception.x + clientPerception.x) * 0.5, y: (serverPerception.y + clientPerception.y) * 0.5 }
-	const roundedDiff = {x: Math.abs(Math.round(average.x) - average.x), y: Math.abs(Math.round(average.y) - average.y)}
-	if (roundedDiff.x > roundedDiff.y) {
-		average.y = Math.round(average.y);
+	const roundedAvg = {x: Math.round(average.x), y: Math.round(average.y)}
+	// snap to grid logic
+	if (direction === Directions.NONE) {
+		return roundedAvg;
 	}
-	else {
-		average.x = Math.round(average.x);
+	if (direction === Directions.UP || direction === Directions.DOWN) {
+		return { y: average.y, x: roundedAvg.x };
 	}
-	return average;
+	return { x: average.x, y: roundedAvg.y };
 }

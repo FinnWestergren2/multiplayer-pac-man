@@ -21,6 +21,8 @@ let socketList: { [key: string]: Socket } = {};
 let mostRecentInput = PlayerStore.getState().mostRecentInput;
 runGame(MapStore, PlayerStore, (new Date()).getTime(), setInterval);
 
+const simulatedLag = 15;
+
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
 	.update(acceptKey + serverId)
@@ -63,10 +65,14 @@ server.on('close', () => console.log("closing"));
 function handleData(buffer: Buffer, playerId: string) {
 	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
-		const toClient = handleMessage(parsedBuffer);
-		if (toClient !== null) {
-			tryWrite(toClient, playerId);
-		}
+		setTimeout(() => {
+			const toClient = handleMessage(parsedBuffer);
+			if (toClient !== null) {
+				setTimeout(() => {
+					tryWrite(toClient, playerId);
+				}, simulatedLag)
+			}
+		}, simulatedLag)
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 		writeToAllSockets({ type: MessageType.REMOVE_PLAYER, payload: playerId });

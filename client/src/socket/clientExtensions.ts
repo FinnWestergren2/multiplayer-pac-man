@@ -1,6 +1,7 @@
 import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatuses, setPlayerStatus } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
+import { PERCEPTION_UPDATE_PERIOD } from ".";
 
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
@@ -62,11 +63,16 @@ export const sendPlayerInput = (playerId: string, dir: Directions) => {
 }
 
 export const sendPerceptionUpdate = () => { 
+    const timeStamp = (new Date()).getTime();
+    const mostRecentInput = PlayerStore.getState().mostRecentInput;
+    if (mostRecentInput && (mostRecentInput.input.frame - timeStamp) >= PERCEPTION_UPDATE_PERIOD) {
+        return;
+    }
     const currentState = PlayerStore.getState().playerStatusMap
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].location }
     });
-    const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp: (new Date()).getTime() } };
+    const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp } };
     ClientSocket.send(JSON.stringify(request));
 }
