@@ -12,4 +12,8 @@ const randomPair: (dimensions: CoordPair) => CoordPair = (dimensions) => {
 
 const equalPairs: (a: CoordPair, b: CoordPair) => boolean = (a,b) => a.x === b.x && a.y === b.y;
 
-export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs };
+const roundedPair = (p: CoordPair) => { 
+    return { x: Math.round(p.x), y: Math.round(p.y) } 
+}
+
+export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair };

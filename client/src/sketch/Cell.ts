@@ -28,7 +28,6 @@ export default class Cell {
     public draw: (p: p5) => void = (p) => {
         p.push();
         p.translate(this.location.x, this.location.y);
-        // this.drawDebugLines(p);
         this.drawDebugText(p);
         this.drawWalls(p);
         p.pop();
@@ -37,23 +36,6 @@ export default class Cell {
     private drawDebugText(p: p5) {
         p.textAlign("center", "center");
         p.text(`(${this.gridCoords.x}, ${this.gridCoords.y})`, 0, 0);
-    }
-
-    private drawDebugLines: (p: p5) => void = (p) => {
-        p.stroke(0, 255, 0);
-        if (this.up) {
-            p.line(0, 0, 0, -this.halfSize);
-        }
-        if (this.down) {
-            p.line(0, 0, 0, this.halfSize);
-        }
-        if (this.left) {
-            p.line(0, 0, -this.halfSize, 0);
-        }
-        if (this.right) {
-            p.line(0, 0, this.halfSize, 0);
-        }
-        p.stroke(0);
     }
 
     private drawWalls: (p: p5) => void = (p) => {

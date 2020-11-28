@@ -2,7 +2,6 @@ import p5 from "p5";
 import Game from "./Game";
 import { updateAppDimensions } from "shared";
 import { MapStore } from "../containers/GameWrapper";
-import { pingServer } from "../socket/clientExtensions";
 
 export default function sketch(p: p5): void {
 	let game: Game;
@@ -19,6 +18,5 @@ export default function sketch(p: p5): void {
 		p.background(255);
 		game.draw(p);
 	};
-	
-	p.mouseClicked = pingServer
+
 }

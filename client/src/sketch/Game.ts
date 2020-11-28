@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
-import { Directions, addPlayerInput } from "shared";
+import { Directions, addPlayerInput, BFS } from "shared";
 import { sendPlayerInput } from "../socket/clientExtensions";
 
 const SIZE_FACTOR = 0.9;
@@ -29,6 +29,20 @@ export default class Game {
 				new Cell(column, x, y)
 			)
 		);
+		
+		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
+		p.mouseClicked = (e: any) => { 
+			const element = document.getElementById("app-p5_container");
+			if (!element || !this.currentPlayer){
+				return;
+			}
+			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
+			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
+			const start = PlayerStore.getState().playerStatusMap[this.currentPlayer].location;
+
+			console.log(start, { x: xDest, y: yDest });
+			console.log(BFS(start, { x: xDest, y: yDest }));
+		}
 	};
 
 	public draw = (p: p5) => {

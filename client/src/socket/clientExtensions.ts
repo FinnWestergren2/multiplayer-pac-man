@@ -6,7 +6,6 @@ import { PERCEPTION_UPDATE_PERIOD } from ".";
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
-            console.log("pong", message.payload)
             return;
         case MessageType.INIT_PLAYER:
             // @ts-ignore
