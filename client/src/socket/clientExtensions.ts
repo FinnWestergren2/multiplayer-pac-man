@@ -1,4 +1,4 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, addPlayerInput, updatePlayerStatuses, setPlayerStatus } from "shared";
+import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, handlePlayerInput, updatePlayerStatuses, setPlayerStatus, StampedInput } from "shared";
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 import { refreshMap } from "shared";
 import { PERCEPTION_UPDATE_PERIOD } from ".";
@@ -26,8 +26,7 @@ export function handleMessage(message: ServerMessage): void {
             PlayerStore.dispatch(removePlayer(message.payload));
             return;
         case MessageType.PLAYER_INPUT:
-            // @ts-ignore
-            PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
+            handlePlayerInput(PlayerStore, message.payload.playerId, message.payload.input);
             return;
         case MessageType.INVALID:
             console.error('sent an invalid message to server')
@@ -56,13 +55,12 @@ export const requestMap = () => {
     ClientSocket.send(JSON.stringify(request));
 }
 
-export const sendPlayerInput = (playerId: string, dir: Directions) => {
-    const request: ClientMessage = { type: MessageType.PLAYER_INPUT, payload: { playerId, input: { frame: (new Date()).getTime(), direction: dir } } }
+export const sendPlayerInput = (playerId: string, input: StampedInput) => {
+    const request: ClientMessage = { type: MessageType.PLAYER_INPUT, payload: { playerId, input } }
     ClientSocket.send(JSON.stringify(request));
 }
 
 export const sendPerceptionUpdate = () => { 
-    return;
     const timeStamp = (new Date()).getTime();
     const currentState = PlayerStore.getState().playerStatusMap
     let locationMap = {};

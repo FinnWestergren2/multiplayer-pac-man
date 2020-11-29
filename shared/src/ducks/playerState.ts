@@ -2,6 +2,7 @@ import { AnyAction, Dispatch, Reducer } from "redux";
 import { PlayerStatusMap, PlayerStatus } from "..";
 import { StampedInput, CoordPair, CoordPairUtils, Directions } from "../Types";
 import { PlayerState, PlayerStateActionTypes, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
+import { BFS } from "../Utils/Pathfinding";
 
 const initialState: PlayerState = {
     playerStatusMap: {},
@@ -70,13 +71,6 @@ export const updatePlayerStatus = (playerId: string, newStatus: PlayerStatus) =>
     };
 };
 
-
-export const addPlayerInput = (playerId: string, input: StampedInput) => {
-    return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: PlayerStateActionTypes.ADD_PLAYER_INPUT, payload: { playerId, input } });
-    };
-};
-
 export const addPlayer = (playerId: string) => {
     return function (dispatch: Dispatch<AnyAction>) {
         dispatch({ type: PlayerStateActionTypes.ADD_PLAYER, payload: playerId });
@@ -108,4 +102,11 @@ export const updatePlayerPath = (store: PlayerStore, playerId: string, path: Coo
 
 export const popPlayerPath = (store: PlayerStore, playerId: string) => {
     store.dispatch({ type: PlayerStateActionTypes.POP_PLAYER_PATH, payload: playerId });
+}
+
+export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedInput: StampedInput ) => {
+    const status = store.getState().playerStatusMap[playerId];
+    if (status) {
+        updatePlayerPath(store, playerId, BFS(status.location, stampedInput.input.destination));
+    }
 }

@@ -1,4 +1,4 @@
-import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, addPlayerInput, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap, Directions } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap, Directions, handlePlayerInput } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
@@ -21,8 +21,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 			}, fromPlayer);
 			return;
 		case MessageType.PLAYER_INPUT:
-			//@ts-ignore
-			PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
+			handlePlayerInput(PlayerStore, fromPlayer, message.payload.input)
 			writeToAllPlayers(message, 0, fromPlayer);
 			return;
 		case MessageType.CLIENT_PERCEPTION_UPDATE:

@@ -1,8 +1,8 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
-import { Directions, addPlayerInput, BFS, updatePlayerPath } from "shared";
-import { sendPlayerInput } from "../socket/clientExtensions";
+import { Directions } from "shared";
+import { playerPathInput } from "../utils/clientActions";
 
 const SIZE_FACTOR = 0.9;
 
@@ -45,41 +45,15 @@ export default class Game {
 	};
 
 	private bindHumanPlayer = (p: p5, playerId: string) => {
-		p.keyPressed = function (): void {
-			if (p.keyCode === p.RIGHT_ARROW) {
-				// @ts-ignore
-				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.RIGHT }));
-				sendPlayerInput(playerId, Directions.RIGHT);
-			}
-			if (p.keyCode === p.LEFT_ARROW) {
-				// @ts-ignore
-				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.LEFT }));
-				sendPlayerInput(playerId, Directions.LEFT);
-			}
-			if (p.keyCode === p.UP_ARROW) {
-				// @ts-ignore
-				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.UP }));
-				sendPlayerInput(playerId, Directions.UP);
-			}
-			if (p.keyCode === p.DOWN_ARROW) {
-				// @ts-ignore
-				PlayerStore.dispatch(addPlayerInput(playerId, { frame: (new Date()).getTime(), direction: Directions.DOWN }));
-				sendPlayerInput(playerId, Directions.DOWN);
-			}
-		};
 		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
 		p.mouseClicked = (e: any) => { 
 			const element = document.getElementById("app-p5_container");
-			if (!element || !PlayerStore.getState().playerStatusMap[playerId]){
+			if (!element){
 				return;
 			}
 			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
 			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
-			const start = PlayerStore.getState().playerStatusMap[playerId].location;
-			const end = { x: xDest, y: yDest };
-			const bfs = BFS(start, end);
-			console.log(bfs);
-			updatePlayerPath(PlayerStore, playerId, bfs);
+			playerPathInput(playerId, {x: xDest, y: yDest})
 		}
 	};
 };
