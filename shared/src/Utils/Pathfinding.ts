@@ -4,6 +4,9 @@ import { DirectionsUtils } from "../Types/Directions";
 
 export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
     const startCell = CoordPairUtils.roundedPair(startFloat);
+    if(CoordPairUtils.equalPairs(startCell, endCell)){
+        return [startCell];
+    }
     let queue = [startCell];
     let popIndex = 0;
     const mapCells = mapStore.getState().mapCells.map(row => row.map(col => { return { dir: col, isVisited: false, parentCell: {x: -1, y: -1}, depth: 0 }} ));

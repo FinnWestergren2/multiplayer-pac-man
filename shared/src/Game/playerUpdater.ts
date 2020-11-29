@@ -9,7 +9,8 @@ export const updatePlayers = () => {
 }
 
 const updatePlayer = (playerId: string, status: PlayerStatus) => {
-    movePlayer(playerId, status);
+    const newLocation = movePlayer(playerId, status);
+    status.location = newLocation;
     const currentCell = CoordPairUtils.flooredPair(status.location);
     const path = playerStore.getState().playerPaths[playerId];
     let targetCell = currentCell;
@@ -52,8 +53,8 @@ const newLocation = { ...status.location }
         case Directions.LEFT:
             newLocation.x -= SPEED_FACTOR;
             break;
-
     }
     // @ts-ignore
     playerStore.dispatch(updatePlayerStatus(playerId, { ...status, location: newLocation }));
+    return newLocation;
 }

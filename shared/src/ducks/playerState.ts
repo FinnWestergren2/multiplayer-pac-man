@@ -33,17 +33,23 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUSES:
             return { ...state, playerStatusMap: {...state.playerStatusMap, ...action.payload } };
         case PlayerStateActionTypes.SET_PLAYER_PATH:
-            return { ...state, playerPaths: { ...state.playerPaths, [action.payload.playerId]: action.payload.path }};
+                const previousCell = state.playerStatusMap[action.payload.playerId].location;
+                const nextCell = action.payload.path[0];
+            return { ...state, 
+                playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: { ...state.playerStatusMap[action.payload.playerId], direction: CoordPairUtils.getDirection(previousCell, nextCell)} }, 
+                playerPaths: { ...state.playerPaths, [action.payload.playerId]: action.payload.path }};
         case PlayerStateActionTypes.POP_PLAYER_PATH:
             if (state.playerPaths[action.payload].length > 1) {
-                const previousCell = state.playerPaths[action.payload][0];
+                const previousCell = state.playerStatusMap[action.payload].location;
                 const nextCell = state.playerPaths[action.payload][1];
                 return { ...state, 
                     playerStatusMap: { ...state.playerStatusMap, [action.payload]: { ...state.playerStatusMap[action.payload], direction: CoordPairUtils.getDirection(previousCell, nextCell)} }, 
                     playerPaths: { ...state.playerPaths, [action.payload]: state.playerPaths[action.payload].slice(1) }};
             }
             else {
-                let newState = { ...state };
+                let newState = { ...state,  
+                    playerStatusMap: { ...state.playerStatusMap, [action.payload]: { ...state.playerStatusMap[action.payload], direction: Directions.NONE } }
+                };
                 delete newState.playerPaths[action.payload];
                 return newState;
             }
