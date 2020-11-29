@@ -51,11 +51,7 @@ server.on('upgrade', function (req, socket: Socket) {
 	socket.on('data', (buffer: Buffer) => handleData(buffer, playerId));
 	socket.on('close', () => console.log("closing from socket"));
 	socketList[playerId] = socket;
-	// @ts-ignore
-	PlayerStore.dispatch(addPlayer(playerId));
-	tryWrite({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	tryWrite({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, playerStatusMap: PlayerStore.getState().playerStatusMap } }, playerId);
-	writeToAllSockets({ type: MessageType.ADD_PLAYER, payload: playerId });
+	addPlayerEverywhere(playerId);
 });
 
 server.on('connection', () => console.log("connected"));
@@ -65,48 +61,53 @@ function handleData(buffer: Buffer, playerId: string) {
 	const parsedBuffer = parseBuffer(buffer);
 	if (parsedBuffer) {
 		setTimeout(() => {
-			const toClient = handleMessage(parsedBuffer);
-			if (toClient !== null) {
-				setTimeout(() => {
-					tryWrite(toClient, playerId);
-				}, simulatedLag)
-			}
-		}, simulatedLag)
+			handleMessage(parsedBuffer, playerId);
+		}, simulatedLag);
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
-		writeToAllSockets({ type: MessageType.REMOVE_PLAYER, payload: playerId });
-		// @ts-ignore
-		PlayerStore.dispatch(removePlayer(playerId));
-		socketList[playerId].end();
-		socketList[playerId].destroy();
-		delete socketList[playerId];
+		removePlayerEverywhere(playerId);
 	}
 };
 
-const writeToAllSockets = (message: ServerMessage, excludeId?: string) => {
-	Object.keys(socketList).forEach(playerId => {
-		if (playerId !== excludeId) {
-			tryWrite(message, playerId);
-		}
+export const writeToAllPlayers = (message: ServerMessage, retryLimit: number = 0, excludeId?: string ) => {
+	Object.keys(socketList).filter(pId => pId !== excludeId).forEach(playerId => {
+		writeToSinglePlayer(message, playerId, retryLimit);
 	});
 };
 
-const tryWrite = (message: ServerMessage, socketId: string, isRetry: boolean = false ) => {
-	try {
-		socketList[socketId].write(constructMessage(message));
-	}
-	catch (e) {
-		console.log(e);
-		if (e.code === 'ERR_STREAM_DESTROYED') {
-			// @ts-ignore
-			PlayerStore.dispatch(removePlayer(socketId));
-			delete socketList[socketId];
+export const writeToSinglePlayer = (message: ServerMessage, playerId: string, retryLimit: number = 0 ) => {
+	setTimeout(() => {
+		try {
+			socketList[playerId].write(constructMessage(message));
 		}
-		else if (!isRetry) {
-			console.log('retrying send');
-			tryWrite(message, socketId, true);
+		catch (e) {
+			console.log(e);
+			if (e.code === 'ERR_STREAM_DESTROYED') {
+				removePlayerEverywhere(playerId);
+			}
+			else if (retryLimit > 0) {
+				console.log('retrying send');
+				writeToSinglePlayer(message, playerId, retryLimit-1);
+			}
 		}
-	}
+	}, simulatedLag);
+}
+
+const addPlayerEverywhere = (playerId: string) => {
+	// @ts-ignore
+	PlayerStore.dispatch(addPlayer(playerId));
+	writeToSinglePlayer({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
+	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, playerStatusMap: PlayerStore.getState().playerStatusMap } }, playerId);
+	writeToAllPlayers({ type: MessageType.ADD_PLAYER, payload: playerId });
+}
+
+const removePlayerEverywhere = (playerId: string) => {
+	// @ts-ignore
+	PlayerStore.dispatch(removePlayer(playerId));
+	writeToAllPlayers({ type: MessageType.REMOVE_PLAYER, payload: playerId }, 10);
+	socketList[playerId].end();
+	socketList[playerId].destroy();
+	delete socketList[playerId];
 }
 
 function parseBuffer(buffer: Buffer): ClientMessage | null | undefined {

@@ -1,25 +1,38 @@
 import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, addPlayerInput, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap, Directions } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
-import { MapStore, PlayerStore } from ".";
+import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
-const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposited direction by now.
+const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.10;
 const snapOverrideTriggerDist = 0.30;
 
-export function handleMessage(message: ClientMessage): ServerMessage | null {
+export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 	switch (message.type) {
 		case MessageType.PING:
-			return { type: MessageType.PONG, payload: (new Date()).getTime() - message.payload.time };
+			writeToSinglePlayer({ 
+				type: MessageType.PONG, 
+				payload: (new Date()).getTime() - message.payload.time
+			}, fromPlayer);
+			return;
 		case MessageType.MAP_REQUEST:
-			return { type: MessageType.MAP_RESPONSE, payload: getCurrentMap() };
+			writeToSinglePlayer({ 
+				type: MessageType.MAP_RESPONSE, 
+				payload: getCurrentMap() 
+			}, fromPlayer);
+			return;
 		case MessageType.PLAYER_INPUT:
 			//@ts-ignore
 			PlayerStore.dispatch(addPlayerInput(message.payload.playerId, message.payload.input));
-			return null;
+			writeToAllPlayers(message, 0, fromPlayer);
+			return;
 		case MessageType.CLIENT_PERCEPTION_UPDATE:
-			return getPerceptionUpdate(message.payload.locationMap, message.payload.timeStamp);
+			const perceptionUpdate = getPerceptionUpdate(message.payload.locationMap, message.payload.timeStamp);
+			if (perceptionUpdate) {
+				writeToSinglePlayer(perceptionUpdate, fromPlayer);
+			}
+			return;
 		default:
-			return { type: MessageType.INVALID, payload: null };
+			writeToSinglePlayer({ type: MessageType.INVALID, payload: null }, fromPlayer);
 	}
 }
 
