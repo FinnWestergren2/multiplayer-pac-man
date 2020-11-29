@@ -46,6 +46,8 @@ export default class Game {
 
 	private bindHumanPlayer = (p: p5, playerId: string) => {
 		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
+		const cells = MapStore.getState().mapCells;
+		const max_y = cells.length, max_x = cells[0].length;
 		p.mouseClicked = (e: any) => { 
 			const element = document.getElementById("app-p5_container");
 			if (!element){
@@ -53,7 +55,9 @@ export default class Game {
 			}
 			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
 			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
-			playerPathInput(playerId, {x: xDest, y: yDest})
+			if (xDest >= 0 && yDest >= 0 && xDest < max_x && yDest < max_y) {
+				playerPathInput(playerId, {x: xDest, y: yDest})
+			}
 		}
 	};
 };
