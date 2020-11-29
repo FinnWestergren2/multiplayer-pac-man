@@ -31,8 +31,6 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
             return { ...state, currentPlayer: action.payload };
         case PlayerStateActionTypes.SET_PLAYER_LIST:
             return { ...state, playerList: action.payload };
-        case PlayerStateActionTypes.UPDATE_PLAYER_STATUSES:
-            return { ...state, playerStatusMap: {...state.playerStatusMap, ...action.payload } };
         case PlayerStateActionTypes.SET_PLAYER_PATH:
             return { ...state, playerPaths: { ...state.playerPaths, [action.payload.playerId]: action.payload.path }};
         case PlayerStateActionTypes.POP_PLAYER_PATH:
@@ -75,12 +73,6 @@ export const setCurrentPlayers = (currentPlayerId: string, fullPlayerList: strin
     };
 };
 
-export const updatePlayerStatuses = (playerStatusMap: PlayerStatusMap) => {
-    return function (dispatch: Dispatch<AnyAction>) {
-        dispatch({ type: PlayerStateActionTypes.UPDATE_PLAYER_STATUSES, payload: playerStatusMap });
-    };
-};
-
 export const updatePlayerPath = (store: PlayerStore, playerId: string, path: CoordPair[]) => {
     store.dispatch({ type: PlayerStateActionTypes.SET_PLAYER_PATH, payload: {playerId, path} });
 }
@@ -94,4 +86,13 @@ export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedI
     if (status) {
         updatePlayerPath(store, playerId, BFS(status.location, stampedInput.input.destination));
     }
+}
+
+export const handleStateCorrection = (store: PlayerStore, locationMap: {[playerId: string]: CoordPair} ) => {
+    Object.keys(locationMap).forEach(key => {
+        const newStatus = store.getState().playerStatusMap[key];
+        newStatus.location = locationMap[key];
+        //@ts-ignore
+        store.dispatch(updatePlayerStatus(key, newStatus));
+    })
 }

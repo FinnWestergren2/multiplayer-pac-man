@@ -41,7 +41,6 @@ export type PlayerState = {
 
 export enum PlayerStateActionTypes {
     UPDATE_PLAYER_STATUS = "UPDATE_PLAYER_STATUS",
-    UPDATE_PLAYER_STATUSES = "UPDATE_PLAYER_STATUSES",
     SET_PLAYER_STATUS = "SET_PLAYER_STATUS",
     ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
     ADD_PLAYER = "ADD_PLAYER",
@@ -56,7 +55,6 @@ export enum PlayerStateActionTypes {
 
 export type PlayerStateAction =
     { type: PlayerStateActionTypes.UPDATE_PLAYER_STATUS; payload: { playerId: string, status: PlayerStatus } } |
-    { type: PlayerStateActionTypes.UPDATE_PLAYER_STATUSES; payload: PlayerStatusMap } |
     { type: PlayerStateActionTypes.SOFT_UPDATE_PLAYER_STATUSES; payload: PlayerStatusMap } |
     { type: PlayerStateActionTypes.RESOLVE_SOFT_UPDATE; payload: string } |
     { type: PlayerStateActionTypes.SET_PLAYER_STATUS; payload: PlayerStatusMap } |
