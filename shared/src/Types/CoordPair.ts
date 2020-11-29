@@ -22,6 +22,7 @@ const flooredPair = (p: CoordPair) => {
     return { x: Math.floor(p.x), y: Math.floor(p.y) } 
 }
 
+// WARNING: kinda jenky. really only supposed to be used when you know its not a diagonal line between start and finish
 const getDirection = (start: CoordPair, finish: CoordPair ) => {
     if (start.x < finish.x) {
         return Directions.RIGHT;

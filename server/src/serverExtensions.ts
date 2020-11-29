@@ -3,7 +3,7 @@ import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
-const smoothOverrideTriggerDist = 0.10;
+const smoothOverrideTriggerDist = 0.02;
 const snapOverrideTriggerDist = 0.30;
 
 export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
@@ -47,7 +47,6 @@ export const getCurrentMap: () => MapResponse = () => {
 
 const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number) => ServerMessage | null = (locationMap, timeStamp) => {
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
-	console.log(potentialDrift);
 	const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
 	let correctionMap: PlayerStatusMap = {};
