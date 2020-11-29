@@ -47,7 +47,7 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     }
 
     let output = [endCell]
-    while(!CoordPairUtils.equalPairs(output[output.length - 1], startCell)){
+    while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
         output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
     }

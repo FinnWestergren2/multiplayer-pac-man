@@ -1,26 +1,27 @@
 import { AnyAction, Dispatch, Reducer } from "redux";
 import { PlayerStatusMap, PlayerStatus } from "..";
-import { StampedInput } from "../Types";
-import { PlayerState, PlayerStateActionTypes, PlayerStateAction } from "../Types/ReduxTypes";
+import { StampedInput, CoordPair, CoordPairUtils, Directions } from "../Types";
+import { PlayerState, PlayerStateActionTypes, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
 
 const initialState: PlayerState = {
     playerStatusMap: {},
     playerList: [],
-    lastOverrideTime: 0,
-    unresolvedSoftUpdates: {}
+    playerPaths: {}
 };
 
 export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (state: PlayerState = initialState, action: PlayerStateAction) => {
     switch (action.type) {
         case PlayerStateActionTypes.SET_PLAYER_STATUS:
-            return { ...state, playerStatusMap: action.payload, lastOverrideTime: (new Date()).getTime() };
+            return { ...state, playerStatusMap: action.payload };
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUS:
             return { ...state, playerStatusMap: { ...state.playerStatusMap, [action.payload.playerId]: action.payload.status } };
         case PlayerStateActionTypes.ADD_PLAYER:
             if (state.playerList.some(p => p === action.payload)) {
                 return state;
             }
-            return { ...state, playerList: [...state.playerList, action.payload] };
+            const playerStatusMap = state.playerStatusMap;
+            playerStatusMap[action.payload] = { location: {x: 0, y:0}, direction: Directions.NONE }
+            return { ...state, playerList: [...state.playerList, action.payload], playerStatusMap };
         case PlayerStateActionTypes.REMOVE_PLAYER:
             const newState = { ...state };
             delete newState.playerStatusMap[action.payload];
@@ -30,7 +31,22 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
         case PlayerStateActionTypes.SET_PLAYER_LIST:
             return { ...state, playerList: action.payload };
         case PlayerStateActionTypes.UPDATE_PLAYER_STATUSES:
-            return { ...state, playerStatusMap: {...state.playerStatusMap, ...action.payload }, lastOverrideTime: (new Date()).getTime() };
+            return { ...state, playerStatusMap: {...state.playerStatusMap, ...action.payload } };
+        case PlayerStateActionTypes.SET_PLAYER_PATH:
+            return { ...state, playerPaths: { ...state.playerPaths, [action.payload.playerId]: action.payload.path }};
+        case PlayerStateActionTypes.POP_PLAYER_PATH:
+            if (state.playerPaths[action.payload].length > 1) {
+                const previousCell = state.playerPaths[action.payload][0];
+                const nextCell = state.playerPaths[action.payload][1];
+                return { ...state, 
+                    playerStatusMap: { ...state.playerStatusMap, [action.payload]: { ...state.playerStatusMap[action.payload], direction: CoordPairUtils.getDirection(previousCell, nextCell)} }, 
+                    playerPaths: { ...state.playerPaths, [action.payload]: state.playerPaths[action.payload].slice(1) }};
+            }
+            else {
+                let newState = { ...state };
+                delete newState.playerPaths[action.payload];
+                return newState;
+            }
         default:
             return state;
     }
@@ -79,3 +95,11 @@ export const updatePlayerStatuses = (playerStatusMap: PlayerStatusMap) => {
         dispatch({ type: PlayerStateActionTypes.UPDATE_PLAYER_STATUSES, payload: playerStatusMap });
     };
 };
+
+export const updatePlayerPath = (store: PlayerStore, playerId: string, path: CoordPair[]) => {
+    store.dispatch({ type: PlayerStateActionTypes.SET_PLAYER_PATH, payload: {playerId, path} });
+}
+
+export const popPlayerPath = (store: PlayerStore, playerId: string) => {
+    store.dispatch({ type: PlayerStateActionTypes.POP_PLAYER_PATH, payload: playerId });
+}

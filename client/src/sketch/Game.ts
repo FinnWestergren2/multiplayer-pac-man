@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
-import { Directions, addPlayerInput, BFS } from "shared";
+import { Directions, addPlayerInput, BFS, updatePlayerPath } from "shared";
 import { sendPlayerInput } from "../socket/clientExtensions";
 
 const SIZE_FACTOR = 0.9;
@@ -70,15 +70,16 @@ export default class Game {
 		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
 		p.mouseClicked = (e: any) => { 
 			const element = document.getElementById("app-p5_container");
-			if (!element){
+			if (!element || !PlayerStore.getState().playerStatusMap[playerId]){
 				return;
 			}
 			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
 			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
 			const start = PlayerStore.getState().playerStatusMap[playerId].location;
 			const end = { x: xDest, y: yDest };
-
-			console.log(BFS(start, end));
+			const bfs = BFS(start, end);
+			console.log(bfs);
+			updatePlayerPath(PlayerStore, playerId, bfs);
 		}
 	};
 };

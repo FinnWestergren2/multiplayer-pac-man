@@ -18,7 +18,6 @@ export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
 export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
 
 let socketList: { [key: string]: Socket } = {};
-let mostRecentInput = PlayerStore.getState().mostRecentInput;
 runGame(MapStore, PlayerStore, setInterval);
 
 const simulatedLag = 15;
@@ -83,14 +82,6 @@ function handleData(buffer: Buffer, playerId: string) {
 		delete socketList[playerId];
 	}
 };
-
-PlayerStore.subscribe(() => {
-	if (mostRecentInput?.input.frame !== PlayerStore.getState().mostRecentInput?.input.frame) {
-		mostRecentInput = PlayerStore.getState().mostRecentInput;
-		const recentInputsMessage: ServerMessage = { type: MessageType.PLAYER_INPUT, payload: mostRecentInput! };
-		writeToAllSockets(recentInputsMessage, mostRecentInput?.playerId);
-	}
-});
 
 const writeToAllSockets = (message: ServerMessage, excludeId?: string) => {
 	Object.keys(socketList).forEach(playerId => {

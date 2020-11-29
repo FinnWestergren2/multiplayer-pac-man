@@ -1,5 +1,6 @@
 import { Directions, PlayerStatusMap, StampedInput, PlayerStatus } from ".";
 import { Store } from "redux";
+import { CoordPair } from "./CoordPair";
 
 export type MapStore = Store<MapState, MapStateAction>;
 export type PlayerStore = Store<PlayerState, PlayerStateAction>;
@@ -33,10 +34,9 @@ export type MapStateAction =
 
 export type PlayerState = {
     playerStatusMap: PlayerStatusMap;
+    playerPaths: { [id: string]: CoordPair[] }
     playerList: string[];
     currentPlayer?: string;
-    lastOverrideTime: number;
-    unresolvedSoftUpdates: PlayerStatusMap;
 };
 
 export enum PlayerStateActionTypes {
@@ -49,7 +49,9 @@ export enum PlayerStateActionTypes {
     SET_CURRENT_PLAYER_ID = "SET_CURRENT_PLAYER_ID",
     SET_PLAYER_LIST = "SET_PLAYER_LIST",
     SOFT_UPDATE_PLAYER_STATUSES = "SOFT_UPDATE_PLAYER_STATUSES",
-    RESOLVE_SOFT_UPDATE = "RESOLVE_SOFT_UPDATE"
+    RESOLVE_SOFT_UPDATE = "RESOLVE_SOFT_UPDATE",
+    SET_PLAYER_PATH = "SET_PLAYER_PATH",
+    POP_PLAYER_PATH= "POP_PLAYER_PATH"
 };
 
 export type PlayerStateAction =
@@ -62,5 +64,6 @@ export type PlayerStateAction =
     { type: PlayerStateActionTypes.ADD_PLAYER; payload: string } |
     { type: PlayerStateActionTypes.REMOVE_PLAYER; payload: string } |
     { type: PlayerStateActionTypes.SET_CURRENT_PLAYER_ID; payload: string } |
-    { type: PlayerStateActionTypes.SET_PLAYER_LIST; payload: string[] }
- 
+    { type: PlayerStateActionTypes.SET_PLAYER_LIST; payload: string[] } |
+    { type: PlayerStateActionTypes.SET_PLAYER_PATH; payload: {playerId: string, path: CoordPair[] } } |
+    { type: PlayerStateActionTypes.POP_PLAYER_PATH; payload: string }

@@ -4,7 +4,7 @@ import { updatePlayers } from "./playerUpdater";
 const FRAME_LENGTH = 16;
 
 export const UPDATE_FREQUENCY = 1 / FRAME_LENGTH;
-export const SPEED_FACTOR = 0.08;
+export const SPEED_FACTOR = 0.008;
 
 export let mapStore: MapStore;
 export let playerStore: PlayerStore;

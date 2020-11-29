@@ -1,3 +1,5 @@
+import { Directions } from "./Directions";
+
 export type CoordPair = { x: number, y: number }
 const zeroPair = { x: 0, y: 0 };
 const addPairs = (p1: CoordPair, p2: CoordPair) => {
@@ -20,4 +22,20 @@ const flooredPair = (p: CoordPair) => {
     return { x: Math.floor(p.x), y: Math.floor(p.y) } 
 }
 
-export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair, flooredPair };
+const getDirection = (start: CoordPair, finish: CoordPair ) => {
+    if (start.x < finish.x) {
+        return Directions.RIGHT;
+    }
+    if (start.x > finish.x) {
+        return Directions.LEFT;
+    }
+    if (start.y < finish.y) {
+        return Directions.DOWN;
+    }
+    if (start.y > finish.y) {
+        return Directions.UP;
+    }
+    return Directions.NONE
+}
+
+export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair, flooredPair, getDirection };

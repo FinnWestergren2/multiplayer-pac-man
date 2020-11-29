@@ -62,6 +62,7 @@ export const sendPlayerInput = (playerId: string, dir: Directions) => {
 }
 
 export const sendPerceptionUpdate = () => { 
+    return;
     const timeStamp = (new Date()).getTime();
     const currentState = PlayerStore.getState().playerStatusMap
     let locationMap = {};
