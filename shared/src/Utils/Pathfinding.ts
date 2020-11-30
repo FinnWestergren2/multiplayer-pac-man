@@ -41,6 +41,9 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     }
 
     while (true) {
+        if (popIndex >= queue.length) {
+            return [];
+        }
         const branches = getAllBranches(queue[popIndex]);
         if (branches.some(b => CoordPairUtils.equalPairs(b, endCell))){
             break;
