@@ -1,6 +1,18 @@
-import { MessageType, ServerMessage, ClientMessage, Directions, setCurrentPlayers, addPlayer, removePlayer, handlePlayerInput, handleStateCorrection, setPlayerStatus, StampedInput } from "shared";
+import { 
+    MessageType,
+    ServerMessage,
+    ClientMessage,
+    setCurrentPlayers,
+    addPlayer,
+    removePlayer,
+    handlePlayerInput,
+    handleStateCorrection,
+    setPlayerStatus,
+    StampedInput,
+    refreshMap
+} from "shared";
+
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
-import { refreshMap } from "shared";
 
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {

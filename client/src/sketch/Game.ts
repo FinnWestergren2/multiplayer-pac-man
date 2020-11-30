@@ -2,7 +2,7 @@ import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
 import { Directions } from "shared";
-import { playerPathInput } from "../utils/clientActions";
+import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
 
@@ -11,17 +11,17 @@ export default class Game {
 	private playerSize: number = 0;
 	private currentPlayer?: string;
 	public constructor(p: p5) {
-		MapStore.subscribe(() => this.initializeMap(p));
+		MapStore.subscribe(() => this.initializeMap());
 		PlayerStore.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
 			this.currentPlayer = PlayerStore.getState().currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
-				this.bindHumanPlayer(p, this.currentPlayer);
+				bindHumanPlayer(p, this.currentPlayer);
 			}
 		});
 	}
 
-	private initializeMap = (p: p5) => {
+	private initializeMap = () => {
 		this.playerSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
 		const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Directions[], y: number) =>
@@ -42,22 +42,5 @@ export default class Game {
 			p.ellipse(0, 0, this.playerSize);
 			p.pop();
 		});
-	};
-
-	private bindHumanPlayer = (p: p5, playerId: string) => {
-		const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
-		const cells = MapStore.getState().mapCells;
-		const max_y = cells.length, max_x = cells[0].length;
-		p.mouseClicked = (e: any) => { 
-			const element = document.getElementById("app-p5_container");
-			if (!element){
-				return;
-			}
-			const xDest = Math.floor((e.clientX - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
-			const yDest = Math.floor((e.clientY - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
-			if (xDest >= 0 && yDest >= 0 && xDest < max_x && yDest < max_y) {
-				playerPathInput(playerId, {x: xDest, y: yDest})
-			}
-		}
 	};
 };
