@@ -21,7 +21,7 @@ export const bindHumanPlayer = (p: p5, playerId: string) => {
     }
 
     p.mouseClicked = (e: any) => { 
-        const mouse = {x: e.clientX, y: e.clientY}
+        const mouse = {x: e.clientX, y: e.clientY} // can't use p.mouse because of scrolling / changing screen sizes
         if (p.keyIsDown(p.CONTROL)) {
             setPath(mouse);
         }

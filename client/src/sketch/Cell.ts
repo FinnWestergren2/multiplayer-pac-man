@@ -30,6 +30,11 @@ export default class Cell {
         p.translate(this.location.x, this.location.y);
         this.drawDebugText(p);
         this.drawWalls(p);
+        if (this.withinBounds(p.mouseX, p.mouseY)){
+            p.fill(255, 0, 0, 20);
+            p.noStroke();
+            p.rect(-this.halfSize, -this.halfSize, this.cellSize, this.cellSize);
+        }
         p.pop();
     }
 
@@ -54,5 +59,12 @@ export default class Cell {
         if (!this.left) {
             p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize);
         }
+    }
+
+    private withinBounds = (x: number, y: number) => {
+        return (x > this.location.x - this.halfSize && 
+        x < this.location.x + this.halfSize &&
+        y > this.location.y - this.halfSize && 
+        y < this.location.y + this.halfSize)
     }
 }
