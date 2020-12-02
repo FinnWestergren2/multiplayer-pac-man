@@ -34,7 +34,6 @@ export type MapStateAction =
 
 export type PlayerState = {
     playerStatusMap: PlayerStatusMap;
-    playerPaths: { [id: string]: CoordPair[] }
     playerList: string[];
     currentPlayer?: string;
 };

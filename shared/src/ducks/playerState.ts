@@ -1,13 +1,12 @@
 import { AnyAction, Dispatch, Reducer } from "redux";
-import { PlayerStatusMap, PlayerStatus } from "..";
 import { StampedInput, CoordPair, CoordPairUtils, Directions } from "../Types";
 import { PlayerState, PlayerStateActionTypes, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
+import { PlayerLocationMap, PlayerStatus, PlayerStatusMap } from "../Types/PlayerStatus";
 import { BFS } from "../Utils/Pathfinding";
 
 const initialState: PlayerState = {
     playerStatusMap: {},
-    playerList: [],
-    playerPaths: {}
+    playerList: []
 };
 
 export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (state: PlayerState = initialState, action: PlayerStateAction) => {
@@ -21,7 +20,7 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
                 return state;
             }
             const playerStatusMap = state.playerStatusMap;
-            playerStatusMap[action.payload] = { location: {x: 0, y:0}, direction: Directions.NONE }
+            playerStatusMap[action.payload] = { location: {x: 0, y:0}, direction: Directions.NONE, path: [] }
             return { ...state, playerList: [...state.playerList, action.payload], playerStatusMap };
         case PlayerStateActionTypes.REMOVE_PLAYER:
             const newState = { ...state };
@@ -31,12 +30,13 @@ export const playerStateReducer: Reducer<PlayerState, PlayerStateAction> = (stat
             return { ...state, currentPlayer: action.payload };
         case PlayerStateActionTypes.SET_PLAYER_LIST:
             return { ...state, playerList: action.payload };
-        case PlayerStateActionTypes.SET_PLAYER_PATH:
-            return { ...state, playerPaths: { ...state.playerPaths, [action.payload.playerId]: action.payload.path }};
+        case PlayerStateActionTypes.SET_PLAYER_PATH: {
+            const newStatusMap = {...state.playerStatusMap, [action.payload.playerId]: {...state.playerStatusMap[action.payload.playerId], path: action.payload.path }};
+            return { ...state, playerStatusMap: newStatusMap}; }
         case PlayerStateActionTypes.POP_PLAYER_PATH:
-            if (state.playerPaths[action.payload].length >= 1) {
-                return { ...state, playerPaths: { ...state.playerPaths, [action.payload]: state.playerPaths[action.payload].slice(1) }};
-            }
+            const newStatusMap = {...state.playerStatusMap, [action.payload]: 
+                {...state.playerStatusMap[action.payload], path: state.playerStatusMap[action.payload].path.slice(1)} };
+            return { ...state, playerStatusMap: newStatusMap};
         default:
             return state;
     }
@@ -88,11 +88,11 @@ export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedI
     }
 }
 
-export const handleStateCorrection = (store: PlayerStore, locationMap: {[playerId: string]: CoordPair} ) => {
-    Object.keys(locationMap).forEach(key => {
-        const newStatus = store.getState().playerStatusMap[key];
-        newStatus.location = locationMap[key];
-        //@ts-ignore
-        store.dispatch(updatePlayerStatus(key, newStatus));
+export const handleStateCorrection = (store: PlayerStore, payload: { soft: PlayerLocationMap, hard: PlayerStatusMap }) => {
+    const {hard, soft} = payload;
+    store.getState().playerList.forEach(pId => {
+        const newState = hard[pId] ?? {...store.getState().playerStatusMap[pId], location: soft[pId] ?? store.getState().playerStatusMap[pId].location};
+        // @ts-ignore
+        store.dispatch(updatePlayerStatus(pId, newState));
     })
 }

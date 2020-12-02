@@ -1,10 +1,10 @@
-import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, PlayerStatusMap, Directions, handlePlayerInput } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, handlePlayerInput, PlayerStatus } from "shared";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
-const smoothOverrideTriggerDist = 0.05;
-const snapOverrideTriggerDist = 0.30;
+const smoothOverrideTriggerDist = 0.1;
+const snapOverrideTriggerDist = 0.4;
 
 export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 	switch (message.type) {
@@ -49,21 +49,23 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
 	const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
-	let correctionMap: {[playerId: string]:  CoordPair} = {};
+	const smoothCorrectionMap: {[playerId: string]: CoordPair} = {};
+	const snapMap: {[playerId: string]: PlayerStatus} = {};
 	const fullMap = PlayerStore.getState().playerStatusMap;
-	Object.keys(correctionMap).filter(pId => !!fullMap[pId]).forEach(pId => {
+	Object.keys(locationMap).filter(pId => !!fullMap[pId]).forEach(pId => {
 		const serverPerception = fullMap[pId].location;
-		const clientPerception = correctionMap[pId];
+		const clientPerception = locationMap[pId];
 		const distSquared = perceptionDifferenceSquared(serverPerception, clientPerception);
 		if (distSquared > snapOverrideSquared) {
-			correctionMap[pId] = fullMap[pId].location;
+			console.log("snapping");
+			snapMap[pId] = fullMap[pId];
 		}
 		else if (distSquared > smoothOverrideSquared) {
-			correctionMap[pId] = interpolate(serverPerception, clientPerception);
+			smoothCorrectionMap[pId] = interpolate(serverPerception, clientPerception);
 		}
 	});
-	if (Object.keys(locationMap).length > 0) {
-		return { type: MessageType.STATE_CORRECTION, payload: correctionMap };
+	if (Object.keys(snapMap).length > 0 || Object.keys(smoothCorrectionMap).length > 0) {
+		return { type: MessageType.STATE_CORRECTION, payload: { soft: smoothCorrectionMap, hard: snapMap } };
 	}
 	return null;
 }

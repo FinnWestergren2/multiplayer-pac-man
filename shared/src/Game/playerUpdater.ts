@@ -9,14 +9,14 @@ export const updatePlayers = () => {
 }
 
 const updatePlayer = (playerId: string, status: PlayerStatus) => {
-    const path = playerStore.getState().playerPaths[playerId];
-    if (path && path.length > 0) {
+    const path = playerStore.getState().playerStatusMap[playerId].path;
+    if (path.length > 0) {
         const targetCell = path[0];
         const newStatus = movePlayerTowardsTarget(status, targetCell);
         // console.log(targetCell, newStatus);
         if (isCentered(newStatus.location, targetCell)) {
-            popPlayerPath(playerStore, playerId);
             newStatus.location = CoordPairUtils.roundedPair(newStatus.location);
+            newStatus.path = newStatus.path.slice(1);
             if (path.length === 1) {
                 newStatus.direction = Directions.NONE;
             }
@@ -42,7 +42,7 @@ const isCentered = (location: CoordPair, target: CoordPair) => {
 };
 
 const movePlayerTowardsTarget = (status: PlayerStatus, targetCell: CoordPair) => {
-const newStatus = { location: status.location, direction: CoordPairUtils.getDirection(status.location, targetCell) } 
+const newStatus = { ...status, direction: CoordPairUtils.getDirection(status.location, targetCell) } 
     switch (newStatus.direction) {
         case Directions.DOWN:
             newStatus.location.y += SPEED_FACTOR;

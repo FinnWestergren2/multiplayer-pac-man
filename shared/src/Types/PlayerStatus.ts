@@ -3,8 +3,9 @@ import { Directions } from "./Directions"
 import { Input } from "./InputTypes"
 
 export type PlayerStatus = { 
-    location: CoordPair,
-    direction: Directions
+    location: CoordPair;
+    direction: Directions;
+    path: CoordPair[];
 }
 
 export type StampedInput = {
@@ -13,3 +14,4 @@ export type StampedInput = {
 }
 
 export type PlayerStatusMap = { [playerId: string]: PlayerStatus }
+export type PlayerLocationMap = { [playerId: string]: CoordPair }
