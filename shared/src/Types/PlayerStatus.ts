@@ -9,7 +9,7 @@ export type PlayerStatus = {
 }
 
 export type StampedInput = {
-    frame: number;
+    time: number;
     input: Input;
 }
 

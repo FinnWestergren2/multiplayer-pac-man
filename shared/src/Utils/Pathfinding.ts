@@ -51,12 +51,20 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
         queue = [...queue, ...branches];
         popIndex++;
     }
-
+ 
+    // we reverse the list at the end
     let output = [endCell]
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
         output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
     }
-
-    return output.reverse();
+    output = output.reverse();
+    if (output.length > 1) {
+        const firstDir = CoordPairUtils.getDirection(startFloat, output[0]);
+        const secondDir = CoordPairUtils.getDirection(startFloat, output[1]);
+        if (DirectionsUtils.getOpposite(firstDir) === secondDir) {
+            output = output.slice(1);
+        }
+    }
+    return output;
 }
