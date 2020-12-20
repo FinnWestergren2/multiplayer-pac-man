@@ -20,7 +20,7 @@ export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk
 let socketList: { [key: string]: Socket } = {};
 runGame(MapStore, PlayerStore, setInterval);
 
-const simulatedLag = 15;
+const simulatedLag = 30;
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -62,7 +62,7 @@ function handleData(buffer: Buffer, playerId: string) {
 	if (parsedBuffer) {
 		setTimeout(() => {
 			handleMessage(parsedBuffer, playerId);
-		}, simulatedLag);
+		}, simulatedLag / 2);
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 		removePlayerEverywhere(playerId);
@@ -90,7 +90,7 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 				writeToSinglePlayer(message, playerId, retryLimit-1);
 			}
 		}
-	}, simulatedLag);
+	}, simulatedLag / 2);
 }
 
 const addPlayerEverywhere = (playerId: string) => {

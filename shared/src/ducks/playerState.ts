@@ -90,9 +90,9 @@ export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedI
     let playerStatus = store.getState().playerStatusMap[playerId];
     if (playerStatus) {
         const frameDiff = ((new Date).getTime() - stampedInput.time) * UPDATE_FREQUENCY;
-        const distTravelled = SPEED_FACTOR * frameDiff;
+        const distTravelled = SPEED_FACTOR * frameDiff * 2; // multiply by two because by the time you update, they'll be crusing along the same speed
         playerStatus.location = stampedInput.input.currentLocation;
-        playerStatus.path = BFS(stampedInput.input.currentLocation, stampedInput.input.destination);
+        playerStatus.path = BFS(playerStatus.location, stampedInput.input.destination);
         movePlayerAlongPath(playerId, playerStatus, distTravelled, store);
     }
 }
