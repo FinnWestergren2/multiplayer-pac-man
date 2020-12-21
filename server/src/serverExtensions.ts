@@ -1,4 +1,4 @@
-import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, handlePlayerInput, PlayerStatus } from "shared";
+import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, handlePlayerInput, PlayerStatus } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
@@ -25,7 +25,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 			writeToAllPlayers(message, 1, fromPlayer);
 			return;
 		case MessageType.CLIENT_PERCEPTION_UPDATE:
-			const perceptionUpdate = getPerceptionUpdate(message.payload.locationMap, message.payload.timeStamp);
+			const perceptionUpdate = getPerceptionUpdate(message.payload.locationMap, message.payload.timeStamp, fromPlayer);
 			if (perceptionUpdate) {
 				writeToSinglePlayer(perceptionUpdate, fromPlayer);
 			}
@@ -45,7 +45,7 @@ export const getCurrentMap: () => MapResponse = () => {
 	return MapStore.getState().mapCells;
 };
 
-const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number) => ServerMessage | null = (locationMap, timeStamp) => {
+const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeStamp: number, fromPlayer: string) => ServerMessage | null = (locationMap, timeStamp, fromPlayer) => {
 	const potentialDrift = Math.abs(((new Date()).getTime() - timeStamp) * potentialDriftFactor);
 	const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
@@ -57,7 +57,7 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 		const clientPerception = locationMap[pId];
 		const distSquared = perceptionDifferenceSquared(serverPerception, clientPerception);
 		if (distSquared > snapOverrideSquared) {
-			console.log("snapping");
+			console.log("snapping:", fromPlayer, pId);
 			snapMap[pId] = fullMap[pId];
 		}
 		else if (distSquared > smoothOverrideSquared) {
@@ -66,7 +66,7 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 				smoothCorrectionMap[pId] = { x: correction.x, y: clientPerception.y }
 			}
 			else {
-				smoothCorrectionMap[pId] = { x: correction.x, y: clientPerception.y }
+				smoothCorrectionMap[pId] = { x: clientPerception.x, y: correction.y }
 			}
 		}
 	});

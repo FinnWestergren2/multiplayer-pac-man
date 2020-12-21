@@ -1,4 +1,4 @@
-import { handlePlayerInput, CoordPair, InputType } from "shared";
+import { handlePlayerInput, CoordPair, InputType } from "core";
 import { PlayerStore } from "../containers/GameWrapper";
 import { sendPlayerInput } from "../socket/clientExtensions";
 

@@ -1,5 +1,5 @@
 import Stack from "./Stack"
-import { CoordPair, Directions, CoordPairUtils, DirectionsUtils,  MapResponse } from "shared"
+import { CoordPair, Directions, CoordPairUtils, DirectionsUtils,  MapResponse } from "core"
 
 export const generateMapUsingRandomDFS: () => MapResponse = () => {
     const dimensions: CoordPair = { x: 7, y: 7 }

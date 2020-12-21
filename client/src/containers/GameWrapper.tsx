@@ -6,7 +6,7 @@ import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import initializeSocket from "../socket";
 import { requestMap } from "../socket/clientExtensions";
-import { mapStateReducer, playerStateReducer, runGame } from "shared";
+import { mapStateReducer, playerStateReducer, runGame } from "core";
 
 const FlexContainer = styled.div`
     display: flex;

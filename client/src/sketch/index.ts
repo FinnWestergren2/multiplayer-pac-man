@@ -1,6 +1,6 @@
 import p5 from "p5";
 import Game from "./Game";
-import { updateAppDimensions } from "shared";
+import { updateAppDimensions } from "core";
 import { MapStore } from "../containers/GameWrapper";
 
 export default function sketch(p: p5): void {

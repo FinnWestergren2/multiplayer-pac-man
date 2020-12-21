@@ -1,5 +1,5 @@
 import { AnyAction, Dispatch, Reducer } from "redux";
-import { StampedInput, CoordPair, CoordPairUtils, Directions, DirectionsUtils } from "../Types";
+import { StampedInput, CoordPair, Directions } from "../Types";
 import { PlayerState, PlayerStateActionTypes, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
 import { PlayerLocationMap, PlayerStatus, PlayerStatusMap } from "../Types/PlayerStatus";
 import { BFS } from "../Utils/Pathfinding";

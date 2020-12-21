@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"server/static": true,
+			"*/node_modules": true,
+			".git*": true,
+			"*.cmd": true,
+			"*/package-lock.json": true,
+			"client/public": true
+		}
+	}
+}

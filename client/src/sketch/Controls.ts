@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { CoordPair } from "shared/static/types";
+import { CoordPair } from "core";
 import { MapStore } from "../containers/GameWrapper";
 import { playerPathInput } from "../utils/clientActions";
 

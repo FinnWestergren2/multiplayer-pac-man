@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, PlayerStore } from "../containers/GameWrapper";
-import { Directions } from "shared";
+import { Directions } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
@@ -43,8 +43,10 @@ export default class Game {
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
-		(player === this.currentPlayer) ? p.fill(0, 0, 255) : p.fill(255, 0, 0);
+		p.fill(`#${player.substr(0,6)}`);
 		p.ellipse(0, 0, this.playerSize);
+		p.fill(255);
+		p.text(player.substr(0,4), 0, 0);
 		p.pop();
 	}
 };

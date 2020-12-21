@@ -1,6 +1,6 @@
 import * as p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { CoordPair, Directions, DirectionsUtils } from "shared";
+import { CoordPair, Directions, DirectionsUtils } from "core";
 
 export default class Cell {
     public cellType: Directions;

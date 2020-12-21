@@ -1,4 +1,4 @@
-import { ClientMessage, MessageType, ServerMessage } from "shared";
+import { ClientMessage, MessageType, ServerMessage } from "core";
 import { handleMessage, pingServer, sendPerceptionUpdate } from "./clientExtensions";
 
 export const PERCEPTION_UPDATE_PERIOD = 30;

@@ -10,7 +10,7 @@ import {
     setPlayerStatus,
     StampedInput,
     refreshMap
-} from "shared";
+} from "core";
 
 import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
 

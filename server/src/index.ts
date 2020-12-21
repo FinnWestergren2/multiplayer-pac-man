@@ -2,7 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
-import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer, runGame } from 'shared';
+import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer, runGame } from "core";
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
 import {Socket} from "net"
