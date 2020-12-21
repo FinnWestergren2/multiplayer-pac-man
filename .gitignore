@@ -6,7 +6,7 @@
 # production
 client/build
 server/static
-shared/static
+core/static
 
 # misc
 .DS_Store

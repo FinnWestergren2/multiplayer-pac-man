@@ -8,7 +8,7 @@
 		"files.exclude": {
 			"*/static": true,
 			"*/node_modules": true,
-			".git*": true,
+			".git*": false,
 			"*.cmd": true,
 			"*/package-lock.json": true,
 			"client/public": true
