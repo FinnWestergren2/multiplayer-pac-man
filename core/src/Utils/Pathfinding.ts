@@ -58,13 +58,5 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
         const currentCell = output[output.length - 1];
         output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
     }
-    output = output.reverse();
-    if (output.length > 1) {
-        const firstDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(startFloat), output[0]);
-        const secondDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(startFloat), output[1]);
-        if (DirectionsUtils.getOpposite(firstDir) === secondDir || firstDir === Directions.NONE) {
-            output = output.slice(1);
-        }
-    }
-    return output;
+    return output.reverse();
 }

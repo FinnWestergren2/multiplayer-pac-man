@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.handleStateCorrection = exports.handlePlayerInput = exports.setCurrentPlayers = exports.removePlayer = exports.addPlayer = exports.updatePlayerStatus = exports.setPlayerStatus = exports.playerStateReducer = void 0;
+exports.popPlayerPath = exports.handleStateCorrection = exports.handlePlayerInput = exports.setCurrentPlayers = exports.removePlayer = exports.addPlayer = exports.updatePlayerStatus = exports.setPlayerStatus = exports.playerStateReducer = void 0;
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
@@ -28,7 +28,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 var initialState = {
   objectStatusDict: {},
   playerList: [],
-  objectDestinationDict: {}
+  objectPathDict: {}
 };
 
 var playerStateReducer = function playerStateReducer() {
@@ -38,15 +38,15 @@ var playerStateReducer = function playerStateReducer() {
   var draft = _objectSpread({}, state);
 
   switch (action.type) {
-    case _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_STATUSES:
+    case _ReduxTypes.GameStateActionTypes.SET_OBJECT_STATUSES:
       draft.objectStatusDict = action.payload;
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_STATUS:
+    case _ReduxTypes.GameStateActionTypes.SET_OBJECT_STATUS:
       draft.objectStatusDict[action.payload.playerId] = action.payload.status;
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.ADD_PLAYER:
+    case _ReduxTypes.GameStateActionTypes.ADD_PLAYER:
       if (!state.playerList.some(function (p) {
         return p === action.payload;
       })) {
@@ -62,23 +62,28 @@ var playerStateReducer = function playerStateReducer() {
 
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.REMOVE_PLAYER:
+    case _ReduxTypes.GameStateActionTypes.REMOVE_PLAYER:
       delete draft.objectStatusDict[action.payload];
       draft.playerList = draft.playerList.filter(function (p) {
         return p != action.payload;
       });
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.SET_CURRENT_PLAYER_ID:
+    case _ReduxTypes.GameStateActionTypes.SET_CURRENT_PLAYER_ID:
       draft.currentPlayer = action.payload;
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.SET_PLAYER_LIST:
+    case _ReduxTypes.GameStateActionTypes.SET_PLAYER_LIST:
       draft.playerList = action.payload;
       break;
 
-    case _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_DESTINATION:
-      draft.objectDestinationDict[action.payload.playerId] = action.payload.dest;
+    case _ReduxTypes.GameStateActionTypes.SET_OBJECT_PATH:
+      draft.objectPathDict[action.payload.objectId] = action.payload.path;
+      break;
+
+    case _ReduxTypes.GameStateActionTypes.POP_OBJECT_PATH:
+      draft.objectPathDict[action.payload] = draft.objectPathDict[action.payload].slice(1);
+      break;
   }
 
   return draft;
@@ -89,7 +94,7 @@ exports.playerStateReducer = playerStateReducer;
 var setPlayerStatus = function setPlayerStatus(objectStatusDict) {
   return function (dispatch) {
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_STATUSES,
+      type: _ReduxTypes.GameStateActionTypes.SET_OBJECT_STATUSES,
       payload: objectStatusDict
     });
   };
@@ -100,7 +105,7 @@ exports.setPlayerStatus = setPlayerStatus;
 var updatePlayerStatus = function updatePlayerStatus(playerId, newStatus) {
   return function (dispatch) {
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_STATUS,
+      type: _ReduxTypes.GameStateActionTypes.SET_OBJECT_STATUS,
       payload: {
         playerId: playerId,
         status: newStatus
@@ -114,7 +119,7 @@ exports.updatePlayerStatus = updatePlayerStatus;
 var addPlayer = function addPlayer(playerId) {
   return function (dispatch) {
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.ADD_PLAYER,
+      type: _ReduxTypes.GameStateActionTypes.ADD_PLAYER,
       payload: playerId
     });
   };
@@ -125,7 +130,7 @@ exports.addPlayer = addPlayer;
 var removePlayer = function removePlayer(playerId) {
   return function (dispatch) {
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.REMOVE_PLAYER,
+      type: _ReduxTypes.GameStateActionTypes.REMOVE_PLAYER,
       payload: playerId
     });
   };
@@ -136,11 +141,11 @@ exports.removePlayer = removePlayer;
 var setCurrentPlayers = function setCurrentPlayers(currentPlayerId, fullPlayerList) {
   return function (dispatch) {
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.SET_CURRENT_PLAYER_ID,
+      type: _ReduxTypes.GameStateActionTypes.SET_CURRENT_PLAYER_ID,
       payload: currentPlayerId
     });
     dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.SET_PLAYER_LIST,
+      type: _ReduxTypes.GameStateActionTypes.SET_PLAYER_LIST,
       payload: fullPlayerList
     });
   };
@@ -152,19 +157,24 @@ var handlePlayerInput = function handlePlayerInput(store, playerId, stampedInput
   var playerStatus = store.getState().objectStatusDict[playerId];
 
   if (playerStatus) {
+    var path = (0, _Pathfinding.BFS)(stampedInput.input.currentLocation, stampedInput.input.destination);
+
     var frameDiff = (new Date().getTime() - stampedInput.time) * _Game.UPDATE_FREQUENCY;
 
-    var distTravelled = _Game.SPEED_FACTOR * Math.max(frameDiff * 2, 1); // multiply by two because by the time you update, they'll be crusing along the same speed
-
-    var path = (0, _Pathfinding.BFS)(stampedInput.input.currentLocation, stampedInput.input.destination);
-    var newStatus = (0, _playerUpdater.moveObjectAlongPath)(distTravelled, path, playerStatus); // @ts-ignore
+    var distTravelled = _Game.SPEED_FACTOR * frameDiff;
+    console.log(frameDiff, distTravelled, _Game.UPDATE_FREQUENCY);
+    var newStatus = (0, _playerUpdater.moveObjectAlongPath)(distTravelled, path, _objectSpread(_objectSpread({}, playerStatus), {}, {
+      location: stampedInput.input.currentLocation
+    }), function () {
+      return popPlayerPath(store, playerId);
+    }); // @ts-ignore
 
     store.dispatch(updatePlayerStatus(playerId, newStatus));
     store.dispatch({
-      type: _ReduxTypes.PlayerStateActionTypes.SET_OBJECT_DESTINATION,
+      type: _ReduxTypes.GameStateActionTypes.SET_OBJECT_PATH,
       payload: {
-        playerId: playerId,
-        dest: stampedInput.input.destination
+        objectId: playerId,
+        path: path
       }
     });
   }
@@ -187,3 +197,12 @@ var handleStateCorrection = function handleStateCorrection(store, payload) {
 };
 
 exports.handleStateCorrection = handleStateCorrection;
+
+var popPlayerPath = function popPlayerPath(store, playerId) {
+  store.dispatch({
+    type: _ReduxTypes.GameStateActionTypes.POP_OBJECT_PATH,
+    payload: playerId
+  });
+};
+
+exports.popPlayerPath = popPlayerPath;

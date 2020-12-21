@@ -3,7 +3,7 @@ import { CoordPair } from "./CoordPair";
 import { Directions } from "./Directions";
 import { ObjectDict as Dictionary, ObjectStatus as ObjectStatus, StampedInput } from "./GameState";
 export declare type MapStore = Store<MapState, MapStateAction>;
-export declare type PlayerStore = Store<GameState, PlayerStateAction>;
+export declare type PlayerStore = Store<GameState, GameStateAction>;
 export declare type MapState = {
     mapCells: Directions[][];
     appDimensions: AppDimensions;
@@ -36,9 +36,9 @@ export declare type GameState = {
     objectStatusDict: Dictionary<ObjectStatus>;
     playerList: string[];
     currentPlayer?: string;
-    objectDestinationDict: Dictionary<CoordPair | undefined>;
+    objectPathDict: Dictionary<CoordPair[]>;
 };
-export declare enum PlayerStateActionTypes {
+export declare enum GameStateActionTypes {
     SET_OBJECT_STATUS = "SET_OBJECT_STATUS",
     SET_OBJECT_STATUSES = "SET_OBJECT_STATUSES",
     ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
@@ -48,45 +48,49 @@ export declare enum PlayerStateActionTypes {
     SET_PLAYER_LIST = "SET_PLAYER_LIST",
     SOFT_SET_OBJECT_STATUSES = "SOFT_SET_OBJECT_STATUSES",
     RESOLVE_SOFT_UPDATE = "RESOLVE_SOFT_UPDATE",
-    SET_OBJECT_DESTINATION = "SET_OBJECT_DESTINATION"
+    SET_OBJECT_PATH = "SET_OBJECT_PATH",
+    POP_OBJECT_PATH = "POP_OBJECT_PATH"
 }
-export declare type PlayerStateAction = {
-    type: PlayerStateActionTypes.SET_OBJECT_STATUS;
+export declare type GameStateAction = {
+    type: GameStateActionTypes.SET_OBJECT_STATUS;
     payload: {
         playerId: string;
         status: ObjectStatus;
     };
 } | {
-    type: PlayerStateActionTypes.SOFT_SET_OBJECT_STATUSES;
+    type: GameStateActionTypes.SOFT_SET_OBJECT_STATUSES;
     payload: Dictionary<ObjectStatus>;
 } | {
-    type: PlayerStateActionTypes.RESOLVE_SOFT_UPDATE;
+    type: GameStateActionTypes.RESOLVE_SOFT_UPDATE;
     payload: string;
 } | {
-    type: PlayerStateActionTypes.SET_OBJECT_STATUSES;
+    type: GameStateActionTypes.SET_OBJECT_STATUSES;
     payload: Dictionary<ObjectStatus>;
 } | {
-    type: PlayerStateActionTypes.ADD_PLAYER_INPUT;
+    type: GameStateActionTypes.ADD_PLAYER_INPUT;
     payload: {
         playerId: string;
         input: StampedInput;
     };
 } | {
-    type: PlayerStateActionTypes.ADD_PLAYER;
+    type: GameStateActionTypes.ADD_PLAYER;
     payload: string;
 } | {
-    type: PlayerStateActionTypes.REMOVE_PLAYER;
+    type: GameStateActionTypes.REMOVE_PLAYER;
     payload: string;
 } | {
-    type: PlayerStateActionTypes.SET_CURRENT_PLAYER_ID;
+    type: GameStateActionTypes.SET_CURRENT_PLAYER_ID;
     payload: string;
 } | {
-    type: PlayerStateActionTypes.SET_PLAYER_LIST;
+    type: GameStateActionTypes.SET_PLAYER_LIST;
     payload: string[];
 } | {
-    type: PlayerStateActionTypes.SET_OBJECT_DESTINATION;
+    type: GameStateActionTypes.SET_OBJECT_PATH;
     payload: {
-        playerId: string;
-        dest: CoordPair;
+        objectId: string;
+        path: CoordPair[];
     };
+} | {
+    type: GameStateActionTypes.POP_OBJECT_PATH;
+    payload: string;
 };

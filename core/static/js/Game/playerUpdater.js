@@ -7,6 +7,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.moveObjectAlongPath = exports.updatePlayers = void 0;
 
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _ = require(".");
@@ -14,8 +16,6 @@ var _ = require(".");
 var _Types = require("../Types");
 
 var _playerState = require("../ducks/playerState");
-
-var _Pathfinding = require("../Utils/Pathfinding");
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -33,19 +33,19 @@ var updatePlayers = function updatePlayers() {
   return _.playerStore.getState().playerList.forEach(function (playerId) {
     var status = _.playerStore.getState().objectStatusDict[playerId];
 
-    var dest = _.playerStore.getState().objectDestinationDict[playerId];
+    var path = _.playerStore.getState().objectPathDict[playerId];
 
-    if (dest) {
-      var _path = (0, _Pathfinding.BFS)(status.location, dest);
-
-      var newStatus = moveObjectAlongPath(_.SPEED_FACTOR, _path, status); // @ts-ignore
+    if (path) {
+      var newStatus = moveObjectAlongPath(_.SPEED_FACTOR, path, status, function () {
+        return (0, _playerState.popPlayerPath)(_.playerStore, playerId);
+      }); // @ts-ignore
 
       _.playerStore.dispatch((0, _playerState.updatePlayerStatus)(playerId, newStatus));
 
       return;
     }
 
-    if (!dest && status && status.direction !== _Types.Directions.NONE) {
+    if (!path && status && status.direction !== _Types.Directions.NONE) {
       // @ts-ignore
       _.playerStore.dispatch((0, _playerState.updatePlayerStatus)(playerId, idleStatus(status.location)));
     }
@@ -54,10 +54,16 @@ var updatePlayers = function updatePlayers() {
 
 exports.updatePlayers = updatePlayers;
 
-var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status) {
-  if (dist === 0 || path.length === 0) {
+var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status, popPath) {
+  if (dist === 0) {
+    return status;
+  }
+
+  if (path.length === 0) {
     return idleStatus(status.location);
   }
+
+  path = checkCurrentPathStatus(status, path, popPath);
 
   var nextLocation = _Types.CoordPairUtils.snappedPair(status.location);
 
@@ -102,3 +108,21 @@ var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status) {
 };
 
 exports.moveObjectAlongPath = moveObjectAlongPath;
+
+var checkCurrentPathStatus = function checkCurrentPathStatus(status, path, popPath) {
+  var out = (0, _toConsumableArray2.default)(path);
+
+  for (var i = 0; i < path.length - 1; i++) {
+    var firstDir = _Types.CoordPairUtils.getDirection(_Types.CoordPairUtils.snappedPair(status.location), path[i]);
+
+    var secondDir = _Types.CoordPairUtils.getDirection(_Types.CoordPairUtils.snappedPair(status.location), path[i + 1]);
+
+    if (_Types.DirectionsUtils.getOpposite(firstDir) === secondDir) {
+      out = out.slice(1);
+      popPath();
+      break;
+    }
+  }
+
+  return out;
+};

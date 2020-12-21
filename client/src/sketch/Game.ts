@@ -45,7 +45,7 @@ export default class Game {
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
 		p.fill(`#${player.substr(0,6)}`);
-		if (player === this.currentPlayer){
+		if (player === this.currentPlayer) {
 			p.ellipse(0, 0, this.playerSize);
 		}
 		else {

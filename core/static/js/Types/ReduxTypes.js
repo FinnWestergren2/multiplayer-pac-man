@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PlayerStateActionTypes = exports.MapStateActionTypes = void 0;
+exports.GameStateActionTypes = exports.MapStateActionTypes = void 0;
 var MapStateActionTypes;
 exports.MapStateActionTypes = MapStateActionTypes;
 
@@ -13,20 +13,21 @@ exports.MapStateActionTypes = MapStateActionTypes;
   MapStateActionTypes["UPDATE_CELL_DIMENSIONS"] = "UPDATE_CELL_DIMENSIONS";
 })(MapStateActionTypes || (exports.MapStateActionTypes = MapStateActionTypes = {}));
 
-var PlayerStateActionTypes;
-exports.PlayerStateActionTypes = PlayerStateActionTypes;
+var GameStateActionTypes;
+exports.GameStateActionTypes = GameStateActionTypes;
 
-(function (PlayerStateActionTypes) {
-  PlayerStateActionTypes["SET_OBJECT_STATUS"] = "SET_OBJECT_STATUS";
-  PlayerStateActionTypes["SET_OBJECT_STATUSES"] = "SET_OBJECT_STATUSES";
-  PlayerStateActionTypes["ADD_PLAYER_INPUT"] = "ADD_PLAYER_INPUT";
-  PlayerStateActionTypes["ADD_PLAYER"] = "ADD_PLAYER";
-  PlayerStateActionTypes["REMOVE_PLAYER"] = "REMOVE_PLAYER";
-  PlayerStateActionTypes["SET_CURRENT_PLAYER_ID"] = "SET_CURRENT_PLAYER_ID";
-  PlayerStateActionTypes["SET_PLAYER_LIST"] = "SET_PLAYER_LIST";
-  PlayerStateActionTypes["SOFT_SET_OBJECT_STATUSES"] = "SOFT_SET_OBJECT_STATUSES";
-  PlayerStateActionTypes["RESOLVE_SOFT_UPDATE"] = "RESOLVE_SOFT_UPDATE";
-  PlayerStateActionTypes["SET_OBJECT_DESTINATION"] = "SET_OBJECT_DESTINATION";
-})(PlayerStateActionTypes || (exports.PlayerStateActionTypes = PlayerStateActionTypes = {}));
+(function (GameStateActionTypes) {
+  GameStateActionTypes["SET_OBJECT_STATUS"] = "SET_OBJECT_STATUS";
+  GameStateActionTypes["SET_OBJECT_STATUSES"] = "SET_OBJECT_STATUSES";
+  GameStateActionTypes["ADD_PLAYER_INPUT"] = "ADD_PLAYER_INPUT";
+  GameStateActionTypes["ADD_PLAYER"] = "ADD_PLAYER";
+  GameStateActionTypes["REMOVE_PLAYER"] = "REMOVE_PLAYER";
+  GameStateActionTypes["SET_CURRENT_PLAYER_ID"] = "SET_CURRENT_PLAYER_ID";
+  GameStateActionTypes["SET_PLAYER_LIST"] = "SET_PLAYER_LIST";
+  GameStateActionTypes["SOFT_SET_OBJECT_STATUSES"] = "SOFT_SET_OBJECT_STATUSES";
+  GameStateActionTypes["RESOLVE_SOFT_UPDATE"] = "RESOLVE_SOFT_UPDATE";
+  GameStateActionTypes["SET_OBJECT_PATH"] = "SET_OBJECT_PATH";
+  GameStateActionTypes["POP_OBJECT_PATH"] = "POP_OBJECT_PATH";
+})(GameStateActionTypes || (exports.GameStateActionTypes = GameStateActionTypes = {}));
 
 ;
