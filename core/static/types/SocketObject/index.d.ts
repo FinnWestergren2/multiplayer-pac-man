@@ -1,4 +1,4 @@
-import { Directions, StampedInput, PlayerStatusMap, CoordPair, PlayerLocationMap } from "../Types";
+import { Directions, StampedInput, CoordPair, ObjectStatus, ObjectDict } from "../Types";
 export declare enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
     PING = "PING",
@@ -42,7 +42,7 @@ declare type PlayerListUpdate = {
     payload: {
         currentPlayerId: string;
         fullPlayerList: string[];
-        playerStatusMap: PlayerStatusMap;
+        objectStatusDict: ObjectDict<ObjectStatus>;
     };
 } | {
     type: MessageType.REMOVE_PLAYER;
@@ -62,12 +62,12 @@ export declare type ServerMessage = PlayerListUpdate | {
     payload: null;
 } | {
     type: MessageType.STATE_OVERRIDE;
-    payload: PlayerStatusMap;
+    payload: ObjectDict<ObjectStatus>;
 } | {
     type: MessageType.STATE_CORRECTION;
     payload: {
-        soft: PlayerLocationMap;
-        hard: PlayerStatusMap;
+        soft: ObjectDict<CoordPair>;
+        hard: ObjectDict<ObjectStatus>;
     };
 } | {
     type: MessageType.PLAYER_INPUT;

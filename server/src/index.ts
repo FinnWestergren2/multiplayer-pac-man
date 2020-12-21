@@ -97,7 +97,7 @@ const addPlayerEverywhere = (playerId: string) => {
 	// @ts-ignore
 	PlayerStore.dispatch(addPlayer(playerId));
 	writeToSinglePlayer({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, playerStatusMap: PlayerStore.getState().playerStatusMap } }, playerId);
+	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, objectStatusDict: PlayerStore.getState().objectStatusDict } }, playerId);
 	writeToAllPlayers({ type: MessageType.ADD_PLAYER, payload: playerId });
 }
 

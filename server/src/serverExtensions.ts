@@ -51,7 +51,7 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
 	const smoothCorrectionMap: {[playerId: string]: CoordPair} = {};
 	const snapMap: {[playerId: string]: PlayerStatus} = {};
-	const fullMap = PlayerStore.getState().playerStatusMap;
+	const fullMap = PlayerStore.getState().objectStatusDict;
 	Object.keys(locationMap).filter(pId => !!fullMap[pId]).forEach(pId => {
 		const serverPerception = fullMap[pId].location;
 		const clientPerception = locationMap[pId];

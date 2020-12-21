@@ -1,4 +1,4 @@
-import { PlayerStatus } from '../Types/PlayerStatus';
-import { PlayerStore } from '../Types';
+import { ObjectStatus } from '../Types/GameState';
+import { CoordPair } from '../Types';
 export declare const updatePlayers: () => void;
-export declare const movePlayerAlongPath: (playerId: string, status: PlayerStatus, dist: number, store: PlayerStore) => void;
+export declare const moveObjectAlongPath: (dist: number, path: CoordPair[], status: ObjectStatus) => ObjectStatus;

@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.movePlayerAlongPath = exports.updatePlayers = void 0;
+exports.moveObjectAlongPath = exports.updatePlayers = void 0;
 
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
@@ -15,85 +15,93 @@ var _Types = require("../Types");
 
 var _playerState = require("../ducks/playerState");
 
+var _Pathfinding = require("../Utils/Pathfinding");
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-var updatePlayers = function updatePlayers() {
-  var psm = _.playerStore.getState().playerStatusMap;
+var idleStatus = function idleStatus(location) {
+  return {
+    location: _Types.CoordPairUtils.roundedPair(location),
+    // snap to grid
+    direction: _Types.Directions.NONE
+  };
+};
 
-  Object.keys(psm).forEach(function (key) {
-    return movePlayerAlongPath(key, psm[key], _.SPEED_FACTOR, _.playerStore);
+var updatePlayers = function updatePlayers() {
+  return _.playerStore.getState().playerList.forEach(function (playerId) {
+    var status = _.playerStore.getState().objectStatusDict[playerId];
+
+    var dest = _.playerStore.getState().objectDestinationDict[playerId];
+
+    if (dest) {
+      var _path = (0, _Pathfinding.BFS)(status.location, dest);
+
+      var newStatus = moveObjectAlongPath(_.SPEED_FACTOR, _path, status); // @ts-ignore
+
+      _.playerStore.dispatch((0, _playerState.updatePlayerStatus)(playerId, newStatus));
+
+      return;
+    }
+
+    if (!dest && status && status.direction !== _Types.Directions.NONE) {
+      // @ts-ignore
+      _.playerStore.dispatch((0, _playerState.updatePlayerStatus)(playerId, idleStatus(status.location)));
+    }
   });
 };
 
 exports.updatePlayers = updatePlayers;
 
-var movePlayerAlongPath = function movePlayerAlongPath(playerId, status, dist, store) {
-  var path = status.path;
-
-  if (path.length > 0) {
-    var targetCell = path[0];
-    var newStatus = movePlayerTowardsTarget(status, targetCell, dist); // console.log(targetCell, newStatus);
-
-    if (isCentered(newStatus.location, targetCell)) {
-      newStatus.location = _Types.CoordPairUtils.roundedPair(newStatus.location);
-      newStatus.path = newStatus.path.slice(1);
-
-      if (newStatus.path.length === 0) {
-        newStatus.direction = _Types.Directions.NONE;
-      }
-    } // @ts-ignore
-
-
-    store.dispatch((0, _playerState.updatePlayerStatus)(playerId, newStatus));
-  } else if (status.direction !== _Types.Directions.NONE) {
-    store.dispatch( //@ts-ignore
-    (0, _playerState.updatePlayerStatus)(playerId, {
-      location: _Types.CoordPairUtils.roundedPair(status.location),
-      direction: _Types.Directions.NONE
-    }));
-  }
-};
-
-exports.movePlayerAlongPath = movePlayerAlongPath;
-
-var isCentered = function isCentered(location, target) {
-  var centeredX = Math.abs(location.x - target.x) < _.SPEED_FACTOR;
-
-  var centeredY = Math.abs(location.y - target.y) < _.SPEED_FACTOR;
-
-  return centeredX && centeredY;
-};
-
-var movePlayerTowardsTarget = function movePlayerTowardsTarget(status, targetCell) {
-  var dist = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _.SPEED_FACTOR;
+var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status) {
+  console.log('updating');
 
   if (dist === 0) {
-    return status;
+    return idleStatus(status.location);
   }
 
-  var newStatus = _objectSpread(_objectSpread({}, status), {}, {
-    direction: _Types.CoordPairUtils.getDirection(status.location, targetCell)
-  });
+  var nextLocation = _Types.CoordPairUtils.snappedPair(status.location);
 
-  switch (newStatus.direction) {
-    case _Types.Directions.DOWN:
-      newStatus.location.y += dist;
-      break;
+  var nextDirection = status.direction;
+  var remainingDist = dist;
 
-    case _Types.Directions.UP:
-      newStatus.location.y -= dist;
-      break;
+  for (var pathIndex = 0; pathIndex < path.length; pathIndex++) {
+    var targetCell = path[pathIndex];
+    nextDirection = _Types.CoordPairUtils.getDirection(nextLocation, targetCell);
+    var distToCell = Math.sqrt(_Types.CoordPairUtils.distSquared(nextLocation, targetCell));
+    console.log(distToCell, nextDirection);
 
-    case _Types.Directions.RIGHT:
-      newStatus.location.x += dist;
-      break;
+    if (remainingDist > distToCell) {
+      nextLocation = _objectSpread({}, targetCell);
+      continue;
+    }
 
-    case _Types.Directions.LEFT:
-      newStatus.location.x -= dist;
-      break;
+    switch (nextDirection) {
+      case _Types.Directions.DOWN:
+        nextLocation.y += remainingDist;
+        break;
+
+      case _Types.Directions.UP:
+        nextLocation.y -= remainingDist;
+        break;
+
+      case _Types.Directions.RIGHT:
+        nextLocation.x += remainingDist;
+        break;
+
+      case _Types.Directions.LEFT:
+        nextLocation.x -= remainingDist;
+        break;
+    }
+
+    break;
   }
 
-  return newStatus;
+  return {
+    location: nextLocation,
+    direction: nextDirection
+  };
 };
+
+exports.moveObjectAlongPath = moveObjectAlongPath;

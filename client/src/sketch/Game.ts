@@ -33,13 +33,13 @@ export default class Game {
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
-		PlayerStore.getState().playerList.filter(player => PlayerStore.getState().playerStatusMap[player]).forEach(player => {
+		PlayerStore.getState().playerList.filter(player => PlayerStore.getState().objectStatusDict[player]).forEach(player => {
 			this.drawPlayer(p, player);
 		});
 	};
 
 	private drawPlayer = (p: p5, player: string) => {
-		const location = PlayerStore.getState().playerStatusMap[player].location;
+		const location = PlayerStore.getState().objectStatusDict[player].location;
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);

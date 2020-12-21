@@ -22,7 +22,7 @@ export function handleMessage(message: ServerMessage): void {
             // @ts-ignore
             PlayerStore.dispatch(setCurrentPlayers(message.payload.currentPlayerId, message.payload.fullPlayerList));
             // @ts-ignore
-            PlayerStore.dispatch(setPlayerStatus(message.payload.playerStatusMap));
+            PlayerStore.dispatch(setPlayerStatus(message.payload.objectStatusDict));
             return;
         case MessageType.MAP_RESPONSE:
             // @ts-ignore
@@ -72,7 +72,7 @@ export const sendPlayerInput = (playerId: string, input: StampedInput) => {
 
 export const sendPerceptionUpdate = () => { 
     const timeStamp = (new Date()).getTime();
-    const currentState = PlayerStore.getState().playerStatusMap
+    const currentState = PlayerStore.getState().objectStatusDict
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].location }

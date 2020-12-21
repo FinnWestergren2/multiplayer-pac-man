@@ -114,11 +114,11 @@ var BFS = function BFS(startFloat, endCell) {
   output = output.reverse();
 
   if (output.length > 1) {
-    var firstDir = _CoordPair.CoordPairUtils.getDirection(startFloat, output[0]);
+    var firstDir = _CoordPair.CoordPairUtils.getDirection(_CoordPair.CoordPairUtils.snappedPair(startFloat), output[0]);
 
-    var secondDir = _CoordPair.CoordPairUtils.getDirection(startFloat, output[1]);
+    var secondDir = _CoordPair.CoordPairUtils.getDirection(_CoordPair.CoordPairUtils.snappedPair(startFloat), output[1]);
 
-    if (_Directions.DirectionsUtils.getOpposite(firstDir) === secondDir) {
+    if (_Directions.DirectionsUtils.getOpposite(firstDir) === secondDir || firstDir === _Directions.Directions.NONE) {
       output = output.slice(1);
     }
   }

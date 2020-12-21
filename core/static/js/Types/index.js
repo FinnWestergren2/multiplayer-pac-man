@@ -28,14 +28,14 @@ Object.keys(_Directions).forEach(function (key) {
   });
 });
 
-var _PlayerStatus = require("./PlayerStatus");
+var _GameState = require("./GameState");
 
-Object.keys(_PlayerStatus).forEach(function (key) {
+Object.keys(_GameState).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _PlayerStatus[key];
+      return _GameState[key];
     }
   });
 });

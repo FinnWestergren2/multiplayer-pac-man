@@ -44,27 +44,49 @@ var flooredPair = function flooredPair(p) {
     x: Math.floor(p.x),
     y: Math.floor(p.y)
   };
-}; // WARNING: kinda jenky. really only supposed to be used when you know its not a diagonal line between start and finish
-
+};
 
 var getDirection = function getDirection(start, finish) {
+  var out = _Directions.Directions.NONE;
+
   if (start.x < finish.x) {
-    return _Directions.Directions.RIGHT;
+    out = out | _Directions.Directions.RIGHT;
   }
 
   if (start.x > finish.x) {
-    return _Directions.Directions.LEFT;
+    out = out | _Directions.Directions.LEFT;
   }
 
   if (start.y < finish.y) {
-    return _Directions.Directions.DOWN;
+    out = out | _Directions.Directions.DOWN;
   }
 
   if (start.y > finish.y) {
-    return _Directions.Directions.UP;
+    out = out | _Directions.Directions.UP;
   }
 
-  return _Directions.Directions.NONE;
+  console.log('start', start, 'finish', finish, 'out', out);
+  return out;
+};
+
+var snappedPair = function snappedPair(p) {
+  var rounded = roundedPair(p);
+
+  if (Math.abs(p.x - rounded.x) > Math.abs(p.y - rounded.y)) {
+    return {
+      x: p.x,
+      y: rounded.y
+    };
+  } else {
+    return {
+      x: rounded.x,
+      y: p.y
+    };
+  }
+};
+
+var distSquared = function distSquared(start, finish) {
+  return Math.pow(Math.abs(start.x - finish.x), 2) + Math.pow(Math.abs(start.y - finish.y), 2);
 };
 
 var CoordPairUtils = {
@@ -74,6 +96,8 @@ var CoordPairUtils = {
   equalPairs: equalPairs,
   roundedPair: roundedPair,
   flooredPair: flooredPair,
-  getDirection: getDirection
+  snappedPair: snappedPair,
+  getDirection: getDirection,
+  distSquared: distSquared
 };
 exports.CoordPairUtils = CoordPairUtils;

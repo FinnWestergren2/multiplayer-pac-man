@@ -1,17 +1,27 @@
-import { AnyAction, Dispatch, Reducer } from "redux";
+import { Reducer } from "redux";
 import { StampedInput, CoordPair } from "../Types";
-import { PlayerState, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
-import { PlayerLocationMap, PlayerStatus, PlayerStatusMap } from "../Types/PlayerStatus";
-export declare const playerStateReducer: Reducer<PlayerState, PlayerStateAction>;
-export declare const setPlayerStatus: (playerStatusMap: PlayerStatusMap) => (dispatch: Dispatch<AnyAction>) => void;
-export declare const updatePlayerStatus: (playerId: string, newStatus: PlayerStatus) => (dispatch: Dispatch<AnyAction>) => void;
-export declare const addPlayer: (playerId: string) => (dispatch: Dispatch<AnyAction>) => void;
-export declare const removePlayer: (playerId: string) => (dispatch: Dispatch<AnyAction>) => void;
-export declare const setCurrentPlayers: (currentPlayerId: string, fullPlayerList: string[]) => (dispatch: Dispatch<AnyAction>) => void;
-export declare const updatePlayerPath: (store: PlayerStore, playerId: string, path: CoordPair[]) => void;
-export declare const popPlayerPath: (store: PlayerStore, playerId: string) => void;
+import { GameState, PlayerStateActionTypes, PlayerStateAction, PlayerStore } from "../Types/ReduxTypes";
+import { ObjectDict, ObjectStatus } from "../Types/GameState";
+export declare const playerStateReducer: Reducer<GameState, PlayerStateAction>;
+export declare const setPlayerStatus: (objectStatusDict: ObjectDict<ObjectStatus>) => (dispatch: (arg0: {
+    type: PlayerStateActionTypes;
+    payload: ObjectDict<ObjectStatus>;
+}) => void) => void;
+export declare const updatePlayerStatus: (playerId: string, newStatus: ObjectStatus) => (dispatch: (action: PlayerStateAction) => void) => void;
+export declare const addPlayer: (playerId: string) => (dispatch: (arg0: {
+    type: PlayerStateActionTypes;
+    payload: string;
+}) => void) => void;
+export declare const removePlayer: (playerId: string) => (dispatch: (arg0: {
+    type: PlayerStateActionTypes;
+    payload: string;
+}) => void) => void;
+export declare const setCurrentPlayers: (currentPlayerId: string, fullPlayerList: string[]) => (dispatch: (arg0: {
+    type: PlayerStateActionTypes;
+    payload: string | string[];
+}) => void) => void;
 export declare const handlePlayerInput: (store: PlayerStore, playerId: string, stampedInput: StampedInput) => void;
 export declare const handleStateCorrection: (store: PlayerStore, payload: {
-    soft: PlayerLocationMap;
-    hard: PlayerStatusMap;
+    soft: ObjectDict<CoordPair>;
+    hard: ObjectDict<ObjectStatus>;
 }) => void;

@@ -1,64 +1,64 @@
 import { playerStore, SPEED_FACTOR } from '.';
-import { PlayerStatus } from '../Types/PlayerStatus';
-import { Directions, CoordPair, CoordPairUtils, PlayerStore } from '../Types';
+import { ObjectStatus } from '../Types/GameState';
+import { Directions, CoordPair, CoordPairUtils } from '../Types';
 import { updatePlayerStatus } from '../ducks/playerState';
+import { BFS } from '../Utils/Pathfinding';
 
-export const updatePlayers = () => {
-    const psm = playerStore.getState().playerStatusMap;
-    Object.keys(psm).forEach(key => movePlayerAlongPath(key, psm[key], SPEED_FACTOR, playerStore));
-}
-
-export const movePlayerAlongPath = (playerId: string, status: PlayerStatus, dist: number, store: PlayerStore) => {
-    const path = status.path;
-    if (path.length > 0) {
-        const targetCell = path[0];
-        const newStatus = movePlayerTowardsTarget(status, targetCell, dist);
-        // console.log(targetCell, newStatus);
-        if (isCentered(newStatus.location, targetCell)) {
-            newStatus.location = CoordPairUtils.roundedPair(newStatus.location);
-            newStatus.path = newStatus.path.slice(1);
-            if (newStatus.path.length === 0) {
-                newStatus.direction = Directions.NONE;
-            }
-        }
-        // @ts-ignore
-        store.dispatch(updatePlayerStatus(playerId, newStatus));
+const idleStatus = (location: CoordPair) => {
+    return {
+        location: CoordPairUtils.roundedPair(location), // snap to grid
+        direction: Directions.NONE
     }
-    else if (status.direction !== Directions.NONE) {
-        store.dispatch(
-            //@ts-ignore
-            updatePlayerStatus(playerId, {
-                location: CoordPairUtils.roundedPair(status.location),
-                direction: Directions.NONE
-            })
-        );
-    }
-}
-
-const isCentered = (location: CoordPair, target: CoordPair) => {
-    const centeredX = Math.abs(location.x - target.x) < SPEED_FACTOR;
-    const centeredY = Math.abs(location.y - target.y) < SPEED_FACTOR;
-    return centeredX && centeredY;
 };
 
-const movePlayerTowardsTarget = (status: PlayerStatus, targetCell: CoordPair, dist: number = SPEED_FACTOR) => {
+export const updatePlayers = () => playerStore.getState().playerList.forEach(playerId => {
+    const status = playerStore.getState().objectStatusDict[playerId];
+    const dest = playerStore.getState().objectDestinationDict[playerId];
+    if (dest) {
+        const path = BFS(status.location, dest);
+        const newStatus = moveObjectAlongPath(SPEED_FACTOR, path, status);
+        // @ts-ignore
+        playerStore.dispatch(updatePlayerStatus(playerId, newStatus));
+        return;
+    }
+    if (!dest && status && status.direction !== Directions.NONE) {
+        // @ts-ignore
+        playerStore.dispatch(updatePlayerStatus(playerId, idleStatus(status.location)));
+    }
+});
+
+export const moveObjectAlongPath: (dist: number, path: CoordPair[], status: ObjectStatus) => ObjectStatus = (dist, path, status) => {
+    console.log('updating');
     if (dist === 0) {
-        return status;
+        return idleStatus(status.location);
     }
-    const newStatus = { ...status, direction: CoordPairUtils.getDirection(status.location, targetCell) }
-    switch (newStatus.direction) {
-        case Directions.DOWN:
-            newStatus.location.y += dist;
-            break;
-        case Directions.UP:
-            newStatus.location.y -= dist;
-            break;
-        case Directions.RIGHT:
-            newStatus.location.x += dist;
-            break;
-        case Directions.LEFT:
-            newStatus.location.x -= dist;
-            break;
+    let nextLocation = CoordPairUtils.snappedPair(status.location);
+    let nextDirection = status.direction;
+    let remainingDist = dist;
+    for (let pathIndex = 0; pathIndex < path.length; pathIndex++) {
+        const targetCell = path[pathIndex];
+        nextDirection = CoordPairUtils.getDirection(nextLocation, targetCell)
+        const distToCell = Math.sqrt(CoordPairUtils.distSquared(nextLocation, targetCell));
+        console.log(distToCell, nextDirection);
+        if (remainingDist > distToCell) {
+            nextLocation = { ...targetCell };
+            continue;
+        }
+        switch (nextDirection) {
+            case Directions.DOWN:
+                nextLocation.y += remainingDist;
+                break;
+            case Directions.UP:
+                nextLocation.y -= remainingDist;
+                break;
+            case Directions.RIGHT:
+                nextLocation.x += remainingDist;
+                break;
+            case Directions.LEFT:
+                nextLocation.x -= remainingDist;
+                break;
+        }
+        break;
     }
-    return newStatus;
+    return { location: nextLocation, direction: nextDirection };
 }

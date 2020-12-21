@@ -1,6 +1,6 @@
 import { mapStore } from "../Game";
 import { CoordPair, CoordPairUtils } from "../Types/CoordPair"
-import { DirectionsUtils } from "../Types/Directions";
+import { Directions, DirectionsUtils } from "../Types/Directions";
 
 export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
     const startCell = CoordPairUtils.roundedPair(startFloat);
@@ -60,9 +60,9 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     }
     output = output.reverse();
     if (output.length > 1) {
-        const firstDir = CoordPairUtils.getDirection(startFloat, output[0]);
-        const secondDir = CoordPairUtils.getDirection(startFloat, output[1]);
-        if (DirectionsUtils.getOpposite(firstDir) === secondDir) {
+        const firstDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(startFloat), output[0]);
+        const secondDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(startFloat), output[1]);
+        if (DirectionsUtils.getOpposite(firstDir) === secondDir || firstDir === Directions.NONE) {
             output = output.slice(1);
         }
     }

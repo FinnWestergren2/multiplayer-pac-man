@@ -9,34 +9,47 @@ const addPairs = (p1: CoordPair, p2: CoordPair) => {
 const randomPair: (dimensions: CoordPair) => CoordPair = (dimensions) => {
     const x = Math.floor(Math.random() * dimensions.x);
     const y = Math.floor(Math.random() * dimensions.y);
-    return {x, y}
+    return { x, y }
 }
 
-const equalPairs: (a: CoordPair, b: CoordPair) => boolean = (a,b) => a.x === b.x && a.y === b.y;
+const equalPairs: (a: CoordPair, b: CoordPair) => boolean = (a, b) => a.x === b.x && a.y === b.y;
 
-const roundedPair = (p: CoordPair) => { 
-    return { x: Math.round(p.x), y: Math.round(p.y) } 
+const roundedPair = (p: CoordPair) => {
+    return { x: Math.round(p.x), y: Math.round(p.y) }
 }
 
-const flooredPair = (p: CoordPair) => { 
-    return { x: Math.floor(p.x), y: Math.floor(p.y) } 
+const flooredPair = (p: CoordPair) => {
+    return { x: Math.floor(p.x), y: Math.floor(p.y) }
 }
 
-// WARNING: kinda jenky. really only supposed to be used when you know its not a diagonal line between start and finish
-const getDirection = (start: CoordPair, finish: CoordPair ) => {
+const getDirection = (start: CoordPair, finish: CoordPair) => {
+    let out = Directions.NONE;
     if (start.x < finish.x) {
-        return Directions.RIGHT;
+        out = out | Directions.RIGHT;
     }
     if (start.x > finish.x) {
-        return Directions.LEFT;
+        out = out | Directions.LEFT;
     }
     if (start.y < finish.y) {
-        return Directions.DOWN;
+        out = out | Directions.DOWN;
     }
     if (start.y > finish.y) {
-        return Directions.UP;
+        out = out | Directions.UP;
     }
-    return Directions.NONE
+    console.log('start', start, 'finish', finish, 'out', out);
+    return out
 }
 
-export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair, flooredPair, getDirection };
+const snappedPair = (p: CoordPair) => {
+    const rounded = roundedPair(p);
+    if (Math.abs(p.x - rounded.x) > Math.abs(p.y - rounded.y)) {
+        return { x: p.x, y: rounded.y };
+    }
+    else {
+        return { x: rounded.x, y: p.y };
+    }
+}
+
+const distSquared = (start: CoordPair, finish: CoordPair) => Math.pow(Math.abs(start.x - finish.x), 2) + Math.pow(Math.abs(start.y - finish.y), 2)
+
+export const CoordPairUtils = { zeroPair, addPairs, randomPair, equalPairs, roundedPair, flooredPair, snappedPair, getDirection, distSquared };

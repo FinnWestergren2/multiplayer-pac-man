@@ -17,17 +17,16 @@ var PlayerStateActionTypes;
 exports.PlayerStateActionTypes = PlayerStateActionTypes;
 
 (function (PlayerStateActionTypes) {
-  PlayerStateActionTypes["UPDATE_PLAYER_STATUS"] = "UPDATE_PLAYER_STATUS";
-  PlayerStateActionTypes["SET_PLAYER_STATUS"] = "SET_PLAYER_STATUS";
+  PlayerStateActionTypes["SET_OBJECT_STATUS"] = "SET_OBJECT_STATUS";
+  PlayerStateActionTypes["SET_OBJECT_STATUSES"] = "SET_OBJECT_STATUSES";
   PlayerStateActionTypes["ADD_PLAYER_INPUT"] = "ADD_PLAYER_INPUT";
   PlayerStateActionTypes["ADD_PLAYER"] = "ADD_PLAYER";
   PlayerStateActionTypes["REMOVE_PLAYER"] = "REMOVE_PLAYER";
   PlayerStateActionTypes["SET_CURRENT_PLAYER_ID"] = "SET_CURRENT_PLAYER_ID";
   PlayerStateActionTypes["SET_PLAYER_LIST"] = "SET_PLAYER_LIST";
-  PlayerStateActionTypes["SOFT_UPDATE_PLAYER_STATUSES"] = "SOFT_UPDATE_PLAYER_STATUSES";
+  PlayerStateActionTypes["SOFT_SET_OBJECT_STATUSES"] = "SOFT_SET_OBJECT_STATUSES";
   PlayerStateActionTypes["RESOLVE_SOFT_UPDATE"] = "RESOLVE_SOFT_UPDATE";
-  PlayerStateActionTypes["SET_PLAYER_PATH"] = "SET_PLAYER_PATH";
-  PlayerStateActionTypes["POP_PLAYER_PATH"] = "POP_PLAYER_PATH";
+  PlayerStateActionTypes["SET_OBJECT_DESTINATION"] = "SET_OBJECT_DESTINATION";
 })(PlayerStateActionTypes || (exports.PlayerStateActionTypes = PlayerStateActionTypes = {}));
 
 ;

@@ -22,5 +22,10 @@ export declare const CoordPairUtils: {
         x: number;
         y: number;
     };
+    snappedPair: (p: CoordPair) => {
+        x: number;
+        y: number;
+    };
     getDirection: (start: CoordPair, finish: CoordPair) => Directions;
+    distSquared: (start: CoordPair, finish: CoordPair) => number;
 };
