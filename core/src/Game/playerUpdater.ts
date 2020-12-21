@@ -28,8 +28,7 @@ export const updatePlayers = () => playerStore.getState().playerList.forEach(pla
 });
 
 export const moveObjectAlongPath: (dist: number, path: CoordPair[], status: ObjectStatus) => ObjectStatus = (dist, path, status) => {
-    console.log('updating');
-    if (dist === 0) {
+    if (dist === 0 || path.length === 0) {
         return idleStatus(status.location);
     }
     let nextLocation = CoordPairUtils.snappedPair(status.location);
@@ -39,7 +38,6 @@ export const moveObjectAlongPath: (dist: number, path: CoordPair[], status: Obje
         const targetCell = path[pathIndex];
         nextDirection = CoordPairUtils.getDirection(nextLocation, targetCell)
         const distToCell = Math.sqrt(CoordPairUtils.distSquared(nextLocation, targetCell));
-        console.log(distToCell, nextDirection);
         if (remainingDist > distToCell) {
             nextLocation = { ...targetCell };
             continue;

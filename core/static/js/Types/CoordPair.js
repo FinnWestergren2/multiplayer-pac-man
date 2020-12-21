@@ -65,7 +65,6 @@ var getDirection = function getDirection(start, finish) {
     out = out | _Directions.Directions.UP;
   }
 
-  console.log('start', start, 'finish', finish, 'out', out);
   return out;
 };
 

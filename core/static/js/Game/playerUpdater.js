@@ -55,9 +55,7 @@ var updatePlayers = function updatePlayers() {
 exports.updatePlayers = updatePlayers;
 
 var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status) {
-  console.log('updating');
-
-  if (dist === 0) {
+  if (dist === 0 || path.length === 0) {
     return idleStatus(status.location);
   }
 
@@ -70,7 +68,6 @@ var moveObjectAlongPath = function moveObjectAlongPath(dist, path, status) {
     var targetCell = path[pathIndex];
     nextDirection = _Types.CoordPairUtils.getDirection(nextLocation, targetCell);
     var distToCell = Math.sqrt(_Types.CoordPairUtils.distSquared(nextLocation, targetCell));
-    console.log(distToCell, nextDirection);
 
     if (remainingDist > distToCell) {
       nextLocation = _objectSpread({}, targetCell);

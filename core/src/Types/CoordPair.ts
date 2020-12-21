@@ -36,7 +36,6 @@ const getDirection = (start: CoordPair, finish: CoordPair) => {
     if (start.y > finish.y) {
         out = out | Directions.UP;
     }
-    console.log('start', start, 'finish', finish, 'out', out);
     return out
 }
 
