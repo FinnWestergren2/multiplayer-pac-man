@@ -43,10 +43,20 @@ export default class Game {
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
+		p.noStroke();
 		p.fill(`#${player.substr(0,6)}`);
-		p.ellipse(0, 0, this.playerSize);
+		if (player === this.currentPlayer){
+			p.ellipse(0, 0, this.playerSize);
+		}
+		else {
+			p.rect(-0.5 * (this.playerSize), -0.5 * (this.playerSize), this.playerSize, this.playerSize );
+		}
 		p.fill(255);
-		p.text(player.substr(0,4), 0, 0);
+		p.rect(-0.32 * (this.playerSize), -0.18 * (this.playerSize), 0.64 * (this.playerSize), 0.2 * (this.playerSize));
+		p.fill(0);
+		p.textAlign(p.CENTER);
+		p.textSize(14);
+		p.text(player.substr(0,6), 0, 0);
 		p.pop();
 	}
 };
