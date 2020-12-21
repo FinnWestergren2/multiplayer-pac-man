@@ -1,6 +1,6 @@
 import Cell from "./Cell";
 import p5 from "p5";
-import { MapStore, PlayerStore } from "../containers/GameWrapper";
+import { MapStore, GameStore } from "../containers/GameWrapper";
 import { Directions } from "core";
 import { bindHumanPlayer } from "./Controls";
 
@@ -12,9 +12,9 @@ export default class Game {
 	private currentPlayer?: string;
 	public constructor(p: p5) {
 		MapStore.subscribe(() => this.initializeMap());
-		PlayerStore.subscribe(() => {
+		GameStore.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
-			this.currentPlayer = PlayerStore.getState().currentPlayer;
+			this.currentPlayer = GameStore.getState().currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
 				bindHumanPlayer(p, this.currentPlayer);
 			}
@@ -33,13 +33,13 @@ export default class Game {
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
-		PlayerStore.getState().playerList.filter(player => PlayerStore.getState().objectStatusDict[player]).forEach(player => {
+		GameStore.getState().playerList.filter(player => GameStore.getState().objectStatusDict[player]).forEach(player => {
 			this.drawPlayer(p, player);
 		});
 	};
 
 	private drawPlayer = (p: p5, player: string) => {
-		const location = PlayerStore.getState().objectStatusDict[player].location;
+		const location = GameStore.getState().objectStatusDict[player].location;
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);

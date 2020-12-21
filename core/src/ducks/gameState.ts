@@ -1,6 +1,6 @@
-import { AnyAction, Dispatch, Reducer } from "redux";
+import { Reducer } from "redux";
 import { StampedInput, CoordPair, Directions } from "../Types";
-import { GameState, GameStateActionTypes, GameStateAction, PlayerStore } from "../Types/ReduxTypes";
+import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../Types/ReduxTypes";
 import { ObjectDict, ObjectStatus } from "../Types/GameState";
 import { BFS } from "../Utils/Pathfinding";
 import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../Game";
@@ -12,7 +12,7 @@ const initialState: GameState = {
     objectPathDict: {}
 };
 
-export const playerStateReducer: Reducer<GameState, GameStateAction> = (state: GameState = initialState, action: GameStateAction) => {
+export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: GameState = initialState, action: GameStateAction) => {
     const draft = { ...state };
     switch (action.type) {
         case GameStateActionTypes.SET_OBJECT_STATUSES:
@@ -47,38 +47,31 @@ export const playerStateReducer: Reducer<GameState, GameStateAction> = (state: G
     return draft;
 };
 
-export const setPlayerStatus = (objectStatusDict: ObjectDict<ObjectStatus>) => {
-    return function (dispatch: (action: GameStateAction) => void) {
-        dispatch({ type: GameStateActionTypes.SET_OBJECT_STATUSES, payload: objectStatusDict });
-    };
+export const setPlayerStatus = (store: GameStore, objectStatusDict: ObjectDict<ObjectStatus>) =>
+    store.dispatch({ type: GameStateActionTypes.SET_OBJECT_STATUSES, payload: objectStatusDict });
+
+export const updatePlayerStatus = (store: GameStore, playerId: string, newStatus: ObjectStatus) => 
+    store.dispatch({ type: GameStateActionTypes.SET_OBJECT_STATUS, payload: { playerId, status: newStatus } });
+
+export const addPlayer = (store: GameStore, playerId: string) =>
+    store.dispatch({ type: GameStateActionTypes.ADD_PLAYER, payload: playerId });
+
+export const removePlayer = (store: GameStore, playerId: string) =>
+    store.dispatch({ type: GameStateActionTypes.REMOVE_PLAYER, payload: playerId });
+
+export const setCurrentPlayers = (store: GameStore, currentPlayerId: string, fullPlayerList: string[]) => {
+    store.dispatch({ type: GameStateActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
+    store.dispatch({ type: GameStateActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
 };
 
-export const updatePlayerStatus = (playerId: string, newStatus: ObjectStatus) => {
-    return function (dispatch: (action: GameStateAction) => void) {
-        dispatch({ type: GameStateActionTypes.SET_OBJECT_STATUS, payload: { playerId, status: newStatus } });
-    };
-};
+export const setObjectPath = (store: GameStore, objectId: string, path: CoordPair[]) =>
+    store.dispatch({ type: GameStateActionTypes.SET_OBJECT_PATH, payload: { objectId, path } });
+    
+export const popPlayerPath = (store: GameStore, playerId: string) => {
+    store.dispatch({ type: GameStateActionTypes.POP_OBJECT_PATH, payload: playerId });
+}
 
-export const addPlayer = (playerId: string) => {
-    return function (dispatch: (action: GameStateAction) => void) {
-        dispatch({ type: GameStateActionTypes.ADD_PLAYER, payload: playerId });
-    };
-};
-
-export const removePlayer = (playerId: string) => {
-    return function (dispatch: (action: GameStateAction) => void) {
-        dispatch({ type: GameStateActionTypes.REMOVE_PLAYER, payload: playerId });
-    };
-};
-
-export const setCurrentPlayers = (currentPlayerId: string, fullPlayerList: string[]) => {
-    return function (dispatch: (action: GameStateAction) => void) {
-        dispatch({ type: GameStateActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
-        dispatch({ type: GameStateActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
-    };
-};
-
-export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedInput: StampedInput) => {
+export const handlePlayerInput = (store: GameStore, playerId: string, stampedInput: StampedInput) => {
     const playerStatus = store.getState().objectStatusDict[playerId];
     if (playerStatus) {
         const path = BFS(stampedInput.input.currentLocation, stampedInput.input.destination);
@@ -86,21 +79,15 @@ export const handlePlayerInput = (store: PlayerStore, playerId: string, stampedI
         const distTravelled = SPEED_FACTOR * frameDiff;
         console.log(frameDiff, distTravelled, UPDATE_FREQUENCY);
         const newStatus = moveObjectAlongPath(distTravelled, path, { ...playerStatus, location: stampedInput.input.currentLocation }, () => popPlayerPath(store, playerId));
-        // @ts-ignore
-        store.dispatch(updatePlayerStatus(playerId, newStatus));
-        store.dispatch({ type: GameStateActionTypes.SET_OBJECT_PATH, payload: { objectId: playerId, path } });
+        updatePlayerStatus(store, playerId, newStatus);
+        setObjectPath(store, playerId, path);
     }
 }
 
-export const handleStateCorrection = (store: PlayerStore, payload: { soft: ObjectDict<CoordPair>, hard: ObjectDict<ObjectStatus> }) => {
+export const handleStateCorrection = (store: GameStore, payload: { soft: ObjectDict<CoordPair>, hard: ObjectDict<ObjectStatus> }) => {
     const { hard, soft } = payload;
     store.getState().playerList.forEach(pId => {
         const newState = hard[pId] ?? { ...store.getState().objectStatusDict[pId], location: soft[pId] ?? store.getState().objectStatusDict[pId].location };
-        // @ts-ignore
-        store.dispatch(updatePlayerStatus(pId, newState));
+        updatePlayerStatus(store, pId, newState);
     })
-}
-
-export const popPlayerPath = (store: PlayerStore, playerId: string) => {
-    store.dispatch({ type: GameStateActionTypes.POP_OBJECT_PATH, payload: playerId });
 }

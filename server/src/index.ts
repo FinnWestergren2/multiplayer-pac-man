@@ -2,7 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
-import { ServerMessage, ClientMessage, mapStateReducer, playerStateReducer, MessageType, addPlayer, removePlayer, runGame } from "core";
+import { ServerMessage, ClientMessage, mapStateReducer, gameStateReducer, MessageType, addPlayer, removePlayer, runGame } from "core";
 import thunk from "redux-thunk";
 import { createStore, applyMiddleware } from "redux";
 import {Socket} from "net"
@@ -15,10 +15,10 @@ const server = http.createServer((req, res) => {
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
-export const PlayerStore = createStore(playerStateReducer, applyMiddleware(thunk));
+export const GameStore = createStore(gameStateReducer, applyMiddleware(thunk));
 
 let socketList: { [key: string]: Socket } = {};
-runGame(MapStore, PlayerStore, setInterval);
+runGame(MapStore, GameStore, setInterval);
 
 const simulatedLag = 30;
 
@@ -94,16 +94,14 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 }
 
 const addPlayerEverywhere = (playerId: string) => {
-	// @ts-ignore
-	PlayerStore.dispatch(addPlayer(playerId));
+	addPlayer(GameStore, playerId);
 	writeToSinglePlayer({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: PlayerStore.getState().playerList, objectStatusDict: PlayerStore.getState().objectStatusDict } }, playerId);
+	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: GameStore.getState().playerList, objectStatusDict: GameStore.getState().objectStatusDict } }, playerId);
 	writeToAllPlayers({ type: MessageType.ADD_PLAYER, payload: playerId });
 }
 
 const removePlayerEverywhere = (playerId: string) => {
-	// @ts-ignore
-	PlayerStore.dispatch(removePlayer(playerId));
+	removePlayer(GameStore, playerId);
 	writeToAllPlayers({ type: MessageType.REMOVE_PLAYER, payload: playerId }, 10);
 	socketList[playerId].end();
 	socketList[playerId].destroy();

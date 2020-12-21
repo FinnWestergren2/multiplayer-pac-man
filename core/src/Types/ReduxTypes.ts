@@ -4,7 +4,7 @@ import { Directions } from "./Directions";
 import { ObjectDict as Dictionary, ObjectStatus as ObjectStatus, StampedInput } from "./GameState";
 
 export type MapStore = Store<MapState, MapStateAction>;
-export type PlayerStore = Store<GameState, GameStateAction>;
+export type GameStore = Store<GameState, GameStateAction>;
 
 export type MapState = {
     mapCells: Directions[][];

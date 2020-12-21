@@ -12,42 +12,37 @@ import {
     refreshMap
 } from "core";
 
-import { MapStore, ClientSocket, PlayerStore } from "../containers/GameWrapper";
+import { MapStore, ClientSocket, GameStore } from "../containers/GameWrapper";
 
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
             return;
         case MessageType.INIT_PLAYER:
-            // @ts-ignore
-            PlayerStore.dispatch(setCurrentPlayers(message.payload.currentPlayerId, message.payload.fullPlayerList));
-            // @ts-ignore
-            PlayerStore.dispatch(setPlayerStatus(message.payload.objectStatusDict));
+            setCurrentPlayers(GameStore, message.payload.currentPlayerId, message.payload.fullPlayerList);
+            setPlayerStatus(GameStore, message.payload.objectStatusDict);
             return;
         case MessageType.MAP_RESPONSE:
-            // @ts-ignore
+            //@ts-ignore
             MapStore.dispatch(refreshMap(message.payload));
             return;
         case MessageType.ADD_PLAYER:
-            // @ts-ignore
-            PlayerStore.dispatch(addPlayer(message.payload));
+            addPlayer(GameStore, message.payload);
             return;
         case MessageType.REMOVE_PLAYER:
-            // @ts-ignore
-            PlayerStore.dispatch(removePlayer(message.payload));
+            removePlayer(GameStore, message.payload);
             return;
         case MessageType.PLAYER_INPUT:
-            handlePlayerInput(PlayerStore, message.payload.playerId, message.payload.input);
+            handlePlayerInput(GameStore, message.payload.playerId, message.payload.input);
             return;
         case MessageType.INVALID:
             console.error('sent an invalid message to server')
             return;
         case MessageType.STATE_OVERRIDE:
-            // @ts-ignore
-            PlayerStore.dispatch(setPlayerStatus(message.payload));
+            setPlayerStatus(GameStore, message.payload);
             return;
         case MessageType.STATE_CORRECTION:
-            handleStateCorrection(PlayerStore, message.payload);
+            handleStateCorrection(GameStore, message.payload);
             return
         default:
             console.error('recieved an invalid message type from server')
@@ -56,7 +51,7 @@ export function handleMessage(message: ServerMessage): void {
 }
 
 export const pingServer = () => {
-    const request: ClientMessage = { type: MessageType.PING, payload: { time: (new Date()).getTime(), playerId: PlayerStore.getState().currentPlayer! } }
+    const request: ClientMessage = { type: MessageType.PING, payload: { time: (new Date()).getTime(), playerId: GameStore.getState().currentPlayer! } }
     ClientSocket.send(JSON.stringify(request));
 }
 
@@ -72,7 +67,7 @@ export const sendPlayerInput = (playerId: string, input: StampedInput) => {
 
 export const sendPerceptionUpdate = () => { 
     const timeStamp = (new Date()).getTime();
-    const currentState = PlayerStore.getState().objectStatusDict
+    const currentState = GameStore.getState().objectStatusDict
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].location }
