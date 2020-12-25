@@ -1,6 +1,6 @@
 import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, handlePlayerInput, ObjectStatus } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
-import { MapStore, PlayerStore, writeToSinglePlayer, writeToAllPlayers } from ".";
+import { MapStore, GameStore, writeToSinglePlayer, writeToAllPlayers } from ".";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.2;
@@ -21,7 +21,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 			}, fromPlayer);
 			return;
 		case MessageType.PLAYER_INPUT:
-			handlePlayerInput(PlayerStore, fromPlayer, message.payload.input)
+			handlePlayerInput(GameStore, fromPlayer, message.payload.input)
 			writeToAllPlayers(message, 1, fromPlayer);
 			return;
 		case MessageType.CLIENT_PERCEPTION_UPDATE:
@@ -51,7 +51,7 @@ const getPerceptionUpdate:(locationMap: {[playerId: string]: CoordPair}, timeSta
 	const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
 	const smoothCorrectionMap: {[playerId: string]: CoordPair} = {};
 	const snapMap: {[playerId: string]: ObjectStatus} = {};
-	const fullMap = PlayerStore.getState().objectStatusDict;
+	const fullMap = GameStore.getState().objectStatusDict;
 	Object.keys(locationMap).filter(pId => !!fullMap[pId]).forEach(pId => {
 		const serverPerception = fullMap[pId].location;
 		const clientPerception = locationMap[pId];

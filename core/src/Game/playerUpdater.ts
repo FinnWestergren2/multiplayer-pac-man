@@ -1,7 +1,7 @@
-import { playerStore, SPEED_FACTOR } from '.';
+import { gameStore, SPEED_FACTOR } from '.';
 import { ObjectStatus } from '../Types/GameState';
 import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../Types';
-import { popPlayerPath, updatePlayerStatus } from '../ducks/playerState';
+import { popPlayerPath, updatePlayerStatus } from '../ducks/gameState';
 
 const idleStatus = (location: CoordPair) => {
     return {
@@ -10,18 +10,16 @@ const idleStatus = (location: CoordPair) => {
     }
 };
 
-export const updatePlayers = () => playerStore.getState().playerList.forEach(playerId => {
-    const status = playerStore.getState().objectStatusDict[playerId];
-    const path = playerStore.getState().objectPathDict[playerId];
+export const updatePlayers = () => gameStore.getState().playerList.forEach(playerId => {
+    const status = gameStore.getState().objectStatusDict[playerId];
+    const path = gameStore.getState().objectPathDict[playerId];
     if (path) {
-        const newStatus = moveObjectAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(playerStore, playerId));
-        // @ts-ignore
-        playerStore.dispatch(updatePlayerStatus(playerId, newStatus));
+        const newStatus = moveObjectAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(gameStore, playerId));
+        updatePlayerStatus(gameStore, playerId, newStatus);
         return;
     }
     if (!path && status && status.direction !== Directions.NONE) {
-        // @ts-ignore
-        playerStore.dispatch(updatePlayerStatus(playerId, idleStatus(status.location)));
+       updatePlayerStatus(gameStore, playerId, idleStatus(status.location));
     }
 });
 

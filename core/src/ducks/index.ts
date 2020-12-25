@@ -1,2 +1,2 @@
 export * from "./mapState";
-export * from "./playerState";
+export * from "./gameState";
