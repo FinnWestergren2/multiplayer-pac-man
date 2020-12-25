@@ -1,6 +1,7 @@
 import { ClientMessage, MessageType, ServerMessage, MapResponse, refreshMap, CoordPair, SPEED_FACTOR, UPDATE_FREQUENCY, handlePlayerInput, ObjectStatus } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
-import { MapStore, GameStore, writeToSinglePlayer, writeToAllPlayers } from ".";
+import { MapStore, GameStore, writeToSinglePlayer, writeToAllPlayers, ServerStore } from ".";
+import { setSimulatedLag } from "./ducks/serverState";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.2;
@@ -30,6 +31,9 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 				writeToSinglePlayer(perceptionUpdate, fromPlayer);
 			}
 			return;
+		case MessageType.SET_SIMULATED_LAG:
+			setSimulatedLag(ServerStore, message.payload);
+			return;
 		default:
 			writeToSinglePlayer({ type: MessageType.INVALID, payload: null }, fromPlayer);
 	}
@@ -38,8 +42,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 export const getCurrentMap: () => MapResponse = () => {
 	if (MapStore.getState().mapCells.length === 0) {
 		const newMap = generateMapUsingRandomDFS();
-		// @ts-ignore
-		MapStore.dispatch(refreshMap(newMap));
+		refreshMap(MapStore, newMap);
 		return newMap;
 	}
 	return MapStore.getState().mapCells;

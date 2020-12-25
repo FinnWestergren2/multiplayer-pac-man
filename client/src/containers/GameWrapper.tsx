@@ -2,11 +2,11 @@ import React, { FunctionComponent } from "react";
 import P5Wrapper from "./P5Wrapper";
 import Octicon, {Sync} from "@primer/octicons-react";
 import styled from "@emotion/styled";
-import { createStore, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
+import { createStore } from "redux";
 import initializeSocket from "../socket";
-import { requestMap } from "../socket/clientExtensions";
+import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
 import { mapStateReducer, gameStateReducer, runGame } from "core";
+import Slider from "../components/Slider";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -23,9 +23,8 @@ const FlexContainer = styled.div`
         }
     }
 `;
-
-export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
-export const GameStore = createStore(gameStateReducer, applyMiddleware(thunk));
+export const MapStore = createStore(mapStateReducer);
+export const GameStore = createStore(gameStateReducer);
 export const ClientSocket = initializeSocket();
 
 const GameWrapper: FunctionComponent = () => {
@@ -38,6 +37,13 @@ const GameWrapper: FunctionComponent = () => {
                     icon={Sync} 
                     size={20} />
             </span>
+            <Slider 
+                min={0}
+                max={100}
+                value={0}
+                onChange={sendSimulatedLagInput}
+                sliderId="sim-lag-input"
+                label="simulatedLag" />
         </FlexContainer>
     );
 };

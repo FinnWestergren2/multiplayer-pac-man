@@ -3,9 +3,9 @@ import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
 import { ServerMessage, ClientMessage, mapStateReducer, gameStateReducer, MessageType, addPlayer, removePlayer, runGame } from "core";
-import thunk from "redux-thunk";
-import { createStore, applyMiddleware } from "redux";
+import { createStore } from "redux";
 import {Socket} from "net"
+import { serverStateReducer } from './ducks/serverState';
 
 const file = new nodeStatic.Server('./');
 const serverId = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -14,13 +14,13 @@ const server = http.createServer((req, res) => {
 	req.addListener('end', () => file.serve(req, res)).resume();
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
-export const MapStore = createStore(mapStateReducer, applyMiddleware(thunk));
-export const GameStore = createStore(gameStateReducer, applyMiddleware(thunk));
+
+export const MapStore = createStore(mapStateReducer);
+export const GameStore = createStore(gameStateReducer);
+export const ServerStore = createStore(serverStateReducer);
 
 let socketList: { [key: string]: Socket } = {};
 runGame(MapStore, GameStore, setInterval);
-
-const simulatedLag = 30;
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -62,7 +62,7 @@ function handleData(buffer: Buffer, playerId: string) {
 	if (parsedBuffer) {
 		setTimeout(() => {
 			handleMessage(parsedBuffer, playerId);
-		}, simulatedLag / 2);
+		}, ServerStore.getState().simulatedLag / 2);
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 		removePlayerEverywhere(playerId);
@@ -90,7 +90,7 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 				writeToSinglePlayer(message, playerId, retryLimit-1);
 			}
 		}
-	}, simulatedLag / 2);
+	}, ServerStore.getState().simulatedLag / 2);
 }
 
 const addPlayerEverywhere = (playerId: string) => {

@@ -1,6 +1,6 @@
 import { mapStore } from "../Game";
 import { CoordPair, CoordPairUtils } from "../Types/CoordPair"
-import { Directions, DirectionsUtils } from "../Types/Directions";
+import { DirectionsUtils } from "../Types/Directions";
 
 export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
     const startCell = CoordPairUtils.roundedPair(startFloat);

@@ -7,8 +7,7 @@ export default function sketch(p: p5): void {
 	let game: Game;
 
 	p.setup = function (): void {
-		// @ts-ignore
-		MapStore.dispatch(updateAppDimensions(600, 600));
+		updateAppDimensions(MapStore, 500, 500);
 		const {canvasHeight, canvasWidth} = MapStore.getState().appDimensions;
 		p.createCanvas(canvasWidth, canvasHeight);
 		game = new Game(p);

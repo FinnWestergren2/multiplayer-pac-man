@@ -23,8 +23,7 @@ export function handleMessage(message: ServerMessage): void {
             setPlayerStatus(GameStore, message.payload.objectStatusDict);
             return;
         case MessageType.MAP_RESPONSE:
-            //@ts-ignore
-            MapStore.dispatch(refreshMap(message.payload));
+            refreshMap(MapStore, message.payload);
             return;
         case MessageType.ADD_PLAYER:
             addPlayer(GameStore, message.payload);
@@ -73,5 +72,11 @@ export const sendPerceptionUpdate = () => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].location }
     });
     const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp } };
+    ClientSocket.send(JSON.stringify(request));
+}
+
+export const sendSimulatedLagInput = (lag: number) => {
+    console.log(lag);
+    const request: ClientMessage = { type: MessageType.SET_SIMULATED_LAG, payload: lag };
     ClientSocket.send(JSON.stringify(request));
 }

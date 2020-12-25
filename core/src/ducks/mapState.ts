@@ -1,6 +1,5 @@
-import { AnyAction, Dispatch } from "redux";
 import { Directions, MapResponse } from "..";
-import { MapState, MapStateAction, MapStateActionTypes, AppDimensions } from "../Types/ReduxTypes";
+import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../Types/ReduxTypes";
 
 const initialState: MapState = {
     mapCells: [],
@@ -27,20 +26,16 @@ export const mapStateReducer = (state: MapState = initialState, action: MapState
     }
 };
 
-export const refreshMap = (mapResponse: MapResponse) => {
-    return function (dispatch: Dispatch<AnyAction>, getState: () => MapState) {
-        dispatch({ type: MapStateActionTypes.REFRESH_MAP, payload: mapResponse });
-        dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, getState().appDimensions) });
-    };
+export const refreshMap = (store: MapStore, mapResponse: MapResponse) => {
+    store.dispatch({ type: MapStateActionTypes.REFRESH_MAP, payload: mapResponse });
+    store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, store.getState().appDimensions) });
 };
 
-export const updateAppDimensions = (width: number, height: number) => {
-    return function (dispatch: Dispatch<AnyAction>, getState: () => MapState) {
-        dispatch({ type: MapStateActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
-        if (getState().mapCells.length > 0) {
-            dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(getState().mapCells, { canvasHeight: height, canvasWidth: width }) });
-        }
-    };
+export const updateAppDimensions = (store: MapStore, width: number, height: number) => {
+    store.dispatch({ type: MapStateActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
+    if (store.getState().mapCells.length > 0) {
+        store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(store.getState().mapCells, { canvasHeight: height, canvasWidth: width }) });
+    }
 };
 
 const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
