@@ -1,8 +1,8 @@
 import { ClientMessage, MessageType, ServerMessage } from "core";
 import { handleMessage, pingServer, sendPerceptionUpdate } from "./clientExtensions";
 
-export const PERCEPTION_UPDATE_PERIOD = 30;
-export const PING_PERIOD = 1000;
+export const PERCEPTION_UPDATE_PERIOD = 51;
+export const PING_PERIOD = 37;
 
 export default () => {
     const ws = new WebSocket('ws://localhost:8080', ['json', 'xml']);

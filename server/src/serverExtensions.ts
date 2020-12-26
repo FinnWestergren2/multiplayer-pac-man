@@ -18,7 +18,7 @@ import {
     writeToAllPlayers,
     ServerStore,
 } from ".";
-import { setSimulatedLag } from "./ducks/serverState";
+import { setLag, setSimulatedLag } from "./ducks/serverState";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.2;
@@ -60,11 +60,11 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
             );
             return;
         case MessageType.LATENCY_UPDATE:
-            setSimulatedLag(ServerStore, fromPlayer, message.payload);
+            setLag(ServerStore, fromPlayer, message.payload);
             console.log(
                 "actual lag for player",
                 fromPlayer,
-                ServerStore.getState().simulatedLag[fromPlayer]
+                ServerStore.getState().lag[fromPlayer]
             );
             return;
         default:

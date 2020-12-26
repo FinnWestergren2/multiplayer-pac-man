@@ -19,7 +19,7 @@ export const updatePlayers = () => gameStore.getState().playerList.forEach(playe
         return;
     }
     if (!path && status && status.direction !== Directions.NONE) {
-       updatePlayerStatus(gameStore, playerId, idleStatus(status.location));
+        updatePlayerStatus(gameStore, playerId, idleStatus(status.location));
     }
 });
 
