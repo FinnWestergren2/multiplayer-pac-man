@@ -21,8 +21,8 @@ import {
 import { setLag, setSimulatedLag } from "./ducks/serverState";
 
 const potentialDriftFactor = SPEED_FACTOR * 2 * UPDATE_FREQUENCY; // multiply by two since they could be going the opposite direction by now.
-const smoothOverrideTriggerDist = 0.2;
-const snapOverrideTriggerDist = 0.4;
+const smoothOverrideTriggerDist = 0.5;
+const snapOverrideTriggerDist = 0.8;
 
 export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
     switch (message.type) {
