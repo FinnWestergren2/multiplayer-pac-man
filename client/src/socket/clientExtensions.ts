@@ -51,17 +51,17 @@ export function handleMessage(message: ServerMessage): void {
 
 export const pingServer = () => {
     const request: ClientMessage = { type: MessageType.PING, payload: { time: (new Date()).getTime(), playerId: GameStore.getState().currentPlayer! } }
-    ClientSocket.send(JSON.stringify(request));
+    trySend(JSON.stringify(request));
 }
 
 export const requestMap = () => {
     const request: ClientMessage = { type: MessageType.MAP_REQUEST, payload: null }
-    ClientSocket.send(JSON.stringify(request));
+    trySend(JSON.stringify(request));
 }
 
 export const sendPlayerInput = (playerId: string, input: StampedInput) => {
     const request: ClientMessage = { type: MessageType.PLAYER_INPUT, payload: { playerId, input } }
-    ClientSocket.send(JSON.stringify(request));
+    trySend(JSON.stringify(request));
 }
 
 export const sendPerceptionUpdate = () => { 
@@ -72,11 +72,18 @@ export const sendPerceptionUpdate = () => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].location }
     });
     const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp } };
-    ClientSocket.send(JSON.stringify(request));
+    trySend(JSON.stringify(request));
 }
 
 export const sendSimulatedLagInput = (lag: number) => {
-    console.log(lag);
     const request: ClientMessage = { type: MessageType.SET_SIMULATED_LAG, payload: lag };
-    ClientSocket.send(JSON.stringify(request));
+    trySend(JSON.stringify(request));
+}
+
+const trySend = (message: string) => {
+    if (ClientSocket.readyState === 1) {
+        ClientSocket.send(message);
+        return true;
+    }
+    return false;
 }

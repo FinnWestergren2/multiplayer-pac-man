@@ -32,7 +32,8 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 			}
 			return;
 		case MessageType.SET_SIMULATED_LAG:
-			setSimulatedLag(ServerStore, message.payload);
+			setSimulatedLag(ServerStore, fromPlayer, message.payload);
+			console.log(fromPlayer, ServerStore.getState().simulatedLag[fromPlayer]);
 			return;
 		default:
 			writeToSinglePlayer({ type: MessageType.INVALID, payload: null }, fromPlayer);

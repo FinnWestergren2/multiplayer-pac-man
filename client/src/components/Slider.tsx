@@ -11,20 +11,13 @@ type Props = {
     label?: string;
 };
 
-const SliderContainer = styled.div`
-    display: flex;
-    input {
-        width: auto;
-        height: 25px;
-        background: #d3d3d3;
-        outline: none;
-        opacity: 0.7;
-        transition: opacity 0.2s;
-    }
+const SliderLabel = styled.label`
+    height: min-content;
+`;
 
-    input:hover {
-        opacity: 1;
-    }
+const SliderInput = styled.input`
+    width: 100%;
+    height: min-content;
 `;
 
 const Slider: FunctionComponent<Props> = ({
@@ -37,14 +30,13 @@ const Slider: FunctionComponent<Props> = ({
 }) => {
     const [immediateValue, setImmediateValue] = useState(value);
     const debouncedValue = useDebounce<number>(immediateValue, 500);
-    useEffect(() => {
-        onChange(debouncedValue);
     // eslint-disable-next-line
-    }, [debouncedValue]);
+    useEffect(() => onChange(debouncedValue), [debouncedValue]);
 
     return (
-        <SliderContainer>
-            <input
+        <>
+            <SliderLabel htmlFor={sliderId}>{`${label}: ${immediateValue}`}</SliderLabel>
+            <SliderInput
                 type="range"
                 min={min}
                 max={max}
@@ -52,8 +44,7 @@ const Slider: FunctionComponent<Props> = ({
                 onChange={(e) => setImmediateValue(parseInt(e.target.value))}
                 id={sliderId}
             />
-            <label htmlFor={sliderId}>{`${label}: ${immediateValue}`}</label>
-        </SliderContainer>
+        </>
     );
 };
 

@@ -7,6 +7,7 @@ import initializeSocket from "../socket";
 import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
 import { mapStateReducer, gameStateReducer, runGame } from "core";
 import Slider from "../components/Slider";
+import SliderGrid from "../components/SliderGrid";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -37,13 +38,15 @@ const GameWrapper: FunctionComponent = () => {
                     icon={Sync} 
                     size={20} />
             </span>
-            <Slider 
-                min={0}
-                max={100}
-                value={0}
-                onChange={sendSimulatedLagInput}
-                sliderId="sim-lag-input"
-                label="simulatedLag" />
+            <SliderGrid>
+                <Slider 
+                    min={0}
+                    max={100}
+                    value={0}
+                    onChange={sendSimulatedLagInput}
+                    sliderId="sim-lag-input"
+                    label="simulated lag (ms)" />
+            </SliderGrid>
         </FlexContainer>
     );
 };
