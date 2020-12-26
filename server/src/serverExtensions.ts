@@ -39,8 +39,13 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
             );
             return;
         case MessageType.PLAYER_INPUT:
-            handlePlayerInput(GameStore, fromPlayer, message.payload.input);
-            writeToAllPlayers(message, 1, fromPlayer);
+            const timeAgo = (ServerStore.getState().lag[fromPlayer] ?? 0) * 0.5;
+            handlePlayerInput(GameStore, fromPlayer, {...message.payload.input, timeAgo});
+            GameStore.getState().playerList.filter(pId => pId !== fromPlayer).forEach(pId => {
+                const convertedMessage = { ...message };
+                convertedMessage.payload.input.timeAgo = (ServerStore.getState().lag[pId] ?? 0) * 0.5 + timeAgo;
+                writeToSinglePlayer(convertedMessage, pId);
+            });
             return;
         case MessageType.CLIENT_PERCEPTION_UPDATE:
             const perceptionUpdate = getPerceptionUpdate(
@@ -83,7 +88,7 @@ export const getCurrentMap: () => MapResponse = () => {
 
 const getPerceptionUpdate: (locationMap: { [playerId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
 	(locationMap, fromPlayer) => {
-    const potentialDrift = Math.abs((ServerStore.getState().lag[fromPlayer] ?? 0)/ 2 * potentialDriftFactor);
+    const potentialDrift = Math.abs((ServerStore.getState().lag[fromPlayer] ?? 0)* 0.5 * potentialDriftFactor);
     const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
     const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
     const smoothCorrectionMap: { [playerId: string]: CoordPair } = {};

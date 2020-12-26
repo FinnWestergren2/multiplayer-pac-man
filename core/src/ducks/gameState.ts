@@ -75,9 +75,7 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
     const playerStatus = store.getState().objectStatusDict[playerId];
     if (playerStatus) {
         const path = BFS(stampedInput.input.currentLocation, stampedInput.input.destination);
-        const currentTime = (new Date).getTime();
-        console.log(stampedInput.time, currentTime);
-        const frameDiff = (currentTime - stampedInput.time) * 0.001 * UPDATE_FREQUENCY;
+        const frameDiff = stampedInput.timeAgo * UPDATE_FREQUENCY;
         const distTravelled = SPEED_FACTOR * frameDiff;
         console.log(frameDiff, distTravelled, UPDATE_FREQUENCY);
         const newStatus = moveObjectAlongPath(distTravelled, path, { ...playerStatus, location: stampedInput.input.currentLocation }, () => popPlayerPath(store, playerId));

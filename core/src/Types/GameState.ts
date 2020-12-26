@@ -8,7 +8,7 @@ export type ObjectStatus = {
 }
 
 export type StampedInput = {
-    time: number;
+    timeAgo: number;
     input: Input;
 }
 
