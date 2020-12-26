@@ -8,7 +8,7 @@ export default () => {
     const ws = new WebSocket('ws://localhost:8080', ['json', 'xml']);
 
     ws.addEventListener('open', () => {
-        const data: ClientMessage = { type: MessageType.MAP_REQUEST, payload: null }
+        const data: ClientMessage = { type: MessageType.MAP_REQUEST }
         const json = JSON.stringify(data);
         ws.send(json);
         setInterval(sendPerceptionUpdate, PERCEPTION_UPDATE_PERIOD)

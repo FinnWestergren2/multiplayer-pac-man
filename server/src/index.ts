@@ -62,7 +62,7 @@ function handleData(buffer: Buffer, playerId: string) {
 	if (parsedBuffer) {
 		setTimeout(() => {
 			handleMessage(parsedBuffer, playerId);
-		}, ServerStore.getState().simulatedLag[playerId] ?? 0 / 2);
+		}, (ServerStore.getState().simulatedLag[playerId] ?? 0) / 2);
 	} else if (parsedBuffer === null) {
 		console.log('WebSocket connection closed by the client.');
 		removePlayerEverywhere(playerId);
@@ -90,7 +90,7 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 				writeToSinglePlayer(message, playerId, retryLimit-1);
 			}
 		}
-	}, ServerStore.getState().simulatedLag[playerId] ?? 0 / 2);
+	}, (ServerStore.getState().simulatedLag[playerId] ?? 0) / 2);
 }
 
 const addPlayerEverywhere = (playerId: string) => {

@@ -14,9 +14,14 @@ import {
 
 import { MapStore, ClientSocket, GameStore } from "../containers/GameWrapper";
 
+let lastPing = 0;
+
 export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
+            const ping = getTime() - lastPing;
+            console.log("ping", ping, getTime(), lastPing);
+            sendLatencyUpdate(ping);
             return;
         case MessageType.INIT_PLAYER:
             setCurrentPlayers(GameStore, message.payload.currentPlayerId, message.payload.fullPlayerList);
@@ -50,12 +55,13 @@ export function handleMessage(message: ServerMessage): void {
 }
 
 export const pingServer = () => {
-    const request: ClientMessage = { type: MessageType.PING, payload: { time: (new Date()).getTime(), playerId: GameStore.getState().currentPlayer! } }
+    const request: ClientMessage = { type: MessageType.PING }
+    lastPing = getTime();
     trySend(JSON.stringify(request));
 }
 
 export const requestMap = () => {
-    const request: ClientMessage = { type: MessageType.MAP_REQUEST, payload: null }
+    const request: ClientMessage = { type: MessageType.MAP_REQUEST }
     trySend(JSON.stringify(request));
 }
 
@@ -80,6 +86,11 @@ export const sendSimulatedLagInput = (lag: number) => {
     trySend(JSON.stringify(request));
 }
 
+const sendLatencyUpdate = (lag: number) => {
+    const request: ClientMessage = { type: MessageType.LATENCY_UPDATE, payload: lag };
+    trySend(JSON.stringify(request));
+}
+
 const trySend = (message: string) => {
     if (ClientSocket.readyState === 1) {
         ClientSocket.send(message);
@@ -87,3 +98,5 @@ const trySend = (message: string) => {
     }
     return false;
 }
+
+const getTime = () => (new Date()).getTime();
