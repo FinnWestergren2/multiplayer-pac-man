@@ -1,6 +1,6 @@
 import { gameStore, mapStore, SPEED_FACTOR } from '.';
-import { ActorStatus } from '../type/GameState';
-import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../type';
+import { ActorStatus } from '../types/GameState';
+import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../types';
 import { popPlayerPath, updateActorStatus } from '../ducks/gameState';
 
 const idleStatus = (location: CoordPair) => {

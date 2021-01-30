@@ -1,10 +1,10 @@
 import { Reducer } from "redux";
-import { StampedInput, CoordPair, Directions } from "../type";
-import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../type/ReduxTypes";
-import {  Actor, ActorStatus, ActorType, Dictionary } from "../type/GameState";
-import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../games";
-import { moveActorAlongPath, BFS } from "../games/actorUpdater";
-import { generateGuid } from "../util/misc";
+import { StampedInput, CoordPair, Directions } from "../types";
+import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../types/ReduxTypes";
+import {  Actor, ActorStatus, ActorType, Dictionary } from "../types/GameState";
+import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../game";
+import { moveActorAlongPath, BFS } from "../game/actorUpdater";
+import { generateGuid } from "../utils/misc";
 
 const initialState: GameState = {
     actorDict: {},

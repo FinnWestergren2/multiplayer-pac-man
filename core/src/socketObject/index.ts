@@ -1,4 +1,4 @@
-import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor } from "../type"
+import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor } from "../types"
 
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
