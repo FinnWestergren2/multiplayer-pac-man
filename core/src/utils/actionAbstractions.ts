@@ -1,5 +1,5 @@
 import { GameStore, StampedInput, UPDATE_FREQUENCY, SPEED_FACTOR, popPlayerPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus } from "..";
-import { BFS, moveActorAlongPath } from "../games/actorUpdater";
+import { BFS, moveActorAlongPath } from "../game/actorUpdater";
 
 export const handlePlayerInput = (store: GameStore, playerId: string, stampedInput: StampedInput) => {
     const playerStatus = store.getState().actorDict[playerId]?.status;
