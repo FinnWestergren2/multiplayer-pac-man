@@ -1,5 +1,5 @@
 import { MapStore, GameStore } from "../Types/ReduxTypes";
-import { updatePlayers } from "./playerUpdater";
+import { updateActors } from "./actorUpdater";
 
 const FRAME_LENGTH = 16;
 
@@ -16,5 +16,5 @@ export const runGame: (ms: MapStore, ps: GameStore, updateInterval: (handler: Ti
 };
 
 const update = () => {
-    updatePlayers();
+    updateActors();
 }

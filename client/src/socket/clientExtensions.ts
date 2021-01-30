@@ -7,7 +7,7 @@ import {
     removePlayer,
     handlePlayerInput,
     handleStateCorrection,
-    setActorStatus,
+    setActors,
     StampedInput,
     refreshMap
 } from "core";
@@ -25,7 +25,7 @@ export function handleMessage(message: ServerMessage): void {
             return;
         case MessageType.INIT_PLAYER:
             setCurrentPlayers(GameStore, message.payload.currentPlayerId, message.payload.fullPlayerList);
-            setActorStatus(GameStore, message.payload.objectStatusDict);
+            setActors(GameStore, message.payload.actorDict);
             return;
         case MessageType.MAP_RESPONSE:
             refreshMap(MapStore, message.payload);
@@ -43,7 +43,7 @@ export function handleMessage(message: ServerMessage): void {
             console.error('sent an invalid message to server')
             return;
         case MessageType.STATE_OVERRIDE:
-            setActorStatus(GameStore, message.payload);
+            setActors(GameStore, message.payload);
             return;
         case MessageType.STATE_CORRECTION:
             handleStateCorrection(GameStore, message.payload);
@@ -72,10 +72,10 @@ export const sendPlayerInput = (playerId: string, input: StampedInput) => {
 
 export const sendPerceptionUpdate = () => { 
     const timeStamp = (new Date()).getTime();
-    const currentState = GameStore.getState().objectStatusDict
+    const currentState = GameStore.getState().actorDict
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
-        locationMap = {...locationMap, [playerId]: currentState[playerId].location }
+        locationMap = {...locationMap, [playerId]: currentState[playerId].status.location }
     });
     const request: ClientMessage = { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: {locationMap, timeStamp } };
     trySend(JSON.stringify(request));

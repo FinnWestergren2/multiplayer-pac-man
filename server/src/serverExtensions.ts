@@ -8,14 +8,13 @@ import {
     SPEED_FACTOR,
     UPDATE_FREQUENCY,
     handlePlayerInput,
-    ObjectStatus,
+    ActorStatus,
 } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import {
     MapStore,
     GameStore,
     writeToSinglePlayer,
-    writeToAllPlayers,
     ServerStore,
 } from ".";
 import { setLag, setSimulatedLag } from "./ducks/serverState";
@@ -92,12 +91,12 @@ const getPerceptionUpdate: (locationMap: { [playerId: string]: CoordPair }, from
     const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
     const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
     const smoothCorrectionMap: { [playerId: string]: CoordPair } = {};
-    const snapMap: { [playerId: string]: ObjectStatus } = {};
-    const fullMap = GameStore.getState().objectStatusDict;
+    const snapMap: { [playerId: string]: ActorStatus } = {};
+    const actorDict = GameStore.getState().actorDict;
     Object.keys(locationMap)
-        .filter((pId) => !!fullMap[pId])
+        .filter((pId) => !!actorDict[pId])
         .forEach((pId) => {
-            const serverPerception = fullMap[pId].location;
+            const serverPerception = actorDict[pId].status.location;
             const clientPerception = locationMap[pId];
             const distSquared = perceptionDifferenceSquared(
                 serverPerception,
@@ -105,7 +104,7 @@ const getPerceptionUpdate: (locationMap: { [playerId: string]: CoordPair }, from
             );
             if (distSquared > snapOverrideSquared) {
                 console.log("snapping:", fromPlayer, pId);
-                snapMap[pId] = fullMap[pId];
+                snapMap[pId] = actorDict[pId].status;
             } else if (distSquared > smoothOverrideSquared) {
                 const correction = interpolate(
                     serverPerception,

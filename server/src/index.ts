@@ -2,7 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
-import { ServerMessage, ClientMessage, mapStateReducer, gameStateReducer, MessageType, addPlayer, removePlayer, runGame } from "core";
+import { ServerMessage, ClientMessage, mapStateReducer, gameStateReducer, MessageType, addPlayer, removePlayer, runGame, generateGuid } from "core";
 import { createStore } from "redux";
 import {Socket} from "net"
 import { serverStateReducer } from './ducks/serverState';
@@ -96,7 +96,7 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 const addPlayerEverywhere = (playerId: string) => {
 	addPlayer(GameStore, playerId);
 	writeToSinglePlayer({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: GameStore.getState().playerList, objectStatusDict: GameStore.getState().objectStatusDict } }, playerId);
+	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayerId: playerId, fullPlayerList: GameStore.getState().playerList, actorDict: GameStore.getState().actorDict } }, playerId);
 	writeToAllPlayers({ type: MessageType.ADD_PLAYER, payload: playerId });
 }
 

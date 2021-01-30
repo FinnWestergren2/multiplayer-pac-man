@@ -23,4 +23,4 @@ export type StampedInput = {
     input: Input;
 }
 
-export type ActorDict<T> = { [id: string]: T }
+export type Dictionary<T> = { [id: string]: T }

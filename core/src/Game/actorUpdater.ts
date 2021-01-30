@@ -10,16 +10,16 @@ const idleStatus = (location: CoordPair) => {
     }
 };
 
-export const updatePlayers = () => gameStore.getState().playerList.forEach(playerId => {
-    const status = gameStore.getState().actorDict[playerId].status;
-    const path = gameStore.getState().actorPathDict[playerId];
+export const updateActors = () => Object.keys(gameStore.getState().actorDict).forEach(actorId => {
+    const status = gameStore.getState().actorDict[actorId].status;
+    const path = gameStore.getState().actorPathDict[actorId];
     if (path) {
-        const newStatus = moveActorAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(gameStore, playerId));
-        updateActorStatus(gameStore, playerId, newStatus);
+        const newStatus = moveActorAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(gameStore, actorId));
+        updateActorStatus(gameStore, actorId, newStatus);
         return;
     }
     if (!path && status && status.direction !== Directions.NONE) {
-        updateActorStatus(gameStore, playerId, idleStatus(status.location));
+        updateActorStatus(gameStore, actorId, idleStatus(status.location));
     }
 });
 

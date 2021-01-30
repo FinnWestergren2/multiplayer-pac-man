@@ -1,7 +1,7 @@
 import { Store } from "redux";
 import { CoordPair } from "./CoordPair";
 import { Directions } from "./Directions";
-import { Actor, ActorDict as Dictionary, ActorStatus as ActorStatus, ActorType, StampedInput } from "./GameState";
+import { Actor, Dictionary, ActorStatus as ActorStatus, ActorType, StampedInput } from "./GameState";
 
 export type MapStore = Store<MapState, MapStateAction>;
 export type GameStore = Store<GameState, GameStateAction>;
@@ -43,7 +43,7 @@ export type GameState = {
 
 export enum GameStateActionTypes {
     SET_ACTOR_STATUS = "SET_ACTOR_STATUS",
-    SET_ACTOR_STATUSES = "SET_ACTOR_STATUSES",
+    SET_ACTORS = "SET_ACTORS",
     ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
     ADD_PLAYER = "ADD_PLAYER",
     ADD_ACTOR = "ADD_ACTOR",
@@ -57,7 +57,7 @@ export enum GameStateActionTypes {
 
 export type GameStateAction =
     { type: GameStateActionTypes.SET_ACTOR_STATUS; payload: { actorId: string, status: ActorStatus } } |
-    { type: GameStateActionTypes.SET_ACTOR_STATUSES; payload: Dictionary<ActorStatus> } |
+    { type: GameStateActionTypes.SET_ACTORS; payload: Dictionary<Actor> } |
     { type: GameStateActionTypes.ADD_PLAYER_INPUT; payload: { playerId: string, input: StampedInput } } |
     { type: GameStateActionTypes.ADD_PLAYER; payload: string } |
     { type: GameStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |

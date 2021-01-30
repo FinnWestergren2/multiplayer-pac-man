@@ -1,10 +1,10 @@
 import { Reducer } from "redux";
 import { StampedInput, CoordPair, Directions } from "../Types";
 import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../Types/ReduxTypes";
-import { ActorDict, ActorStatus, ActorType } from "../Types/GameState";
+import {  Actor, ActorStatus, ActorType, Dictionary } from "../Types/GameState";
 import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../Game";
-import { moveActorAlongPath, BFS } from "../Game/playerUpdater";
-import { generateGuid } from "../Utils/misco";
+import { moveActorAlongPath, BFS } from "../Game/actorUpdater";
+import { generateGuid } from "../Utils/misc";
 
 const initialState: GameState = {
     actorDict: {},
@@ -16,8 +16,8 @@ const initialState: GameState = {
 export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: GameState = initialState, action: GameStateAction) => {
     const draft = { ...state };
     switch (action.type) {
-        case GameStateActionTypes.SET_ACTOR_STATUSES:
-            Object.keys(action.payload).forEach(key => draft.actorDict[key].status = action.payload[key])
+        case GameStateActionTypes.SET_ACTORS:
+            draft.actorDict = action.payload;
             break;
         case GameStateActionTypes.SET_ACTOR_STATUS:
             draft.actorDict[action.payload.actorId].status = action.payload.status;
@@ -62,8 +62,8 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
     return draft;
 };
 
-export const setActorStatus = (store: GameStore, actorStatusDict: ActorDict<ActorStatus>) =>
-    store.dispatch({ type: GameStateActionTypes.SET_ACTOR_STATUSES, payload: actorStatusDict });
+export const setActors = (store: GameStore, actorDict: Dictionary<Actor>) =>
+    store.dispatch({ type: GameStateActionTypes.SET_ACTORS, payload: actorDict });
 
 export const updateActorStatus = (store: GameStore, actorId: string, newStatus: ActorStatus) => 
     store.dispatch({ type: GameStateActionTypes.SET_ACTOR_STATUS, payload: { actorId, status: newStatus } });
@@ -104,7 +104,7 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
     }
 }
 
-export const handleStateCorrection = (store: GameStore, payload: { soft: ActorDict<CoordPair>, hard: ActorDict<ActorStatus> }) => {
+export const handleStateCorrection = (store: GameStore, payload: { soft: Dictionary<CoordPair>, hard: Dictionary<ActorStatus> }) => {
     const { hard, soft } = payload;
     store.getState().playerList.forEach(pId => {
         const newState = hard[pId] ?? { ...store.getState().actorDict[pId], location: soft[pId] ?? store.getState().actorDict[pId].status.location };

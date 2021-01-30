@@ -1,4 +1,4 @@
-import { Directions, StampedInput, CoordPair, ActorDict, ActorStatus } from "../Types"
+import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor } from "../Types"
 
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
@@ -25,21 +25,17 @@ export type ClientMessage =
     { type: MessageType.CLIENT_PERCEPTION_UPDATE, payload: { locationMap: { [playerId: string]: CoordPair }, timeStamp: number } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } } |
     { type: MessageType.SET_SIMULATED_LAG, payload: number } |
-    { type: MessageType.ADD_ACTOR, payload: string } |
-    { type: MessageType.REMOVE_ACTOR, payload: string } |
     { type: MessageType.LATENCY_UPDATE, payload: number }
 
 export type ServerMessage = 
-    { type: MessageType.INIT_PLAYER, payload: { currentPlayerId: string, fullPlayerList: string[], actorStatusDict: ActorDict<ActorStatus> } }|
+    { type: MessageType.INIT_PLAYER, payload: { currentPlayerId: string, fullPlayerList: string[], actorDict: Dictionary<Actor> } }|
     { type: MessageType.ADD_PLAYER, payload: string } |
-    { type: MessageType.ADD_ACTOR, payload: string } |
     { type: MessageType.REMOVE_PLAYER, payload: string } |
-    { type: MessageType.REMOVE_ACTOR, payload: string } |
     { type: MessageType.PONG } |
     { type: MessageType.MAP_RESPONSE, payload: MapResponse } |
     { type: MessageType.INVALID } |
-    { type: MessageType.STATE_OVERRIDE, payload: ActorDict<ActorStatus> } |
-    { type: MessageType.STATE_CORRECTION, payload: { soft:  ActorDict<CoordPair>, hard: ActorDict<ActorStatus> } } |
+    { type: MessageType.STATE_OVERRIDE, payload: Dictionary<Actor> } |
+    { type: MessageType.STATE_CORRECTION, payload: { soft:  Dictionary<CoordPair>, hard: Dictionary<ActorStatus> } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
 export type MapResponse = Directions[][];
