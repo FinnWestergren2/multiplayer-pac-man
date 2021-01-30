@@ -47,7 +47,7 @@ server.on('upgrade', function (req, socket: Socket) {
 	// additional newlines so that the browser recognises the end of the response 
 	// header and doesn't continue to wait for more header data: 
 	socket.write(responseHeaders.join('\r\n') + '\r\n\r\n');
-	const playerId = uuidv4();
+	const playerId = generateGuid();
 	socket.on('data', (buffer: Buffer) => handleData(buffer, playerId));
 	socket.on('close', () => console.log("closing from socket"));
 	socketList[playerId] = socket;

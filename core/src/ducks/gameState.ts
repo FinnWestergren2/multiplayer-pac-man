@@ -4,7 +4,7 @@ import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../
 import { ActorDict, ActorStatus, ActorType } from "../Types/GameState";
 import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../Game";
 import { moveActorAlongPath, BFS } from "../Game/playerUpdater";
-import { generateGuid } from "../Utils/Misc";
+import { generateGuid } from "../Utils/misco";
 
 const initialState: GameState = {
     actorDict: {},
