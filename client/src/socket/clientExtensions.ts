@@ -7,7 +7,7 @@ import {
     removePlayer,
     handlePlayerInput,
     handleStateCorrection,
-    setPlayerStatus,
+    setActorStatus,
     StampedInput,
     refreshMap
 } from "core";
@@ -25,7 +25,7 @@ export function handleMessage(message: ServerMessage): void {
             return;
         case MessageType.INIT_PLAYER:
             setCurrentPlayers(GameStore, message.payload.currentPlayerId, message.payload.fullPlayerList);
-            setPlayerStatus(GameStore, message.payload.objectStatusDict);
+            setActorStatus(GameStore, message.payload.objectStatusDict);
             return;
         case MessageType.MAP_RESPONSE:
             refreshMap(MapStore, message.payload);
@@ -43,7 +43,7 @@ export function handleMessage(message: ServerMessage): void {
             console.error('sent an invalid message to server')
             return;
         case MessageType.STATE_OVERRIDE:
-            setPlayerStatus(GameStore, message.payload);
+            setActorStatus(GameStore, message.payload);
             return;
         case MessageType.STATE_CORRECTION:
             handleStateCorrection(GameStore, message.payload);

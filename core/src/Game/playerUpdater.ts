@@ -1,7 +1,7 @@
-import { gameStore, SPEED_FACTOR } from '.';
-import { ObjectStatus } from '../Types/GameState';
+import { gameStore, mapStore, SPEED_FACTOR } from '.';
+import { ActorStatus } from '../Types/GameState';
 import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../Types';
-import { popPlayerPath, updatePlayerStatus } from '../ducks/gameState';
+import { popPlayerPath, updateActorStatus } from '../ducks/gameState';
 
 const idleStatus = (location: CoordPair) => {
     return {
@@ -11,19 +11,19 @@ const idleStatus = (location: CoordPair) => {
 };
 
 export const updatePlayers = () => gameStore.getState().playerList.forEach(playerId => {
-    const status = gameStore.getState().objectStatusDict[playerId];
-    const path = gameStore.getState().objectPathDict[playerId];
+    const status = gameStore.getState().actorDict[playerId].status;
+    const path = gameStore.getState().actorPathDict[playerId];
     if (path) {
-        const newStatus = moveObjectAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(gameStore, playerId));
-        updatePlayerStatus(gameStore, playerId, newStatus);
+        const newStatus = moveActorAlongPath(SPEED_FACTOR, path, status, () => popPlayerPath(gameStore, playerId));
+        updateActorStatus(gameStore, playerId, newStatus);
         return;
     }
     if (!path && status && status.direction !== Directions.NONE) {
-        updatePlayerStatus(gameStore, playerId, idleStatus(status.location));
+        updateActorStatus(gameStore, playerId, idleStatus(status.location));
     }
 });
 
-export const moveObjectAlongPath: (dist: number, path: CoordPair[], status: ObjectStatus, popPath: () => void) => ObjectStatus = (dist, path, status, popPath) => {
+export const moveActorAlongPath: (dist: number, path: CoordPair[], status: ActorStatus, popPath: () => void) => ActorStatus = (dist, path, status, popPath) => {
     if (dist === 0) {
         return status;
     }
@@ -61,7 +61,7 @@ export const moveObjectAlongPath: (dist: number, path: CoordPair[], status: Obje
     return { location: nextLocation, direction: nextDirection };
 }
 
-const checkCurrentPathStatus = (status: ObjectStatus, path: CoordPair[], popPath: () => void) => {
+const checkCurrentPathStatus = (status: ActorStatus, path: CoordPair[], popPath: () => void) => {
     let out = [...path]
     for(let i = 0; i < path.length - 1; i++ ) {
         const firstDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(status.location), path[i]);
@@ -75,4 +75,61 @@ const checkCurrentPathStatus = (status: ObjectStatus, path: CoordPair[], popPath
     return out;
 }
 
+export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
+    const startCell = CoordPairUtils.roundedPair(startFloat);
+    if(CoordPairUtils.equalPairs(startCell, endCell)){
+        return [startCell];
+    }
+    let queue = [startCell];
+    let popIndex = 0;
+    const mapCells = mapStore.getState().mapCells.map(row => row.map(col => { return { dir: col, isVisited: false, parentCell: {x: -1, y: -1}, depth: 0 }} ));
+    mapCells[startCell.y][startCell.x].isVisited = true;
 
+    const getAllBranches = (location: CoordPair) => {
+        const branches: CoordPair[] = []
+        const x = Math.floor(location.x);
+        const y = Math.floor(location.y);
+        const directions = mapCells[y][x].dir;
+        if (mapCells[y + 1] && mapCells[y + 1][x] && DirectionsUtils.isDown(directions) && !mapCells[y + 1][x].isVisited){
+            branches.push({x: x, y: y + 1});
+            mapCells[y + 1][x].isVisited = true;
+            mapCells[y + 1][x].parentCell = location;
+        }
+        if (mapCells[y - 1] && mapCells[y - 1][x] && DirectionsUtils.isUp(directions) && !mapCells[y - 1][x].isVisited){
+            branches.push({x: x, y: y - 1});
+            mapCells[y - 1][x].isVisited = true;
+            mapCells[y - 1][x].parentCell = location;
+        }
+        if (mapCells[y] && mapCells[y][x + 1] && DirectionsUtils.isRight(directions) && !mapCells[y][x + 1].isVisited){
+            branches.push({x: x + 1, y: y});
+            mapCells[y][x + 1].isVisited = true;
+            mapCells[y][x + 1].parentCell = location;
+        }
+        if (mapCells[y] && mapCells[y][x - 1] && DirectionsUtils.isLeft(directions) && !mapCells[y][x - 1].isVisited){
+            branches.push({x: x - 1, y: y});
+            mapCells[y][x - 1].isVisited = true;
+            mapCells[y][x - 1].parentCell = location;
+        }
+        return branches;
+    }
+
+    while (true) {
+        if (popIndex >= queue.length) {
+            return [];
+        }
+        const branches = getAllBranches(queue[popIndex]);
+        if (branches.some(b => CoordPairUtils.equalPairs(b, endCell))){
+            break;
+        }
+        queue = [...queue, ...branches];
+        popIndex++;
+    }
+
+    // we reverse the list at the end
+    let output = [endCell]
+    while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
+        const currentCell = output[output.length - 1];
+        output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
+    }
+    return output.reverse();
+}

@@ -2,9 +2,20 @@ import { CoordPair } from "./CoordPair"
 import { Directions } from "./Directions"
 import { Input } from "./InputTypes"
 
-export type ObjectStatus = {
+export type Actor = {
+    ownerId: string;
+    type: ActorType;
+    status: ActorStatus;
+}
+
+export type ActorStatus = {
     location: CoordPair;
     direction: Directions;
+}
+
+export enum ActorType {
+    CHAMPION = "CHAMPION",
+    MINER = "MINER"
 }
 
 export type StampedInput = {
@@ -12,4 +23,4 @@ export type StampedInput = {
     input: Input;
 }
 
-export type ObjectDict<T> = { [playerId: string]: T }
+export type ActorDict<T> = { [id: string]: T }
