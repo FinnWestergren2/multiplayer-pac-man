@@ -1,5 +1,5 @@
 import { Directions, MapResponse } from "..";
-import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../Types/ReduxTypes";
+import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../type/ReduxTypes";
 
 const initialState: MapState = {
     mapCells: [],

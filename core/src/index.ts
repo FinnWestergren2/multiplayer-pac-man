@@ -1,7 +1,7 @@
-export * from './Types';
-export * from './SocketObject';
+export * from './type';
+export * from './socketObjects';
 export * from './ducks';
-export {runGame as runGame} from './Game';
-export {SPEED_FACTOR as SPEED_FACTOR} from './Game';
-export {UPDATE_FREQUENCY as UPDATE_FREQUENCY} from './Game';
-export * from './Utils'
+export {runGame as runGame} from './games';
+export {SPEED_FACTOR as SPEED_FACTOR} from './games';
+export {UPDATE_FREQUENCY as UPDATE_FREQUENCY} from './games';
+export * from './util'

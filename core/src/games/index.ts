@@ -1,4 +1,4 @@
-import { MapStore, GameStore } from "../Types/ReduxTypes";
+import { MapStore, GameStore } from "../type/ReduxTypes";
 import { updateActors } from "./actorUpdater";
 
 const FRAME_LENGTH = 16;
