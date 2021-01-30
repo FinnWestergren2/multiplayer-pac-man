@@ -1,7 +1,7 @@
 import p5 from "p5";
 import { CoordPair } from "core";
 import { MapStore } from "../containers/GameWrapper";
-import { playerPathInput } from "../utils/clientActions";
+import { champPathInput } from "../utils/clientActions";
 
 export const bindHumanPlayer = (p: p5, playerId: string) => {
     const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
@@ -16,7 +16,7 @@ export const bindHumanPlayer = (p: p5, playerId: string) => {
         const xDest = Math.floor((mouse.x - element.offsetLeft + document.documentElement.scrollLeft) * oneOverCellSize);
         const yDest = Math.floor((mouse.y - element.offsetTop + document.documentElement.scrollTop) * oneOverCellSize);
         if (xDest >= 0 && yDest >= 0 && xDest < max_x && yDest < max_y) {
-            playerPathInput(playerId, {x: xDest, y: yDest})
+            champPathInput(playerId, {x: xDest, y: yDest})
         }
     }
 

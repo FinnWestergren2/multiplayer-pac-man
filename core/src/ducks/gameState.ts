@@ -36,7 +36,7 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
             draft.actorOwnershipDict[action.payload.ownerId].push(action.payload.actorId);
             break;
         case GameStateActionTypes.REMOVE_PLAYER:
-            draft.actorOwnershipDict[action.payload].forEach(oId => {
+            draft.actorOwnershipDict[action.payload]?.forEach(oId => {
                 delete draft.actorDict[oId];
             });
             delete draft.actorOwnershipDict[action.payload];
@@ -71,10 +71,8 @@ export const updateActorStatus = (store: GameStore, actorId: string, newStatus: 
 export const addPlayer = (store: GameStore, playerId: string) =>
     store.dispatch({ type: GameStateActionTypes.ADD_PLAYER, payload: playerId });
 
-export const addActor = (store: GameStore, ownerId: string, actorType: ActorType, location: CoordPair) => {
-    const actor = { ownerId, actorType, location, actorId: generateGuid() };
-    store.dispatch({ type: GameStateActionTypes.ADD_ACTOR, payload: { ...actor }});
-}
+export const addActor = (store: GameStore, ownerId: string, actorId: string, actorType: ActorType, location: CoordPair) => 
+    store.dispatch({ type: GameStateActionTypes.ADD_ACTOR, payload: { ownerId, actorType, location, actorId }});
 
 export const removePlayer = (store: GameStore, playerId: string) =>
     store.dispatch({ type: GameStateActionTypes.REMOVE_PLAYER, payload: playerId });
@@ -87,27 +85,5 @@ export const setCurrentPlayers = (store: GameStore, currentPlayerId: string, ful
 export const setActorPath = (store: GameStore, actorId: string, path: CoordPair[]) =>
     store.dispatch({ type: GameStateActionTypes.SET_ACTOR_PATH, payload: { actorId, path } });
     
-export const popPlayerPath = (store: GameStore, playerId: string) => {
+export const popPlayerPath = (store: GameStore, playerId: string) =>
     store.dispatch({ type: GameStateActionTypes.POP_ACTOR_PATH, payload: playerId });
-}
-
-export const handlePlayerInput = (store: GameStore, playerId: string, stampedInput: StampedInput) => {
-    const playerStatus = store.getState().actorDict[playerId]?.status;
-    if (playerStatus) {
-        const path = BFS(stampedInput.input.currentLocation, stampedInput.input.destination);
-        const frameDiff = stampedInput.timeAgo * UPDATE_FREQUENCY;
-        const distTravelled = SPEED_FACTOR * frameDiff;
-        console.log(frameDiff, distTravelled, UPDATE_FREQUENCY);
-        const newStatus = moveActorAlongPath(distTravelled, path, { ...playerStatus, location: stampedInput.input.currentLocation }, () => popPlayerPath(store, playerId));
-        updateActorStatus(store, playerId, newStatus);
-        setActorPath(store, playerId, path);
-    }
-}
-
-export const handleStateCorrection = (store: GameStore, payload: { soft: Dictionary<CoordPair>, hard: Dictionary<ActorStatus> }) => {
-    const { hard, soft } = payload;
-    store.getState().playerList.forEach(pId => {
-        const newState = hard[pId] ?? { ...store.getState().actorDict[pId], location: soft[pId] ?? store.getState().actorDict[pId].status.location };
-        updateActorStatus(store, pId, newState);
-    })
-}
