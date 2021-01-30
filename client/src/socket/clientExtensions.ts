@@ -2,14 +2,13 @@ import {
     MessageType,
     ServerMessage,
     ClientMessage,
-    setCurrentPlayers,
-    addPlayer,
     removePlayer,
     handlePlayerInput,
     handleStateCorrection,
-    setActors,
     StampedInput,
-    refreshMap
+    refreshMap,
+    initPlayer,
+    setGameState
 } from "core";
 
 import { MapStore, ClientSocket, GameStore } from "../containers/GameWrapper";
@@ -24,14 +23,13 @@ export function handleMessage(message: ServerMessage): void {
             sendLatencyUpdate(ping);
             return;
         case MessageType.INIT_PLAYER:
-            setCurrentPlayers(GameStore, message.payload.currentPlayerId, message.payload.fullPlayerList);
-            setActors(GameStore, message.payload.actorDict);
+            setGameState(GameStore, message.payload);
             return;
         case MessageType.MAP_RESPONSE:
             refreshMap(MapStore, message.payload);
             return;
         case MessageType.ADD_PLAYER:
-            addPlayer(GameStore, message.payload);
+            initPlayer(GameStore, message.payload.playerId, message.payload.championId);
             return;
         case MessageType.REMOVE_PLAYER:
             removePlayer(GameStore, message.payload);
@@ -41,9 +39,6 @@ export function handleMessage(message: ServerMessage): void {
             return;
         case MessageType.INVALID:
             console.error('sent an invalid message to server')
-            return;
-        case MessageType.STATE_OVERRIDE:
-            setActors(GameStore, message.payload);
             return;
         case MessageType.STATE_CORRECTION:
             handleStateCorrection(GameStore, message.payload);

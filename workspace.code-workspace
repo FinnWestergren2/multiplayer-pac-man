@@ -9,7 +9,7 @@
 			"*/static": true,
 			"*/node_modules": true,
 			".git*": false,
-			"*.cmd": true,
+			"*.cmd": false,
 			"*/package-lock.json": true,
 			"client/public": true
 		}

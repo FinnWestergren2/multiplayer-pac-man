@@ -1,4 +1,4 @@
-import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor } from "../types"
+import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, GameState } from "../types"
 
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
@@ -10,7 +10,7 @@ export enum MessageType {
     ADD_PLAYER = "ADD_PLAYER",
     ADD_ACTOR = "ADD_ACTOR",
     REMOVE_PLAYER = "REMOVE_PLAYER",
-    REMOVE_ACTOR = "REMOVE_ACTOR",
+    REMOVE_UNIT = "REMOVE_UNIT",
     INVALID = "INVALID",
     CLIENT_PERCEPTION_UPDATE = "CLIENT_PERCEPTION_UPDATE",
     STATE_OVERRIDE = "STATE_OVERRIDE",
@@ -28,8 +28,8 @@ export type ClientMessage =
     { type: MessageType.LATENCY_UPDATE, payload: number }
 
 export type ServerMessage = 
-    { type: MessageType.INIT_PLAYER, payload: { currentPlayerId: string, fullPlayerList: string[], actorDict: Dictionary<Actor> } }|
-    { type: MessageType.ADD_PLAYER, payload: string } |
+    { type: MessageType.INIT_PLAYER, payload: GameState }|
+    { type: MessageType.ADD_PLAYER, payload: { playerId: string; championId: string } } |
     { type: MessageType.REMOVE_PLAYER, payload: string } |
     { type: MessageType.PONG } |
     { type: MessageType.MAP_RESPONSE, payload: MapResponse } |

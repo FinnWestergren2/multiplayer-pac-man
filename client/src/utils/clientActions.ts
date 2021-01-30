@@ -10,9 +10,10 @@ export const champPathInput = (playerId: string, destination: CoordPair) => {
 	const stampedInput = { 
 		timeAgo: 0, 
 		input: { 
-			type: InputType.PLAYER_PATH_INPUT, 
+			type: InputType.MOVE_UNIT, 
 			destination, 
-			currentLocation: GameStore.getState().actorDict[actorId].status.location 
+			origin: GameStore.getState().actorDict[actorId].status.location,
+			actorId
 		} };
 	handlePlayerInput(GameStore, playerId, stampedInput);
 	sendPlayerInput(playerId, stampedInput);

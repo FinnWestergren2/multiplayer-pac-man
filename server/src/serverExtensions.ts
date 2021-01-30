@@ -85,13 +85,13 @@ export const getCurrentMap: () => MapResponse = () => {
     return MapStore.getState().mapCells;
 };
 
-const getPerceptionUpdate: (locationMap: { [playerId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
+const getPerceptionUpdate: (locationMap: { [actorId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
 	(locationMap, fromPlayer) => {
     const potentialDrift = Math.abs((ServerStore.getState().lag[fromPlayer] ?? 0)* 0.5 * potentialDriftFactor);
     const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
     const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
-    const smoothCorrectionMap: { [playerId: string]: CoordPair } = {};
-    const snapMap: { [playerId: string]: ActorStatus } = {};
+    const smoothCorrectionMap: { [actorId: string]: CoordPair } = {};
+    const snapMap: { [actorId: string]: ActorStatus } = {};
     const actorDict = GameStore.getState().actorDict;
     Object.keys(locationMap)
         .filter((pId) => !!actorDict[pId])

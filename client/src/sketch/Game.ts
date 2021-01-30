@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { Directions } from "core";
+import { ActorType, Directions } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
@@ -33,19 +33,22 @@ export default class Game {
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
-		GameStore.getState().playerList.filter(player => GameStore.getState().actorDict[player]).forEach(player => {
+		GameStore.getState().playerList.filter(player => GameStore.getState().actorOwnershipDict[player]).forEach(player => {
 			this.drawPlayer(p, player);
 		});
 	};
 
-	private drawPlayer = (p: p5, player: string) => {
-		const location = GameStore.getState().actorDict[player].status.location;
+	private drawPlayer = (p: p5, playerId: string) => {
+		const actorDict = GameStore.getState().actorDict;
+		const actorId = GameStore.getState().actorOwnershipDict[playerId]?.find(aId => actorDict[aId].type === ActorType.CHAMPION);
+		if(!actorId) return;
+		const location = actorDict[actorId].status.location;
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
-		p.fill(`#${player.substr(0,6)}`);
-		if (player === this.currentPlayer) {
+		p.fill(`#${playerId.substr(0,6)}`);
+		if (playerId === this.currentPlayer) {
 			p.ellipse(0, 0, this.playerSize);
 		}
 		else {
@@ -56,7 +59,7 @@ export default class Game {
 		p.fill(0);
 		p.textAlign(p.CENTER);
 		p.textSize(14);
-		p.text(player.substr(0,6), 0, 0);
+		p.text(playerId.substr(0,6), 0, 0);
 		p.pop();
 	}
 };

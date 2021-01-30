@@ -1,7 +1,10 @@
 import { CoordPair } from "./CoordPair";
 
 export enum InputType {
-    PLAYER_PATH_INPUT
+    MOVE_UNIT = "MOVE_UNIT"
 }
 
-export type Input = { type: InputType.PLAYER_PATH_INPUT, destination: CoordPair, currentLocation: CoordPair }
+export type Input = MoveUnit;
+
+// used for all unit types. origin information required for multiplayer sync.
+type MoveUnit = { type: InputType.MOVE_UNIT, origin: CoordPair, destination: CoordPair, actorId: string  }

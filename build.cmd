@@ -1,1 +1,1 @@
-(cd core && npm run build && cd ../server && npm install core && cd ../client && npm install core && cd .. && .\runall.cmd)
+(cd core && npm run build)

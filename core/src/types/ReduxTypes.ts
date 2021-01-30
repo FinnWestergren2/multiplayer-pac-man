@@ -43,28 +43,24 @@ export type GameState = {
 
 export enum GameStateActionTypes {
     SET_ACTOR_STATUS = "SET_ACTOR_STATUS",
-    SET_ACTORS = "SET_ACTORS",
     ADD_PLAYER_INPUT = "ADD_PLAYER_INPUT",
     ADD_PLAYER = "ADD_PLAYER",
     ADD_ACTOR = "ADD_ACTOR",
     REMOVE_PLAYER = "REMOVE_PLAYER",
-    REMOVE_ACTOR = "REMOVE_ACTOR",
-    SET_CURRENT_PLAYER_ID = "SET_CURRENT_PLAYER_ID",
-    SET_PLAYER_LIST = "SET_PLAYER_LIST",
+    REMOVE_UNIT = "REMOVE_UNIT",
     SET_ACTOR_PATH = "SET_ACTOR_PATH",
-    POP_ACTOR_PATH = "POP_ACTOR_PATH"
+    POP_ACTOR_PATH = "POP_ACTOR_PATH",
+    SET_GAME_STATE = "SET_GAME_STATE"
 };
 
 export type GameStateAction =
     { type: GameStateActionTypes.SET_ACTOR_STATUS; payload: { actorId: string, status: ActorStatus } } |
-    { type: GameStateActionTypes.SET_ACTORS; payload: Dictionary<Actor> } |
     { type: GameStateActionTypes.ADD_PLAYER_INPUT; payload: { playerId: string, input: StampedInput } } |
     { type: GameStateActionTypes.ADD_PLAYER; payload: string } |
     { type: GameStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |
     { type: GameStateActionTypes.REMOVE_PLAYER; payload: string } |
-    { type: GameStateActionTypes.REMOVE_ACTOR; payload: string } |
-    { type: GameStateActionTypes.SET_CURRENT_PLAYER_ID; payload: string } |
-    { type: GameStateActionTypes.SET_PLAYER_LIST; payload: string[] } | 
+    { type: GameStateActionTypes.REMOVE_UNIT; payload: string } |
     { type: GameStateActionTypes.SET_ACTOR_PATH; payload: { actorId: string, path: CoordPair[] } } |
-    { type: GameStateActionTypes.POP_ACTOR_PATH; payload: string } 
+    { type: GameStateActionTypes.POP_ACTOR_PATH; payload: string } |
+    { type: GameStateActionTypes.SET_GAME_STATE; payload: GameState }
     

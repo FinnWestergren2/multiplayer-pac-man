@@ -1,10 +1,7 @@
 import { Reducer } from "redux";
-import { StampedInput, CoordPair, Directions } from "../types";
+import { CoordPair, Directions } from "../types";
 import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../types/ReduxTypes";
-import {  Actor, ActorStatus, ActorType, Dictionary } from "../types/GameState";
-import { SPEED_FACTOR, UPDATE_FREQUENCY } from "../game";
-import { moveActorAlongPath, BFS } from "../game/actorUpdater";
-import { generateGuid } from "../utils/misc";
+import { ActorStatus, ActorType } from "../types/GameState";
 
 const initialState: GameState = {
     actorDict: {},
@@ -16,9 +13,8 @@ const initialState: GameState = {
 export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: GameState = initialState, action: GameStateAction) => {
     const draft = { ...state };
     switch (action.type) {
-        case GameStateActionTypes.SET_ACTORS:
-            draft.actorDict = action.payload;
-            break;
+        case GameStateActionTypes.SET_GAME_STATE:
+            return action.payload;
         case GameStateActionTypes.SET_ACTOR_STATUS:
             draft.actorDict[action.payload.actorId].status = action.payload.status;
             break;
@@ -33,7 +29,12 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
                 ownerId: action.payload.ownerId,
                 status: { location: action.payload.location, direction: Directions.NONE }
             };
-            draft.actorOwnershipDict[action.payload.ownerId].push(action.payload.actorId);
+            if (draft.actorOwnershipDict[action.payload.ownerId]) {
+                draft.actorOwnershipDict[action.payload.ownerId].push(action.payload.actorId);
+            }
+            else {
+                draft.actorOwnershipDict[action.payload.ownerId] = [action.payload.actorId];
+            }
             break;
         case GameStateActionTypes.REMOVE_PLAYER:
             draft.actorOwnershipDict[action.payload]?.forEach(oId => {
@@ -42,15 +43,9 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
             delete draft.actorOwnershipDict[action.payload];
             draft.playerList = draft.playerList.filter(p => p != action.payload);
             break;
-        case GameStateActionTypes.REMOVE_ACTOR:
+        case GameStateActionTypes.REMOVE_UNIT:
             const obj = draft.actorDict[action.payload];
             draft.actorOwnershipDict[obj.ownerId] = draft.actorOwnershipDict[obj.ownerId].filter(o => o != action.payload); 
-            break;
-        case GameStateActionTypes.SET_CURRENT_PLAYER_ID:
-            draft.currentPlayer = action.payload;
-            break;
-        case GameStateActionTypes.SET_PLAYER_LIST:
-            draft.playerList = action.payload;
             break;
         case GameStateActionTypes.SET_ACTOR_PATH:
             draft.actorPathDict[action.payload.actorId] = action.payload.path;
@@ -62,8 +57,8 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
     return draft;
 };
 
-export const setActors = (store: GameStore, actorDict: Dictionary<Actor>) =>
-    store.dispatch({ type: GameStateActionTypes.SET_ACTORS, payload: actorDict });
+export const setGameState = (store: GameStore, state: GameState) => 
+    store.dispatch({ type: GameStateActionTypes.SET_GAME_STATE, payload: state });
 
 export const updateActorStatus = (store: GameStore, actorId: string, newStatus: ActorStatus) => 
     store.dispatch({ type: GameStateActionTypes.SET_ACTOR_STATUS, payload: { actorId, status: newStatus } });
@@ -77,13 +72,8 @@ export const addActor = (store: GameStore, ownerId: string, actorId: string, act
 export const removePlayer = (store: GameStore, playerId: string) =>
     store.dispatch({ type: GameStateActionTypes.REMOVE_PLAYER, payload: playerId });
 
-export const setCurrentPlayers = (store: GameStore, currentPlayerId: string, fullPlayerList: string[]) => {
-    store.dispatch({ type: GameStateActionTypes.SET_CURRENT_PLAYER_ID, payload: currentPlayerId });
-    store.dispatch({ type: GameStateActionTypes.SET_PLAYER_LIST, payload: fullPlayerList });
-};
-
 export const setActorPath = (store: GameStore, actorId: string, path: CoordPair[]) =>
     store.dispatch({ type: GameStateActionTypes.SET_ACTOR_PATH, payload: { actorId, path } });
     
-export const popPlayerPath = (store: GameStore, playerId: string) =>
+export const popActorPath = (store: GameStore, playerId: string) =>
     store.dispatch({ type: GameStateActionTypes.POP_ACTOR_PATH, payload: playerId });
