@@ -46,13 +46,6 @@ const GameWrapper: FunctionComponent = () => {
                     onChange={sendSimulatedLagInput}
                     sliderId="sim-lag-input"
                     label="simulated lag (ms)" />
-                <Slider 
-                    min={0}
-                    max={100}
-                    value={0}
-                    onChange={sendSimulatedLagInput}
-                    sliderId="sim-lag-input"
-                    label="simulated lag (ms)" />
             </ControllerGrid>
         </FlexContainer>
     );
