@@ -1,4 +1,4 @@
-export * from './coordPairs';
+export * from './coordPair';
 export * from './direction';
 export * from './actor';
 export * from './redux';

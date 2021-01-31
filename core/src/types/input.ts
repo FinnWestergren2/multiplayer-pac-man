@@ -1,4 +1,9 @@
-import { CoordPair } from "./coordPairs";
+import { CoordPair } from "./coordPair";
+
+export type StampedInput = {
+    timeAgo: number;
+    input: Input;
+}
 
 export enum InputType {
     MOVE_UNIT = "MOVE_UNIT"

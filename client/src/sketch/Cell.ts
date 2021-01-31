@@ -1,9 +1,9 @@
 import * as p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { CoordPair, Directions, DirectionsUtils } from "core";
+import { CoordPair, Direction, DirectionUtils } from "core";
 
 export default class Cell {
-    public cellType: Directions;
+    public cellType: Direction;
     private gridCoords: CoordPair;
     private location: CoordPair;
     private halfSize: number;
@@ -13,16 +13,16 @@ export default class Cell {
     private left: boolean;
     private right: boolean;
 
-    public constructor(cellType: Directions, x: number, y: number) {
+    public constructor(cellType: Direction, x: number, y: number) {
         this.cellType = cellType;
         this.gridCoords = { x, y };
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
-        this.up = DirectionsUtils.isUp(cellType);
-        this.down = DirectionsUtils.isDown(cellType);
-        this.left = DirectionsUtils.isLeft(cellType);
-        this.right = DirectionsUtils.isRight(cellType);
+        this.up = DirectionUtils.isUp(cellType);
+        this.down = DirectionUtils.isDown(cellType);
+        this.left = DirectionUtils.isLeft(cellType);
+        this.right = DirectionUtils.isRight(cellType);
     }
 
     public draw: (p: p5) => void = (p) => {

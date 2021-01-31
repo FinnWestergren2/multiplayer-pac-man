@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { CoordPair, Directions } from "../types";
+import { CoordPair, Direction } from "../types";
 import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../types/redux";
 import { ActorStatus, ActorType } from "../types/actor";
 
@@ -27,7 +27,7 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
             draft.actorDict[action.payload.actorId] = { 
                 type: action.payload.actorType,
                 ownerId: action.payload.ownerId,
-                status: { location: action.payload.location, direction: Directions.NONE }
+                status: { location: action.payload.location, direction: Direction.NONE }
             };
             if (draft.actorOwnershipDict[action.payload.ownerId]) {
                 draft.actorOwnershipDict[action.payload.ownerId].push(action.payload.actorId);

@@ -1,4 +1,4 @@
-import { Directions } from "./direction";
+import { Direction } from "./direction";
 
 export type CoordPair = { x: number, y: number }
 const zeroPair = { x: 0, y: 0 };
@@ -23,18 +23,18 @@ const flooredPair = (p: CoordPair) => {
 }
 
 const getDirection = (start: CoordPair, finish: CoordPair) => {
-    let out = Directions.NONE;
+    let out = Direction.NONE;
     if (start.x < finish.x) {
-        out = out | Directions.RIGHT;
+        out = out | Direction.RIGHT;
     }
     if (start.x > finish.x) {
-        out = out | Directions.LEFT;
+        out = out | Direction.LEFT;
     }
     if (start.y < finish.y) {
-        out = out | Directions.DOWN;
+        out = out | Direction.DOWN;
     }
     if (start.y > finish.y) {
-        out = out | Directions.UP;
+        out = out | Direction.UP;
     }
     return out
 }

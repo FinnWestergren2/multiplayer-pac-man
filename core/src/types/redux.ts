@@ -1,13 +1,14 @@
 import { Store } from "redux";
-import { CoordPair } from "./coordPairs";
-import { Directions } from "./direction";
-import { Actor, Dictionary, ActorStatus as ActorStatus, ActorType, StampedInput } from "./actor";
+import { CoordPair } from "./coordPair";
+import { Direction } from "./direction";
+import { Actor, Dictionary, ActorStatus as ActorStatus, ActorType } from "./actor";
+import { StampedInput } from "./input";
 
 export type MapStore = Store<MapState, MapStateAction>;
 export type GameStore = Store<GameState, GameStateAction>;
 
 export type MapState = {
-    mapCells: Directions[][];
+    mapCells: Direction[][];
     appDimensions: AppDimensions;
     cellDimensions: CellDimensions;
 }
@@ -29,7 +30,7 @@ export type CellDimensions = {
 }
 
 export type MapStateAction =
-    { type: MapStateActionTypes.REFRESH_MAP; payload: Directions[][] } |
+    { type: MapStateActionTypes.REFRESH_MAP; payload: Direction[][] } |
     { type: MapStateActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions } |
     { type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions }
 

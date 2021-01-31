@@ -1,12 +1,12 @@
 import { gameStore, mapStore, SPEED_FACTOR } from '.';
 import { ActorStatus } from '../types/actor';
-import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../types';
+import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from '../types';
 import { popActorPath, updateActorStatus } from '../ducks/gameState';
 
 const idleStatus = (location: CoordPair) => {
     return {
         location: CoordPairUtils.roundedPair(location), // snap to grid
-        direction: Directions.NONE
+        direction: Direction.NONE
     }
 };
 
@@ -18,7 +18,7 @@ export const updateActors = () => Object.keys(gameStore.getState().actorDict).fo
         updateActorStatus(gameStore, actorId, newStatus);
         return;
     }
-    if (!path && status && status.direction !== Directions.NONE) {
+    if (!path && status && status.direction !== Direction.NONE) {
         updateActorStatus(gameStore, actorId, idleStatus(status.location));
     }
 });
@@ -43,16 +43,16 @@ export const moveActorAlongPath: (dist: number, path: CoordPair[], status: Actor
             continue;
         }
         switch (nextDirection) {
-            case Directions.DOWN:
+            case Direction.DOWN:
                 nextLocation.y += remainingDist;
                 break;
-            case Directions.UP:
+            case Direction.UP:
                 nextLocation.y -= remainingDist;
                 break;
-            case Directions.RIGHT:
+            case Direction.RIGHT:
                 nextLocation.x += remainingDist;
                 break;
-            case Directions.LEFT:
+            case Direction.LEFT:
                 nextLocation.x -= remainingDist;
                 break;
         }
@@ -66,7 +66,7 @@ const checkCurrentPathStatus = (status: ActorStatus, path: CoordPair[], popPath:
     for(let i = 0; i < path.length - 1; i++ ) {
         const firstDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(status.location), path[i]);
         const secondDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(status.location), path[i + 1]);
-        if (DirectionsUtils.getOpposite(firstDir) === secondDir) {
+        if (DirectionUtils.getOpposite(firstDir) === secondDir) {
             out = out.slice(1);
             popPath();
             break;
@@ -90,22 +90,22 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
         const x = Math.floor(location.x);
         const y = Math.floor(location.y);
         const directions = mapCells[y][x].dir;
-        if (mapCells[y + 1] && mapCells[y + 1][x] && DirectionsUtils.isDown(directions) && !mapCells[y + 1][x].isVisited){
+        if (mapCells[y + 1] && mapCells[y + 1][x] && DirectionUtils.isDown(directions) && !mapCells[y + 1][x].isVisited){
             branches.push({x: x, y: y + 1});
             mapCells[y + 1][x].isVisited = true;
             mapCells[y + 1][x].parentCell = location;
         }
-        if (mapCells[y - 1] && mapCells[y - 1][x] && DirectionsUtils.isUp(directions) && !mapCells[y - 1][x].isVisited){
+        if (mapCells[y - 1] && mapCells[y - 1][x] && DirectionUtils.isUp(directions) && !mapCells[y - 1][x].isVisited){
             branches.push({x: x, y: y - 1});
             mapCells[y - 1][x].isVisited = true;
             mapCells[y - 1][x].parentCell = location;
         }
-        if (mapCells[y] && mapCells[y][x + 1] && DirectionsUtils.isRight(directions) && !mapCells[y][x + 1].isVisited){
+        if (mapCells[y] && mapCells[y][x + 1] && DirectionUtils.isRight(directions) && !mapCells[y][x + 1].isVisited){
             branches.push({x: x + 1, y: y});
             mapCells[y][x + 1].isVisited = true;
             mapCells[y][x + 1].parentCell = location;
         }
-        if (mapCells[y] && mapCells[y][x - 1] && DirectionsUtils.isLeft(directions) && !mapCells[y][x - 1].isVisited){
+        if (mapCells[y] && mapCells[y][x - 1] && DirectionUtils.isLeft(directions) && !mapCells[y][x - 1].isVisited){
             branches.push({x: x - 1, y: y});
             mapCells[y][x - 1].isVisited = true;
             mapCells[y][x - 1].parentCell = location;

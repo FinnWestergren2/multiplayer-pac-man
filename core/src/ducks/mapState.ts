@@ -1,4 +1,4 @@
-import { Directions, MapResponse } from "..";
+import { Direction, MapResponse } from "..";
 import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../types/redux";
 
 const initialState: MapState = {
@@ -38,7 +38,7 @@ export const updateAppDimensions = (store: MapStore, width: number, height: numb
     }
 };
 
-const generateCellDimensions = (data: Directions[][], appDimensions: AppDimensions) => {
+const generateCellDimensions = (data: Direction[][], appDimensions: AppDimensions) => {
 
     const size = Math.min(
         (appDimensions.canvasWidth - 1) / Math.max(...(data.map(r => r.length))),

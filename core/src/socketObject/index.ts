@@ -1,4 +1,4 @@
-import { Directions, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, GameState } from "../types"
+import { Direction, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, GameState } from "../types"
 
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
@@ -38,4 +38,4 @@ export type ServerMessage =
     { type: MessageType.STATE_CORRECTION, payload: { soft:  Dictionary<CoordPair>, hard: Dictionary<ActorStatus> } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
-export type MapResponse = Directions[][];
+export type MapResponse = Direction[][];

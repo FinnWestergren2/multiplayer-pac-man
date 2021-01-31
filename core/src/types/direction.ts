@@ -1,4 +1,4 @@
-export enum Directions {
+export enum Direction {
     "NONE" = 0,
     "UP" = 1,
     "RIGHT" = 2,
@@ -6,18 +6,18 @@ export enum Directions {
     "LEFT" = 8
 }
 
-const isUp: (dir: Directions) => boolean = dir =>
-    Directions.UP === (Directions.UP & dir);
-const isDown: (dir: Directions) => boolean = dir =>
-    Directions.DOWN === (Directions.DOWN & dir);
-const isLeft: (dir: Directions) => boolean = dir =>
-    Directions.LEFT === (Directions.LEFT & dir);
-const isRight: (dir: Directions) => boolean = dir =>
-    Directions.RIGHT === (Directions.RIGHT & dir);
+const isUp: (dir: Direction) => boolean = dir =>
+    Direction.UP === (Direction.UP & dir);
+const isDown: (dir: Direction) => boolean = dir =>
+    Direction.DOWN === (Direction.DOWN & dir);
+const isLeft: (dir: Direction) => boolean = dir =>
+    Direction.LEFT === (Direction.LEFT & dir);
+const isRight: (dir: Direction) => boolean = dir =>
+    Direction.RIGHT === (Direction.RIGHT & dir);
 
-const getString: (dir: Directions) => string = dir => {
+const getString: (dir: Direction) => string = dir => {
     let out = "";
-    if (dir === Directions.NONE) {
+    if (dir === Direction.NONE) {
         return "NONE";
     }
     if (isUp(dir)) {
@@ -39,49 +39,49 @@ const randomSingleDirection = () => {
     const randomNum = Math.random() * 4;
     switch (Math.floor(randomNum)) {
         case 0:
-            return Directions.DOWN;
+            return Direction.DOWN;
         case 1:
-            return Directions.UP;
+            return Direction.UP;
         case 2:
-            return Directions.LEFT;
+            return Direction.LEFT;
         case 3:
-            return Directions.RIGHT;
+            return Direction.RIGHT;
         default:
-            return Directions.NONE;
+            return Direction.NONE;
     }
 };
 
-const rotateClockwise = (dir: Directions) => {
+const rotateClockwise = (dir: Direction) => {
     switch (dir) {
-        case Directions.UP:
-            return Directions.RIGHT;
-        case Directions.RIGHT:
-            return Directions.DOWN;
-        case Directions.DOWN:
-            return Directions.LEFT;
-        case Directions.LEFT:
-            return Directions.UP;
+        case Direction.UP:
+            return Direction.RIGHT;
+        case Direction.RIGHT:
+            return Direction.DOWN;
+        case Direction.DOWN:
+            return Direction.LEFT;
+        case Direction.LEFT:
+            return Direction.UP;
         default:
-            return Directions.NONE;
+            return Direction.NONE;
     }
 };
 
-const getOpposite = (dir: Directions) => {
+const getOpposite = (dir: Direction) => {
     switch (dir) {
-        case Directions.UP:
-            return Directions.DOWN;
-        case Directions.RIGHT:
-            return Directions.LEFT;
-        case Directions.DOWN:
-            return Directions.UP;
-        case Directions.LEFT:
-            return Directions.RIGHT;
+        case Direction.UP:
+            return Direction.DOWN;
+        case Direction.RIGHT:
+            return Direction.LEFT;
+        case Direction.DOWN:
+            return Direction.UP;
+        case Direction.LEFT:
+            return Direction.RIGHT;
         default:
-            return Directions.NONE;
+            return Direction.NONE;
     }
 };
 
-export const DirectionsUtils = {  
+export const DirectionUtils = {  
     isUp,
     isDown,
     isLeft,

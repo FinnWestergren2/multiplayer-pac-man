@@ -1,5 +1,5 @@
-import { CoordPair } from "./coordPairs"
-import { Directions } from "./direction"
+import { CoordPair } from "./coordPair"
+import { Direction } from "./direction"
 import { Input } from "./input"
 
 export type Actor = {
@@ -10,17 +10,12 @@ export type Actor = {
 
 export type ActorStatus = {
     location: CoordPair;
-    direction: Directions;
+    direction: Direction;
 }
 
 export enum ActorType {
     CHAMPION = "CHAMPION",
     MINER = "MINER"
-}
-
-export type StampedInput = {
-    timeAgo: number;
-    input: Input;
 }
 
 export type Dictionary<T> = { [id: string]: T }
