@@ -1,8 +1,9 @@
 import { Store } from "redux";
 import { CoordPair } from "./coordPair";
 import { Direction } from "./direction";
-import { Actor, Dictionary, ActorStatus as ActorStatus, ActorType } from "./actor";
+import { Actor, ActorStatus as ActorStatus, ActorType } from "./actor";
 import { StampedInput } from "./input";
+import { Dictionary } from ".";
 
 export type MapStore = Store<MapState, MapStateAction>;
 export type GameStore = Store<GameState, GameStateAction>;

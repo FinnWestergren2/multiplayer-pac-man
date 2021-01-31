@@ -17,5 +17,3 @@ export enum ActorType {
     CHAMPION = "CHAMPION",
     MINER = "MINER"
 }
-
-export type Dictionary<T> = { [id: string]: T }
