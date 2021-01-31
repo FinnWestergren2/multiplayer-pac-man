@@ -40,6 +40,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
         case MessageType.PLAYER_INPUT:
             const timeAgo = (ServerStore.getState().lag[fromPlayer] ?? 0) * 0.5;
             handlePlayerInput(GameStore, fromPlayer, {...message.payload.input, timeAgo});
+            // can't use writeToAllPlayers for this message because we need to cater for everyones lag
             GameStore.getState().playerList.filter(pId => pId !== fromPlayer).forEach(pId => {
                 const convertedMessage = { ...message };
                 convertedMessage.payload.input.timeAgo = (ServerStore.getState().lag[pId] ?? 0) * 0.5 + timeAgo;

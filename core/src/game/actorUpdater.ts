@@ -1,5 +1,5 @@
 import { gameStore, mapStore, SPEED_FACTOR } from '.';
-import { ActorStatus } from '../types/GameState';
+import { ActorStatus } from '../types/actor';
 import { Directions, CoordPair, CoordPairUtils, DirectionsUtils } from '../types';
 import { popActorPath, updateActorStatus } from '../ducks/gameState';
 

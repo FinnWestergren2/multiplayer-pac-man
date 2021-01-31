@@ -13,11 +13,15 @@ type Props = {
 
 const SliderLabel = styled.label`
     height: min-content;
+    grid-column-start: 1;
+    grid-column-end: 2;
 `;
 
 const SliderInput = styled.input`
     width: 100%;
     height: min-content;
+    grid-column-start: 2;
+    grid-column-end: 3;
 `;
 
 const Slider: FunctionComponent<Props> = ({

@@ -1,6 +1,6 @@
-import { CoordPair } from "./CoordPair"
-import { Directions } from "./Directions"
-import { Input } from "./InputTypes"
+import { CoordPair } from "./coordPairs"
+import { Directions } from "./direction"
+import { Input } from "./input"
 
 export type Actor = {
     ownerId: string;

@@ -1,4 +1,4 @@
-import { Directions } from "./Directions";
+import { Directions } from "./direction";
 
 export type CoordPair = { x: number, y: number }
 const zeroPair = { x: 0, y: 0 };

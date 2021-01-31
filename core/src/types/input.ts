@@ -1,4 +1,4 @@
-import { CoordPair } from "./CoordPair";
+import { CoordPair } from "./coordPairs";
 
 export enum InputType {
     MOVE_UNIT = "MOVE_UNIT"

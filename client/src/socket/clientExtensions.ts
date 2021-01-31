@@ -19,7 +19,7 @@ export function handleMessage(message: ServerMessage): void {
     switch (message.type) {
         case MessageType.PONG:
             const ping = getTime() - lastPing;
-            console.log("ping", ping, getTime(), lastPing);
+            console.debug("ping", ping, getTime(), lastPing);
             sendLatencyUpdate(ping);
             return;
         case MessageType.INIT_PLAYER:

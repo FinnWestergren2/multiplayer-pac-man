@@ -1,7 +1,7 @@
 import { Reducer } from "redux";
 import { CoordPair, Directions } from "../types";
-import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../types/ReduxTypes";
-import { ActorStatus, ActorType } from "../types/GameState";
+import { GameState, GameStateActionTypes, GameStateAction, GameStore } from "../types/redux";
+import { ActorStatus, ActorType } from "../types/actor";
 
 const initialState: GameState = {
     actorDict: {},

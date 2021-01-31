@@ -8,6 +8,7 @@ import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
 import { mapStateReducer, gameStateReducer, runGame } from "core";
 import Slider from "../components/Slider";
 import ControllerGrid from "../components/ControllerGrid";
+import DebugButton from "../components/DebugButton";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -46,6 +47,9 @@ const GameWrapper: FunctionComponent = () => {
                     onChange={sendSimulatedLagInput}
                     sliderId="sim-lag-input"
                     label="simulated lag (ms)" />
+                <DebugButton 
+                    onClick={() => console.log('test')}
+                    label="add miner" />
             </ControllerGrid>
         </FlexContainer>
     );
