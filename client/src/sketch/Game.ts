@@ -1,15 +1,17 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { ActorType, Direction } from "core";
+import { Actor, ActorType, Direction } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
 
 export default class Game {
 	private cells: Cell[][] = [];
-	private playerSize: number = 0;
+	private champSize: number = 0;
 	private currentPlayer?: string;
+	private selectedActorId?: string;
+	
 	public constructor(p: p5) {
 		MapStore.subscribe(() => this.initializeMap());
 		GameStore.subscribe(() => {
@@ -22,44 +24,48 @@ export default class Game {
 	}
 
 	private initializeMap = () => {
-		this.playerSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
+		this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
 		const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Direction[], y: number) =>
-			row.map((column: Direction, x) =>
-				new Cell(column, x, y)
-			)
+			row.map((column: Direction, x) => new Cell(column, x, y))
 		);
 	};
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
-		GameStore.getState().playerList.filter(player => GameStore.getState().actorOwnershipDict[player]).forEach(player => {
-			this.drawPlayer(p, player);
+		Object.values(GameStore.getState().actorDict).forEach(actor => {
+			this.drawActor(p, actor);
 		});
 	};
 
-	private drawPlayer = (p: p5, playerId: string) => {
-		const actorDict = GameStore.getState().actorDict;
-		const actorId = GameStore.getState().actorOwnershipDict[playerId]?.find(aId => actorDict[aId].type === ActorType.CHAMPION);
-		if(!actorId) return;
-		const location = actorDict[actorId].status.location;
+	private drawActor = (p: p5, actor: Actor) => {
+		const location = actor.status.location;
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
-		p.fill(`#${playerId.substr(0,6)}`);
-		if (playerId === this.currentPlayer) {
-			p.ellipse(0, 0, this.playerSize);
+		p.fill(`#${actor.ownerId.substr(0,6)}`);
+		switch(actor.type) {
+			case ActorType.CHAMPION:
+				console.log(actor.type);
+				p.ellipse(0, 0, this.champSize);
+				break;
+			case ActorType.MINER:
+				console.log(actor.type);
+				p.ellipse(0, 0, this.champSize * 0.66);
+				break;
 		}
-		else {
-			p.rect(-0.5 * (this.playerSize), -0.5 * (this.playerSize), this.playerSize, this.playerSize );
-		}
+		this.drawPlayerId(p, actor.ownerId);
+		p.pop();
+	};
+
+	private drawPlayerId = (p: p5, playerId: string) => {
+		const factor = 0.24;
 		p.fill(255);
-		p.rect(-0.32 * (this.playerSize), -0.18 * (this.playerSize), 0.64 * (this.playerSize), 0.2 * (this.playerSize));
+		p.rect(-factor * (this.champSize), -0.18 * (this.champSize), factor * 2 * (this.champSize), 0.2 * (this.champSize));
 		p.fill(0);
 		p.textAlign(p.CENTER);
 		p.textSize(14);
-		p.text(playerId.substr(0,6), 0, 0);
-		p.pop();
-	}
+		p.text(playerId.substr(0,4), 0, 0);
+	};
 };

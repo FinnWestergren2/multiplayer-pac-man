@@ -24,5 +24,4 @@ export default class Stack<T> {
     }
     
     public isEmpty = () => this.size() === 0;
-
 }

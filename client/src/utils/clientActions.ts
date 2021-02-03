@@ -1,20 +1,47 @@
-import { handlePlayerInput, CoordPair, InputType, ActorType } from "core";
+import { handlePlayerInput, CoordPair, InputType, Input, ActorType, generateGuid, addActor } from "core";
 import { GameStore } from "../containers/GameWrapper";
 import { sendPlayerInput } from "../socket/clientExtensions";
 
-export const champPathInput = (playerId: string, destination: CoordPair) => {
-	const actorId = GameStore.getState().actorOwnershipDict[playerId]?.find(actId => {
-		return GameStore.getState().actorDict[actId].type === ActorType.CHAMPION;
-	});
-	if (!actorId) return;
-	const stampedInput = { 
-		timeAgo: 0, 
-		input: { 
-			type: InputType.MOVE_UNIT, 
-			destination, 
-			origin: GameStore.getState().actorDict[actorId].status.location,
-			actorId
-		} };
-	handlePlayerInput(GameStore, playerId, stampedInput);
-	sendPlayerInput(playerId, stampedInput);
+export const moveUnit = (actorId: string, destination: CoordPair) => {
+	const playerId = GameStore.getState().currentPlayer;
+	const origin = GameStore.getState().actorDict[actorId]?.status.location;
+
+	if (!origin || !playerId) return; // probably should do some error reporting or something someday
+	
+	const input: Input = {
+		type: InputType.MOVE_UNIT, 
+		destination, 
+		origin,
+		actorId
+	};
+
+	const stampedInput = {
+		timeAgo: 0,
+		input
+	};
+
+	handlePlayerInput(GameStore, playerId!, stampedInput);
+	sendPlayerInput(playerId!, stampedInput);
+}
+
+export const createUnit = (destination: CoordPair, actorType: ActorType) => {
+	const playerId = GameStore.getState().currentPlayer;
+	if (!playerId) return; // probably should do some error reporting or something someday
+
+	const actorId = generateGuid();
+	
+	const input: Input = {
+		type: InputType.CREATE_UNIT, 
+		destination, 
+		actorId,
+		actorType
+	};
+
+	const stampedInput = {
+		timeAgo: 0,
+		input
+	};
+	
+	addActor(GameStore, playerId, actorId, actorType, destination)
+	sendPlayerInput(playerId!, stampedInput);
 }

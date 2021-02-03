@@ -6,14 +6,14 @@ export type Actor = {
     ownerId: string;
     type: ActorType;
     status: ActorStatus;
-}
+};
 
 export type ActorStatus = {
     location: CoordPair;
     direction: Direction;
-}
+};
 
 export enum ActorType {
     CHAMPION = "CHAMPION",
     MINER = "MINER"
-}
+};

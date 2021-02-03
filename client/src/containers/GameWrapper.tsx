@@ -5,10 +5,11 @@ import styled from "@emotion/styled";
 import { createStore } from "redux";
 import initializeSocket from "../socket";
 import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
-import { mapStateReducer, gameStateReducer, runGame } from "core";
+import { mapStateReducer, gameStateReducer, runGame, CoordPairUtils, ActorType } from "core";
 import Slider from "../components/Slider";
 import ControllerGrid from "../components/ControllerGrid";
 import DebugButton from "../components/DebugButton";
+import { createUnit } from "../utils/clientActions";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -48,9 +49,9 @@ const GameWrapper: FunctionComponent = () => {
                     sliderId="sim-lag-input"
                     label="simulated lag (ms)" />
                 <DebugButton 
-                    onClick={() => console.log('test')}
+                    onClick={() => createUnit(CoordPairUtils.zeroPair, ActorType.MINER)}
                     label="add miner" />
-            </ControllerGrid>
+            </ControllerGrid>1
         </FlexContainer>
     );
 };
