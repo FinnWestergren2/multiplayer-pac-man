@@ -10,7 +10,6 @@ export default class Game {
 	private cells: Cell[][] = [];
 	private champSize: number = 0;
 	private currentPlayer?: string;
-	private selectedActorId?: string;
 	
 	public constructor(p: p5) {
 		MapStore.subscribe(() => this.initializeMap());
@@ -44,7 +43,7 @@ export default class Game {
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
-		p.fill(`#${actor.ownerId.substr(0,6)}`);
+		p.fill(`#${actor.ownerId.substr(0,6)}`); // arbitrary color just to keep track. eventually we should add preset colors
 		switch(actor.type) {
 			case ActorType.CHAMPION:
 				console.log(actor.type);
@@ -60,7 +59,7 @@ export default class Game {
 	};
 
 	private drawPlayerId = (p: p5, playerId: string) => {
-		const factor = 0.24;
+		const factor = 0.28;
 		p.fill(255);
 		p.rect(-factor * (this.champSize), -0.18 * (this.champSize), factor * 2 * (this.champSize), 0.2 * (this.champSize));
 		p.fill(0);
