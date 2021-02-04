@@ -39,6 +39,5 @@ export const bindHumanPlayer = (p: p5, playerId: string) => {
         if (p.keyIsDown(p.CONTROL) && actors.length > 0) {
             setPath(mouse, actors[0]);
         }
-
     }
 };

@@ -20,6 +20,10 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
             );
             updateActorStatus(store, stampedInput.input.actorId, newStatus);
             setActorPath(store, stampedInput.input.actorId, path);
+            return;
+        case InputType.CREATE_UNIT:
+            addActor(store, playerId, stampedInput.input.actorId, stampedInput.input.actorType, stampedInput.input.destination);
+            return;
     }
 }
 

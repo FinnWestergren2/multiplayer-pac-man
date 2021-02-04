@@ -1,4 +1,4 @@
-import { handlePlayerInput, CoordPair, InputType, Input, ActorType, generateGuid, addActor } from "core";
+import { handlePlayerInput, CoordPair, InputType, Input, ActorType, generateGuid } from "core";
 import { GameStore } from "../containers/GameWrapper";
 import { sendPlayerInput } from "../socket/clientExtensions";
 
@@ -29,7 +29,7 @@ export const createUnit = (destination: CoordPair, actorType: ActorType) => {
 	if (!playerId) return; // probably should do some error reporting or something someday
 
 	const actorId = generateGuid();
-	
+
 	const input: Input = {
 		type: InputType.CREATE_UNIT, 
 		destination, 
@@ -41,7 +41,7 @@ export const createUnit = (destination: CoordPair, actorType: ActorType) => {
 		timeAgo: 0,
 		input
 	};
-	
-	addActor(GameStore, playerId, actorId, actorType, destination)
+
+	handlePlayerInput(GameStore, playerId!, stampedInput);
 	sendPlayerInput(playerId!, stampedInput);
 }
