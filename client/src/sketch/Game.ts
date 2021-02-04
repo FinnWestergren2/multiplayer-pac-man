@@ -10,6 +10,7 @@ export default class Game {
 	private cells: Cell[][] = [];
 	private champSize: number = 0;
 	private currentPlayer?: string;
+	private selectedActor?: string
 	
 	public constructor(p: p5) {
 		MapStore.subscribe(() => this.initializeMap());
@@ -17,7 +18,7 @@ export default class Game {
 			const oldAssignment = this.currentPlayer;
 			this.currentPlayer = GameStore.getState().currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
-				bindHumanPlayer(p, this.currentPlayer);
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => {this.selectedActor = actorId}, () => this.selectedActor);
 			}
 		});
 	}
@@ -44,15 +45,15 @@ export default class Game {
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
 		p.fill(`#${actor.ownerId.substr(0,6)}`); // arbitrary color just to keep track. eventually we should add preset colors
-		switch(actor.type) {
-			case ActorType.CHAMPION:
-				console.log(actor.type);
-				p.ellipse(0, 0, this.champSize);
-				break;
-			case ActorType.MINER:
-				console.log(actor.type);
-				p.ellipse(0, 0, this.champSize * 0.66);
-				break;
+		const actorSize = actor.type === ActorType.CHAMPION ? this.champSize : this.champSize * 0.66
+		p.ellipse(0, 0, actorSize);
+		if (this.selectedActor === actor.id) {
+			p.push();
+			p.strokeWeight(3);
+			p.stroke(`#${actor.ownerId.substr(0,6)}`); // arbitrary color just to keep track. eventually we should add preset colors
+			p.noFill();
+			p.ellipse(0, 0, actorSize + 7);
+			p.pop();
 		}
 		this.drawPlayerId(p, actor.ownerId);
 		p.pop();

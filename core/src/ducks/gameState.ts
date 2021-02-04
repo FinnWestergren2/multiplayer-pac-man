@@ -27,7 +27,8 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
             draft.actorDict[action.payload.actorId] = { 
                 type: action.payload.actorType,
                 ownerId: action.payload.ownerId,
-                status: { location: action.payload.location, direction: Direction.NONE }
+                status: { location: action.payload.location, direction: Direction.NONE },
+                id: action.payload.actorId
             };
             if (draft.actorOwnershipDict[action.payload.ownerId]) {
                 draft.actorOwnershipDict[action.payload.ownerId].push(action.payload.actorId);

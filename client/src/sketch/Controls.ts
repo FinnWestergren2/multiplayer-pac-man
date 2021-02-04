@@ -7,7 +7,7 @@ const KeyCodeOne = 49;
 const KeyCodeTwo = 50;
 const KeyCodeThree = 51;
 
-export const bindHumanPlayer = (p: p5, playerId: string) => {
+export const bindHumanPlayer = (p: p5, playerId: string, selectActor: (actorId: string) => void, selectedActor: () => string | undefined) => {
     const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
     const cells = MapStore.getState().mapCells;
     const max_y = cells.length, max_x = cells[0].length;
@@ -25,19 +25,25 @@ export const bindHumanPlayer = (p: p5, playerId: string) => {
         }
     }
 
+    p.keyPressed = () => {
+        if (p.keyCode === KeyCodeOne && actors.length > 0) {
+            selectActor(actors[0]);
+            console.log(actors[0]);
+        }
+        if (p.keyCode === KeyCodeTwo && actors.length > 1) {
+            selectActor(actors[1]);
+        }
+        if (p.keyCode === KeyCodeThree && actors.length > 2) {
+            selectActor(actors[2]);
+        }
+    }
+
+
     p.mouseClicked = (e: any) => { 
         const mouse = {x: e.clientX, y: e.clientY} // can't use p.mouse because of scrolling / changing screen sizes
-        if (p.keyIsDown(KeyCodeOne) && actors.length > 0) {
-            setPath(mouse, actors[0]);
-        }
-        if (p.keyIsDown(KeyCodeTwo) && actors.length > 1) {
-            setPath(mouse, actors[1]);
-        }
-        if (p.keyIsDown(KeyCodeThree) && actors.length > 2) {
-            setPath(mouse, actors[2]);
-        }
-        if (p.keyIsDown(p.CONTROL) && actors.length > 0) {
-            setPath(mouse, actors[0]);
+        const actor = selectedActor();
+        if (p.keyIsDown(p.CONTROL) && actor) {
+            setPath(mouse, actor);
         }
     }
 };

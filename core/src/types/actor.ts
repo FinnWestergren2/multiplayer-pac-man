@@ -1,11 +1,11 @@
 import { CoordPair } from "./coordPair"
 import { Direction } from "./direction"
-import { Input } from "./input"
 
 export type Actor = {
     ownerId: string;
     type: ActorType;
     status: ActorStatus;
+    id: string;
 };
 
 export type ActorStatus = {
