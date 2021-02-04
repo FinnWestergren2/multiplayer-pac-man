@@ -50,9 +50,9 @@ export default class Game {
 		if (this.selectedActor === actor.id) {
 			p.push();
 			p.strokeWeight(3);
-			p.stroke(`#${actor.ownerId.substr(0,6)}`); // arbitrary color just to keep track. eventually we should add preset colors
+			p.stroke(255); // arbitrary color just to keep track. eventually we should add preset colors
 			p.noFill();
-			p.ellipse(0, 0, actorSize + 7);
+			p.ellipse(0, 0, actorSize - 7);
 			p.pop();
 		}
 		this.drawPlayerId(p, actor.ownerId);

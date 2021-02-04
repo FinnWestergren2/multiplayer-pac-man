@@ -5,8 +5,8 @@ import { sendPlayerInput } from "../socket/clientExtensions";
 export const moveUnit = (actorId: string, destination: CoordPair) => {
 	const playerId = GameStore.getState().currentPlayer;
 	const origin = GameStore.getState().actorDict[actorId]?.status.location;
-
 	if (!origin || !playerId) return; // probably should do some error reporting or something someday
+	if (!GameStore.getState().actorOwnershipDict[playerId].includes(actorId)) return;
 	
 	const input: Input = {
 		type: InputType.MOVE_UNIT, 
