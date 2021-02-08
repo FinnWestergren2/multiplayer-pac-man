@@ -1,7 +1,8 @@
-import { gameStore, mapStore, SPEED_FACTOR } from '.';
+import { gameStore, mapStore, CELLS_PER_MILLISECOND } from '.';
 import { ActorStatus } from '../types/actor';
 import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from '../types';
 import { popActorPath, updateActorStatus } from '../ducks/gameState';
+import { getAverageFrameLength } from './frameManager';
 
 const idleStatus = (location: CoordPair) => {
     return {
@@ -14,7 +15,7 @@ export const updateActors = () => Object.keys(gameStore.getState().actorDict).fo
     const status = gameStore.getState().actorDict[actorId].status;
     const path = gameStore.getState().actorPathDict[actorId];
     if (path) {
-        const newStatus = moveActorAlongPath(SPEED_FACTOR, path, status, () => popActorPath(gameStore, actorId));
+        const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status, () => popActorPath(gameStore, actorId));
         updateActorStatus(gameStore, actorId, newStatus);
         return;
     }

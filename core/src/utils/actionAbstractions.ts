@@ -1,4 +1,4 @@
-import { GameStore, StampedInput, UPDATE_FREQUENCY, SPEED_FACTOR, popActorPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus, addPlayer } from "..";
+import { GameStore, StampedInput, getUpdateFrequency, CELLS_PER_MILLISECOND, popActorPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus, addPlayer } from "..";
 import { addActor } from "../ducks";
 import { BFS, moveActorAlongPath } from "../game/actorUpdater";
 import { ActorType, CoordPairUtils, InputType } from "../types";
@@ -10,8 +10,8 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
             if (!actorStatus) return;
 
             const path = BFS(stampedInput.input.origin, stampedInput.input.destination);
-            const frameDiff = stampedInput.timeAgo * UPDATE_FREQUENCY;
-            const distTravelled = SPEED_FACTOR * frameDiff;
+            const frameDiff = stampedInput.timeAgo * getUpdateFrequency();
+            const distTravelled = CELLS_PER_MILLISECOND * frameDiff;
             const newStatus = moveActorAlongPath(
                 distTravelled, 
                 path, 
