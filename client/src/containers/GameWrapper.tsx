@@ -5,11 +5,12 @@ import styled from "@emotion/styled";
 import { createStore } from "redux";
 import initializeSocket from "../socket";
 import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
-import { mapStateReducer, gameStateReducer, runGame, CoordPairUtils, ActorType } from "core";
-import Slider from "../components/Slider";
-import ControllerGrid from "../components/ControllerGrid";
-import DebugButton from "../components/DebugButton";
+import { mapStateReducer, gameStateReducer, runGame, CoordPairUtils, ActorType, getUpdateFrequency } from "core";
+import Slider from "../debugComponents/DebugSlider";
+import ControllerGrid from "../debugComponents/ControllerGrid";
+import DebugButton from "../debugComponents/DebugButton";
 import { createUnit } from "../utils/clientActions";
+import DebugIndicator from "../debugComponents/DebugIndicator";
 
 const FlexContainer = styled.div`
     display: flex;
@@ -51,7 +52,11 @@ const GameWrapper: FunctionComponent = () => {
                 <DebugButton 
                     onClick={() => createUnit(CoordPairUtils.zeroPair, ActorType.MINER)}
                     label="add miner" />
-            </ControllerGrid>1
+                <DebugIndicator 
+                    label='UPS'
+                    timer={2000}
+                    update={() => Math.floor(getUpdateFrequency() * 1000)} />
+            </ControllerGrid>
         </FlexContainer>
     );
 };

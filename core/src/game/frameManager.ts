@@ -23,4 +23,4 @@ export const updateFrameManager = () => {
     frameCounter++;
 };
 
-export const getAverageFrameLength = () => frameTracker.reduce((p, c) => p + c) * divisor;
+export const getAverageFrameLength = () => frameTracker ? frameTracker.reduce((p, c) => p + c) * divisor : IDEAL_FRAME_LENGTH;

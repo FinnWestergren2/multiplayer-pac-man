@@ -18,4 +18,6 @@ export default function sketch(p: p5): void {
 		game.draw(p);
 	};
 
+	p.frameRate(50);
+
 }

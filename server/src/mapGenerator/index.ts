@@ -2,7 +2,7 @@ import Stack from "./Stack"
 import { CoordPair, Direction, CoordPairUtils, DirectionUtils,  MapResponse } from "core"
 
 export const generateMapUsingRandomDFS: () => MapResponse = () => {
-    const dimensions: CoordPair = { x: 16, y: 16 }
+    const dimensions: CoordPair = { x: 7, y: 7 }
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
     const start: CoordPair = CoordPairUtils.randomPair(dimensions);
     const { mapCells, visited } = emptyMap(dimensions);

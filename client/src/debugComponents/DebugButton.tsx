@@ -12,7 +12,11 @@ const StyledButton = styled.button`
     grid-column-start: 1;
     grid-column-end: 2;
 `;
-
+const Spacer = styled.div`
+    height: 2em;
+    grid-column-start: 2;
+    grid-column-end: 3;
+`
 const Button: FunctionComponent<Props> = ({
     onClick,
     label
@@ -24,6 +28,7 @@ const Button: FunctionComponent<Props> = ({
                 e.preventDefault(); 
                 onClick();
             }}>{label}</StyledButton>
+            <Spacer/>
         </>
     );
 };
