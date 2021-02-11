@@ -1,11 +1,11 @@
 import Stack from "./Stack"
-import { CoordPair, Direction, CoordPairUtils, DirectionUtils,  MapResponse } from "core"
+import { CoordPair, Direction, CoordPairUtils, DirectionUtils,  MapResponse, CellModifier } from "core"
 
 export const generateMapUsingRandomDFS: () => MapResponse = () => {
     const dimensions: CoordPair = { x: 7, y: 7 }
     const stack: Stack<CoordPair> = new Stack<CoordPair>();
     const start: CoordPair = CoordPairUtils.randomPair(dimensions);
-    const { mapCells, visited } = emptyMap(dimensions);
+    const { mapCells, cellModifiers, visited } = emptyMap(dimensions);
     const withinDimensions = (cell: CoordPair) => cell.x >= 0 && cell.y >= 0 && cell.x < dimensions.x && cell.y < dimensions.y;
     let deepestNode: { depth: number; cell: CoordPair; } = { depth: 0, cell: start }
     const push = (cell: CoordPair) => {
@@ -34,7 +34,8 @@ export const generateMapUsingRandomDFS: () => MapResponse = () => {
         destroyWall(currentCell, dir, mapCells);
         push(nextCell);
     }
-    return mapCells;
+    cellModifiers[0][2] = CellModifier.MINE; 
+    return {cells: mapCells, cellModifiers};
 }
 
 export const emptyMap = (dimensions: CoordPair) => {
@@ -48,7 +49,10 @@ export const emptyMap = (dimensions: CoordPair) => {
             yield Array.from(emptyRow(dimensions.x));
         }
     }
-    return { mapCells: Array.from(fillEmptyMap<Direction>(Direction.NONE)), visited: Array.from(fillEmptyMap<boolean>(false)) }
+    return { 
+        mapCells: Array.from(fillEmptyMap<Direction>(Direction.NONE)), 
+        cellModifiers: Array.from(fillEmptyMap<CellModifier>(CellModifier.NONE)), 
+        visited: Array.from(fillEmptyMap<boolean>(false)) }
 }
 
 export const getAdjacentCell = (current: CoordPair, dir: Direction) => {

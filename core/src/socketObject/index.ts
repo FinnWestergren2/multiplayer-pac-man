@@ -1,4 +1,5 @@
 import { Direction, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, GameState } from "../types"
+import { CellModifier } from "../types/cellModifier"
 
 export enum MessageType {
     INIT_PLAYER = "INIT_PLAYER",
@@ -10,7 +11,7 @@ export enum MessageType {
     ADD_PLAYER = "ADD_PLAYER",
     ADD_ACTOR = "ADD_ACTOR",
     REMOVE_PLAYER = "REMOVE_PLAYER",
-    REMOVE_UNIT = "REMOVE_UNIT",
+    REMOVE_ACTOR = "REMOVE_ACTOR",
     INVALID = "INVALID",
     CLIENT_PERCEPTION_UPDATE = "CLIENT_PERCEPTION_UPDATE",
     STATE_OVERRIDE = "STATE_OVERRIDE",
@@ -38,4 +39,8 @@ export type ServerMessage =
     { type: MessageType.STATE_CORRECTION, payload: { soft:  Dictionary<CoordPair>, hard: Dictionary<ActorStatus> } } |
     { type: MessageType.PLAYER_INPUT, payload: { playerId: string; input: StampedInput } }
 
-export type MapResponse = Direction[][];
+export type MapResponse = {
+    cells: Direction[][];
+    cellModifiers: CellModifier[][];
+}
+

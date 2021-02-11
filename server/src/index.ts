@@ -103,10 +103,10 @@ const addPlayerEverywhere = (playerId: string) => {
 
 const removePlayerEverywhere = (playerId: string) => {
 	removePlayer(GameStore, playerId);
-	writeToAllPlayers({ type: MessageType.REMOVE_PLAYER, payload: playerId }, 10);
 	socketList[playerId].end();
 	socketList[playerId].destroy();
 	delete socketList[playerId];
+	writeToAllPlayers({ type: MessageType.REMOVE_PLAYER, payload: playerId }, 10);
 }
 
 function parseBuffer(buffer: Buffer): ClientMessage | null | undefined {

@@ -1,8 +1,10 @@
+import { Reducer } from "redux";
 import { Direction, MapResponse } from "..";
 import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../types/redux";
 
 const initialState: MapState = {
     mapCells: [],
+    cellModifiers: [],
     appDimensions: {
         canvasHeight: 0,
         canvasWidth: 0
@@ -13,10 +15,10 @@ const initialState: MapState = {
     }
 };
 
-export const mapStateReducer = (state: MapState = initialState, action: MapStateAction) => {
+export const mapStateReducer: Reducer<MapState, MapStateAction>  = (state: MapState = initialState, action: MapStateAction) => {
     switch (action.type) {
         case MapStateActionTypes.REFRESH_MAP:
-            return { ...state, mapCells: action.payload };
+            return { ...state, mapCells: action.payload.cells, cellModifiers: action.payload.cellModifiers };
         case MapStateActionTypes.UPDATE_APP_DIMENSIONS:
             return { ...state, appDimensions: action.payload };
         case MapStateActionTypes.UPDATE_CELL_DIMENSIONS:
@@ -28,7 +30,7 @@ export const mapStateReducer = (state: MapState = initialState, action: MapState
 
 export const refreshMap = (store: MapStore, mapResponse: MapResponse) => {
     store.dispatch({ type: MapStateActionTypes.REFRESH_MAP, payload: mapResponse });
-    store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse, store.getState().appDimensions) });
+    store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse.cells, store.getState().appDimensions) });
 };
 
 export const updateAppDimensions = (store: MapStore, width: number, height: number) => {
@@ -39,7 +41,6 @@ export const updateAppDimensions = (store: MapStore, width: number, height: numb
 };
 
 const generateCellDimensions = (data: Direction[][], appDimensions: AppDimensions) => {
-
     const size = Math.min(
         (appDimensions.canvasWidth - 1) / Math.max(...(data.map(r => r.length))),
         (appDimensions.canvasHeight - 1) / data.length);

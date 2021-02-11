@@ -6,7 +6,7 @@
 	],
 	"settings": {
 		"files.exclude": {
-			"*/static": true,
+			"*/static": false,
 			"*/node_modules": true,
 			".git*": false,
 			"*.cmd": false,

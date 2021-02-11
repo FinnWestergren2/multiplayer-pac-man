@@ -44,7 +44,7 @@ export const gameStateReducer: Reducer<GameState, GameStateAction> = (state: Gam
             delete draft.actorOwnershipDict[action.payload];
             draft.playerList = draft.playerList.filter(p => p != action.payload);
             break;
-        case GameStateActionTypes.REMOVE_UNIT:
+        case GameStateActionTypes.REMOVE_ACTOR:
             const obj = draft.actorDict[action.payload];
             draft.actorOwnershipDict[obj.ownerId] = draft.actorOwnershipDict[obj.ownerId].filter(o => o != action.payload); 
             break;
