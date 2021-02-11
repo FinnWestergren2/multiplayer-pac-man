@@ -78,7 +78,7 @@ export const getCurrentMap: () => MapResponse = () => {
         refreshMap(MapStore, newMap);
         return newMap;
     }
-    return MapStore.getState().mapCells;
+    return { cells: MapStore.getState().mapCells, cellModifiers: MapStore.getState().cellModifiers };
 };
 
 const getPerceptionUpdate: (locationMap: { [actorId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
