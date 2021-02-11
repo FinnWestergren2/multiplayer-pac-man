@@ -27,7 +27,7 @@ export default class Game {
 		this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
 		const mapCells = MapStore.getState().mapCells;
 		this.cells = mapCells.map((row: Direction[], y: number) =>
-			row.map((column: Direction, x) => new Cell(column, x, y))
+			row.map((column: Direction, x) => new Cell(x, y))
 		);
 	};
 

@@ -1,9 +1,9 @@
 import * as p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { CoordPair, Direction, DirectionUtils } from "core";
+import { CellModifier, CoordPair, Direction, DirectionUtils } from "core";
 
 export default class Cell {
-    public cellType: Direction;
+    private cellModifier: CellModifier;
     private gridCoords: CoordPair;
     private location: CoordPair;
     private halfSize: number;
@@ -13,8 +13,9 @@ export default class Cell {
     private left: boolean;
     private right: boolean;
 
-    public constructor(cellType: Direction, x: number, y: number) {
-        this.cellType = cellType;
+    public constructor(x: number, y: number) {
+        const cellType = MapStore.getState().mapCells[y][x];
+        this.cellModifier = MapStore.getState().cellModifiers[y][x];
         this.gridCoords = { x, y };
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
@@ -28,8 +29,10 @@ export default class Cell {
     public draw: (p: p5) => void = (p) => {
         p.push();
         p.translate(this.location.x, this.location.y);
-        this.drawDebugText(p);
+        p.textAlign("center", "center");
+        // this.drawDebugText(p);
         this.drawWalls(p);
+        this.drawModifier(p)
         if (this.withinBounds(p.mouseX, p.mouseY)){
             p.fill(255, 0, 0, 20);
             p.noStroke();
@@ -39,7 +42,6 @@ export default class Cell {
     }
 
     private drawDebugText(p: p5) {
-        p.textAlign("center", "center");
         p.text(`(${this.gridCoords.x}, ${this.gridCoords.y})`, 0, 0);
     }
 
@@ -58,6 +60,12 @@ export default class Cell {
 
         if (!this.left) {
             p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize);
+        }
+    }
+
+    private drawModifier = (p: p5) => {
+        if (this.cellModifier === CellModifier.MINE) {
+            p.text("MINE", 0 , 0);
         }
     }
 
