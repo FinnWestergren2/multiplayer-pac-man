@@ -1,6 +1,6 @@
 import * as p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { CellModifier, CoordPair, Direction, DirectionUtils } from "core";
+import { CellModifier, CoordPair, Direction, DirectionUtils, MapNode } from "core";
 
 export default class Cell {
     private cellModifier: CellModifier;
@@ -8,22 +8,17 @@ export default class Cell {
     private location: CoordPair;
     private halfSize: number;
     private cellSize: number;
-    private up: boolean;
-    private down: boolean;
-    private left: boolean;
-    private right: boolean;
+    private cellType: Direction;
+    private node: MapNode | null;
 
-    public constructor(x: number, y: number) {
-        const cellType = MapStore.getState().mapCells[y][x];
+    public constructor(x: number, y: number, node: MapNode | null) {
+        this.cellType = MapStore.getState().mapCells[y][x];
         this.cellModifier = MapStore.getState().cellModifiers[y][x];
         this.gridCoords = { x, y };
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
-        this.up = DirectionUtils.isUp(cellType);
-        this.down = DirectionUtils.isDown(cellType);
-        this.left = DirectionUtils.isLeft(cellType);
-        this.right = DirectionUtils.isRight(cellType);
+        this.node = node;
     }
 
     public draw: (p: p5) => void = (p) => {
@@ -31,6 +26,7 @@ export default class Cell {
         p.translate(this.location.x, this.location.y);
         p.textAlign("center", "center");
         // this.drawDebugText(p);
+        this.drawDebugNodeOverlay(p);
         this.drawWalls(p);
         this.drawModifier(p)
         if (this.withinBounds(p.mouseX, p.mouseY)){
@@ -45,20 +41,26 @@ export default class Cell {
         p.text(`(${this.gridCoords.x}, ${this.gridCoords.y})`, 0, 0);
     }
 
-    private drawWalls: (p: p5) => void = (p) => {
-        if (!this.down) {
-            p.line(-this.halfSize, this.halfSize, this.halfSize, this.halfSize);
+    private drawDebugNodeOverlay(p: p5) {
+        if (this.node !== null) {
+            p.ellipse(0, 0, this.halfSize * 0.5);
         }
+    }
 
-        if (!this.up) {
+    private drawWalls: (p: p5) => void = (p) => {
+        if (!DirectionUtils.isUp(this.cellType)) {
             p.line(-this.halfSize, -this.halfSize, this.halfSize, -this.halfSize);
         }
 
-        if (!this.right) {
+        if (!DirectionUtils.isRight(this.cellType)) {
             p.line(this.halfSize, -this.halfSize, this.halfSize, this.halfSize);
         }
 
-        if (!this.left) {
+        if (!DirectionUtils.isDown(this.cellType)) {
+            p.line(-this.halfSize, this.halfSize, this.halfSize, this.halfSize);
+        }
+
+        if (!DirectionUtils.isLeft(this.cellType)) {
             p.line(-this.halfSize, -this.halfSize, -this.halfSize, this.halfSize);
         }
     }

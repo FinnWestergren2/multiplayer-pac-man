@@ -81,6 +81,12 @@ const getOpposite = (dir: Direction) => {
     }
 };
 
+const isAJunction = (dir: Direction) => {
+    const isHorizontalThroughpass = isRight(dir) && isLeft(dir) && !isUp(dir) && !isDown(dir);
+    const isVerticalThroughpass = !isRight(dir) && !isLeft(dir) && isUp(dir) && isDown(dir);
+    return !(isHorizontalThroughpass || isVerticalThroughpass)
+}
+
 export const DirectionUtils = {  
     isUp,
     isDown,
@@ -89,5 +95,6 @@ export const DirectionUtils = {
     getString,
     randomSingleDirection,
     rotateClockwise,
-    getOpposite
+    getOpposite,
+    isAJunction
 };
