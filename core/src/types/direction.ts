@@ -87,6 +87,8 @@ const isAJunction = (dir: Direction) => {
     return !(isHorizontalThroughpass || isVerticalThroughpass)
 }
 
+const containsDirection = (dir: Direction, match: Direction) => match === (match & dir)
+
 export const DirectionUtils = {  
     isUp,
     isDown,
@@ -96,5 +98,6 @@ export const DirectionUtils = {
     randomSingleDirection,
     rotateClockwise,
     getOpposite,
-    isAJunction
+    isAJunction,
+    containsDirection
 };
