@@ -137,28 +137,25 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     return output.reverse();
 }
 
+// this pathing method takes up around 22% less memory in redux than the pathing method above. More on maps with long corridors, less on maps with a lot of junctions.
 export const BFSWithNodes: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
     const startCell = CoordPairUtils.roundedPair(startFloat);
     if (CoordPairUtils.equalPairs(startCell, endCell)){
         return [startCell];
     }
-    const junctions = junctionSelector(mapStore.getState()).map(row => [...row]);
+    const junctions = junctionSelector(mapStore.getState()).map(row => [...row]); // we need to copy here because the tie Nodes function
     const startNode = new MapNode(startCell.x, startCell.y);
     const endNode = new MapNode(endCell.x, endCell.y);
+    junctions[startNode.y].splice(startNode.x, 1, startNode);
+    junctions[endNode.y].splice(endNode.x, 1, endNode);
     tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
     tieAllNodes(endNode, junctions, mapStore.getState().mapCells[endCell.y][endCell.x]);
     let queue = [startNode];
     const visitedTable: { isVisited: boolean, parentNode: MapNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentNode: null }} ));
     let popIndex = 0;
 
-    while (true) {
-        if (popIndex >= queue.length) {
-            return [];
-        }
+    while (!CoordPairUtils.equalPairs({ x: queue[popIndex].x, y: queue[popIndex].y }, endCell)) {
         const currentNode = queue[popIndex];
-        if (CoordPairUtils.equalPairs({ x: currentNode.x, y: currentNode.y }, endCell)) {
-            break;
-        }
         const neighbors: MapNode[] = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
         neighbors.forEach(n => {
             visitedTable[n.y][n.x].isVisited = true;

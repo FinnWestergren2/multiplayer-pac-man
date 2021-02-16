@@ -66,5 +66,4 @@ export const tieAllNodes = (node: MapNode, nodeMap: (MapNode | null)[][], cell: 
     if (DirectionUtils.isRight(cell)) {
         node.TieNeighbor(findRightNode(node.x, node.y, nodeMap), Direction.RIGHT);
     }
-    nodeMap[node.y].splice(node.x, 1, node);
 }
