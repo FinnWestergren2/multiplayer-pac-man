@@ -138,35 +138,40 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
 }
 
 // this pathing method takes up around 22% less memory in redux than the pathing method above. More on maps with long corridors, less on maps with a lot of junctions.
-export const BFSWithNodes: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
-    const startCell = CoordPairUtils.roundedPair(startFloat);
-    if (CoordPairUtils.equalPairs(startCell, endCell)){
-        return [startCell];
-    }
-    const junctions = junctionSelector(mapStore.getState()).map(row => [...row]); // we need to copy here because the tie Nodes function
+export const BFSWithNodes: (startCell: CoordPair, endCell: CoordPair) => CoordPair[] = (startCell, endCell) => {
+    const junctions = junctionSelector(mapStore.getState()); // we need to copy here because we add temporary nodes to solve
     const startNode = new MapNode(startCell.x, startCell.y);
-    const endNode = new MapNode(endCell.x, endCell.y);
-    junctions[startNode.y].splice(startNode.x, 1, startNode);
-    junctions[endNode.y].splice(endNode.x, 1, endNode);
     tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
-    tieAllNodes(endNode, junctions, mapStore.getState().mapCells[endCell.y][endCell.x]);
-    let queue = [startNode];
+    const queue = [startNode];
     const visitedTable: { isVisited: boolean, parentNode: MapNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentNode: null }} ));
-    let popIndex = 0;
+    visitedTable[startCell.y][startCell.x].isVisited = true;
 
-    while (!CoordPairUtils.equalPairs({ x: queue[popIndex].x, y: queue[popIndex].y }, endCell)) {
-        const currentNode = queue[popIndex];
+    const checkForEndNode = (currentNode: MapNode, neighbor: MapNode) => {
+        if (currentNode.x === neighbor.x && endCell.x === currentNode.x) {
+            return (endCell.y > currentNode.y && endCell.y < neighbor.y) || (endCell.y < currentNode.y && endCell.y > neighbor.y)
+        }
+
+        if (currentNode.y === neighbor.y && endCell.y === currentNode.y) {
+            return (endCell.x > currentNode.x && endCell.x < neighbor.x) || (endCell.x < currentNode.x && endCell.x > neighbor.x)
+        }
+    }
+
+    while (queue.length > 0) {
+        const currentNode = queue.splice(0,1)[0];
         const neighbors: MapNode[] = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
         neighbors.forEach(n => {
             visitedTable[n.y][n.x].isVisited = true;
             visitedTable[n.y][n.x].parentNode = currentNode;
         });
-        queue = [...queue, ...neighbors];
-        popIndex++;
+        if (neighbors.some(n => checkForEndNode(currentNode, n))) {
+            visitedTable[endCell.y][endCell.x].parentNode = currentNode;
+            break;
+        }
+        queue.push(...neighbors);
     }
 
     // we reverse the list at the end
-    let output = [endCell]
+    let output = [endCell];
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
         const parent = visitedTable[currentCell.y][currentCell.x].parentNode as MapNode

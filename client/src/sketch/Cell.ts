@@ -4,7 +4,7 @@ import { CellModifier, CoordPair, Direction, DirectionUtils, junctionSelector, M
 
 export default class Cell {
     private cellModifier: CellModifier;
-    private gridCoords: CoordPair;
+    public gridCoords: CoordPair;
     private location: CoordPair;
     private halfSize: number;
     private cellSize: number;
@@ -70,7 +70,7 @@ export default class Cell {
         }
     }
 
-    private withinBounds = (x: number, y: number) => {
+    public withinBounds = (x: number, y: number) => {
         return (x > this.location.x - this.halfSize && 
         x < this.location.x + this.halfSize &&
         y > this.location.y - this.halfSize && 

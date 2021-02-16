@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { Actor, ActorType, Direction } from "core";
+import { Actor, ActorType, BFSWithNodes, CoordPair, CoordPairUtils, Direction, junctionSelector, MapNode } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
@@ -11,11 +11,11 @@ export default class Game {
 	private champSize: number = 0;
 	private currentPlayer?: string;
 	private selectedActor?: string
-	
+
 	public constructor(p: p5) {
-		MapStore.subscribe(() =>{
+		MapStore.subscribe(() => {
 			if (this.currentPlayer) {
-				bindHumanPlayer(p, this.currentPlayer, (actorId) => {this.selectedActor = actorId}, () => this.selectedActor);
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
 			}
 			this.initializeMap()
 		});
@@ -23,7 +23,7 @@ export default class Game {
 			const oldAssignment = this.currentPlayer;
 			this.currentPlayer = GameStore.getState().currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
-				bindHumanPlayer(p, this.currentPlayer, (actorId) => {this.selectedActor = actorId}, () => this.selectedActor);
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
 			}
 		});
 	}
@@ -38,9 +38,20 @@ export default class Game {
 
 	public draw = (p: p5) => {
 		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
+		let selectedActorLocation: CoordPair | undefined = undefined;
+		const drawStack:(() => void)[] = [];
 		Object.values(GameStore.getState().actorDict).forEach(actor => {
-			this.drawActor(p, actor);
+			if (actor.id === this.selectedActor) {
+				selectedActorLocation = actor.status.location;
+			}
+			drawStack.push(() => this.drawActor(p, actor));
 		});
+		const mousedOverCell = this.cells.flat().find(c => c.withinBounds(p.mouseX, p.mouseY))
+		if (mousedOverCell && selectedActorLocation) {
+			const path = BFSWithNodes(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
+			this.drawPath(p, path);
+		}
+		drawStack.forEach(d => d());
 	};
 
 	private drawActor = (p: p5, actor: Actor) => {
@@ -49,7 +60,7 @@ export default class Game {
 		p.push();
 		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
 		p.noStroke();
-		p.fill(`#${actor.ownerId.substr(0,6)}`); // arbitrary color just to keep track. eventually we should add preset colors
+		p.fill(`#${actor.ownerId.substr(0, 6)}`); // arbitrary color just to keep track. eventually we should add preset colors
 		const actorSize = actor.type === ActorType.CHAMPION ? this.champSize : this.champSize * 0.66
 		p.ellipse(0, 0, actorSize);
 		if (this.selectedActor === actor.id) {
@@ -71,6 +82,42 @@ export default class Game {
 		p.fill(0);
 		p.textAlign(p.CENTER);
 		p.textSize(14);
-		p.text(playerId.substr(0,4), 0, 0);
+		p.text(playerId.substr(0, 4), 0, 0);
 	};
+
+	private drawPath = (p: p5, path: CoordPair[]) => {
+		const cellSize = MapStore.getState().cellDimensions.cellSize;
+		const center = (cell: CoordPair) => { return { x: cellSize * cell.x + cellSize * 0.5 , y: cellSize * cell.y + cellSize * 0.5 } }
+		path.forEach((cell, i) => {
+			if (i < path.length - 1) {
+				const a = center(cell);
+				const b = center(path[i + 1]);
+				p.line(a.x, a.y, b.x, b.y);
+			}
+		});
+	}
+
+	// private drawEdges = (p: p5) => {
+	// 	const cellSize = MapStore.getState().cellDimensions.cellSize;
+	// 	const center = (cell: CoordPair, index: number) => { return { x: cellSize * cell.x + cellSize * 0.5 + ((index % 2) * 5), y: cellSize * cell.y + cellSize * 0.5 + ((index % 2) * 5)} }
+	// 	const juncs = junctionSelector(MapStore.getState());
+	// 	const firstNode = juncs[0][0]
+	// 	const visitedTable: boolean[][] = juncs.map(row => row.map(() => false));
+	// 	visitedTable[0][0] = true;
+	// 	let queue = [firstNode!];
+	// 	let i = 0;
+	// 	while (queue.length > 0) {
+	// 		const currentNode = queue.splice(0,1)[0];
+	// 		const neighbors = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x]) as MapNode[];
+	// 		console.log(neighbors);
+	// 		neighbors.forEach(n => {
+	// 			visitedTable[n.y][n.x] = true;
+	// 			const a = center(currentNode, i);
+	// 			const b = center({x: n.x, y: n.y }, i + 1);
+	// 			p.line(a.x, a.y, b.x, b.y);
+	// 		});
+	// 		i++;
+	// 		queue.push(...neighbors);
+	// 	}
+	// };
 };

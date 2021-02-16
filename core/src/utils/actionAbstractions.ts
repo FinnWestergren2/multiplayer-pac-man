@@ -8,8 +8,12 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
         case InputType.MOVE_UNIT:
             const actorStatus = store.getState().actorDict[stampedInput.input.actorId]?.status;
             if (!actorStatus) return;
+            const startCell = CoordPairUtils.roundedPair(stampedInput.input.origin);
+            const endCell = stampedInput.input.destination;
             // const a = (new Date).getTime();
-            const path = BFSWithNodes(stampedInput.input.origin, stampedInput.input.destination);
+            const path = CoordPairUtils.equalPairs(startCell, endCell) 
+                ? [startCell]
+                : BFSWithNodes(startCell, endCell);
             // const b = (new Date).getTime();
             // const path2 = BFS(stampedInput.input.origin, stampedInput.input.destination);
             // const c = (new Date).getTime();

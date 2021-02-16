@@ -53,17 +53,17 @@ const findRightNode = (x: number, y: number, nodeMap: (MapNode | null)[][]) => {
     return null;
 }
 
-export const tieAllNodes = (node: MapNode, nodeMap: (MapNode | null)[][], cell: Direction) => {
+export const tieAllNodes = (node: MapNode, nodeMap: (MapNode | null)[][], cell: Direction, bothWays: boolean = false) => {
     if (DirectionUtils.isLeft(cell)) {
-        node.TieNeighbor(findLeftNode(node.x, node.y, nodeMap), Direction.LEFT);
+        node.TieNeighbor(findLeftNode(node.x, node.y, nodeMap), Direction.LEFT, bothWays);
     }
     if (DirectionUtils.isUp(cell)) {
-        node.TieNeighbor(findUpNode(node.x, node.y, nodeMap), Direction.UP);
+        node.TieNeighbor(findUpNode(node.x, node.y, nodeMap), Direction.UP, bothWays);
     }
     if (DirectionUtils.isDown(cell)) {
-        node.TieNeighbor(findDownNode(node.x, node.y, nodeMap), Direction.DOWN);
+        node.TieNeighbor(findDownNode(node.x, node.y, nodeMap), Direction.DOWN, bothWays);
     }
     if (DirectionUtils.isRight(cell)) {
-        node.TieNeighbor(findRightNode(node.x, node.y, nodeMap), Direction.RIGHT);
+        node.TieNeighbor(findRightNode(node.x, node.y, nodeMap), Direction.RIGHT, bothWays);
     }
 }
