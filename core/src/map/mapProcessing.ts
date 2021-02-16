@@ -2,6 +2,7 @@ import { Direction, DirectionUtils } from "../types/direction";
 import MapNode from "./mapNode";
 
 export const preProcessMap = (cells: Direction[][]) => {
+    console.log('processing map');
     const [height, width] = [cells.length, cells[0].length];
     const nodesSoFar: (MapNode | null)[][] = [];
     for (let y = 0; y < height; y++) {

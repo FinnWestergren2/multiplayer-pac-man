@@ -1,6 +1,6 @@
 import * as p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
-import { CellModifier, CoordPair, Direction, DirectionUtils, MapNode } from "core";
+import { CellModifier, CoordPair, Direction, DirectionUtils, junctionSelector, MapNode } from "core";
 
 export default class Cell {
     private cellModifier: CellModifier;
@@ -9,16 +9,14 @@ export default class Cell {
     private halfSize: number;
     private cellSize: number;
     private cellType: Direction;
-    private node: MapNode | null;
 
-    public constructor(x: number, y: number, node: MapNode | null) {
+    public constructor(x: number, y: number) {
         this.cellType = MapStore.getState().mapCells[y][x];
         this.cellModifier = MapStore.getState().cellModifiers[y][x];
         this.gridCoords = { x, y };
         this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = { x: (this.halfSize + x * this.cellSize), y: (this.halfSize + y * this.cellSize) };
-        this.node = node;
     }
 
     public draw: (p: p5) => void = (p) => {
@@ -42,7 +40,8 @@ export default class Cell {
     }
 
     private drawDebugNodeOverlay(p: p5) {
-        if (this.node !== null) {
+        const juncs = junctionSelector(MapStore.getState());
+        if (juncs && juncs[this.gridCoords.y] && juncs[this.gridCoords.y][this.gridCoords.x]) {
             p.ellipse(0, 0, this.halfSize * 0.5);
         }
     }

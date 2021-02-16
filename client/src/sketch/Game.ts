@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { Actor, ActorType, Direction, MapNode, preProcessMap } from "core";
+import { Actor, ActorType, Direction } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
@@ -26,9 +26,8 @@ export default class Game {
 	private initializeMap = () => {
 		this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
 		const mapCells = MapStore.getState().mapCells;
-		const nodes = preProcessMap(mapCells);
 		this.cells = mapCells.map((row: Direction[], y: number) =>
-			row.map((column: Direction, x) => new Cell(x, y, nodes[y][x]))
+			row.map((column: Direction, x) => new Cell(x, y))
 		);
 	};
 
