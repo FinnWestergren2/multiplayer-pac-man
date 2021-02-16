@@ -3,6 +3,8 @@ import { ActorStatus } from '../types/actor';
 import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from '../types';
 import { popActorPath, updateActorStatus } from '../ducks/gameState';
 import { getAverageFrameLength } from './frameManager';
+import { junctionSelector, MapNode } from '../map';
+import { tieAllNodes } from '../map/mapProcessing';
 
 const idleStatus = (location: CoordPair) => {
     return {
@@ -83,33 +85,33 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     }
     let queue = [startCell];
     let popIndex = 0;
-    const mapCells = mapStore.getState().mapCells.map(row => row.map(col => { return { dir: col, isVisited: false, parentCell: {x: -1, y: -1}, depth: 0 }} ));
-    mapCells[startCell.y][startCell.x].isVisited = true;
+    const visitedTable = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentCell: {x: -1, y: -1}}} ));
+    visitedTable[startCell.y][startCell.x].isVisited = true;
 
     const getAllBranches = (location: CoordPair) => {
         const branches: CoordPair[] = []
         const x = Math.floor(location.x);
         const y = Math.floor(location.y);
-        const directions = mapCells[y][x].dir;
-        if (mapCells[y + 1] && mapCells[y + 1][x] && DirectionUtils.isDown(directions) && !mapCells[y + 1][x].isVisited){
+        const directions = mapStore.getState().mapCells[y][x];
+        if (visitedTable[y + 1] && visitedTable[y + 1][x] && DirectionUtils.isDown(directions) && !visitedTable[y + 1][x].isVisited){
             branches.push({x: x, y: y + 1});
-            mapCells[y + 1][x].isVisited = true;
-            mapCells[y + 1][x].parentCell = location;
+            visitedTable[y + 1][x].isVisited = true;
+            visitedTable[y + 1][x].parentCell = location;
         }
-        if (mapCells[y - 1] && mapCells[y - 1][x] && DirectionUtils.isUp(directions) && !mapCells[y - 1][x].isVisited){
+        if (visitedTable[y - 1] && visitedTable[y - 1][x] && DirectionUtils.isUp(directions) && !visitedTable[y - 1][x].isVisited){
             branches.push({x: x, y: y - 1});
-            mapCells[y - 1][x].isVisited = true;
-            mapCells[y - 1][x].parentCell = location;
+            visitedTable[y - 1][x].isVisited = true;
+            visitedTable[y - 1][x].parentCell = location;
         }
-        if (mapCells[y] && mapCells[y][x + 1] && DirectionUtils.isRight(directions) && !mapCells[y][x + 1].isVisited){
+        if (visitedTable[y] && visitedTable[y][x + 1] && DirectionUtils.isRight(directions) && !visitedTable[y][x + 1].isVisited){
             branches.push({x: x + 1, y: y});
-            mapCells[y][x + 1].isVisited = true;
-            mapCells[y][x + 1].parentCell = location;
+            visitedTable[y][x + 1].isVisited = true;
+            visitedTable[y][x + 1].parentCell = location;
         }
-        if (mapCells[y] && mapCells[y][x - 1] && DirectionUtils.isLeft(directions) && !mapCells[y][x - 1].isVisited){
+        if (visitedTable[y] && visitedTable[y][x - 1] && DirectionUtils.isLeft(directions) && !visitedTable[y][x - 1].isVisited){
             branches.push({x: x - 1, y: y});
-            mapCells[y][x - 1].isVisited = true;
-            mapCells[y][x - 1].parentCell = location;
+            visitedTable[y][x - 1].isVisited = true;
+            visitedTable[y][x - 1].parentCell = location;
         }
         return branches;
     }
@@ -130,7 +132,48 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     let output = [endCell]
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
-        output = [...output, mapCells[currentCell.y][currentCell.x].parentCell];
+        output = [...output, visitedTable[currentCell.y][currentCell.x].parentCell];
+    }
+    return output.reverse();
+}
+
+export const BFSWithNodes: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (startFloat, endCell) => {
+    const startCell = CoordPairUtils.roundedPair(startFloat);
+    if (CoordPairUtils.equalPairs(startCell, endCell)){
+        return [startCell];
+    }
+    const junctions = junctionSelector(mapStore.getState()).map(row => [...row]);
+    const startNode = new MapNode(startCell.x, startCell.y);
+    const endNode = new MapNode(endCell.x, endCell.y);
+    tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
+    tieAllNodes(endNode, junctions, mapStore.getState().mapCells[endCell.y][endCell.x]);
+    let queue = [startNode];
+    const visitedTable: { isVisited: boolean, parentNode: MapNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentNode: null }} ));
+    let popIndex = 0;
+
+    while (true) {
+        if (popIndex >= queue.length) {
+            return [];
+        }
+        const currentNode = queue[popIndex];
+        if (CoordPairUtils.equalPairs({ x: currentNode.x, y: currentNode.y }, endCell)) {
+            break;
+        }
+        const neighbors: MapNode[] = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
+        neighbors.forEach(n => {
+            visitedTable[n.y][n.x].isVisited = true;
+            visitedTable[n.y][n.x].parentNode = currentNode;
+        });
+        queue = [...queue, ...neighbors];
+        popIndex++;
+    }
+
+    // we reverse the list at the end
+    let output = [endCell]
+    while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
+        const currentCell = output[output.length - 1];
+        const parent = visitedTable[currentCell.y][currentCell.x].parentNode as MapNode
+        output = [...output, { x: parent.x, y: parent.y }];
     }
     return output.reverse();
 }

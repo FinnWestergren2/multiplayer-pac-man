@@ -13,7 +13,12 @@ export default class Game {
 	private selectedActor?: string
 	
 	public constructor(p: p5) {
-		MapStore.subscribe(() => this.initializeMap());
+		MapStore.subscribe(() =>{
+			if (this.currentPlayer) {
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => {this.selectedActor = actorId}, () => this.selectedActor);
+			}
+			this.initializeMap()
+		});
 		GameStore.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
 			this.currentPlayer = GameStore.getState().currentPlayer;

@@ -1,6 +1,6 @@
 import { GameStore, StampedInput, getUpdateFrequency, CELLS_PER_MILLISECOND, popActorPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus, addPlayer } from "..";
 import { addActor } from "../ducks";
-import { BFS, moveActorAlongPath } from "../game/actorUpdater";
+import { BFS, BFSWithNodes, moveActorAlongPath } from "../game/actorUpdater";
 import { ActorType, CoordPairUtils, InputType } from "../types";
 
 export const handlePlayerInput = (store: GameStore, playerId: string, stampedInput: StampedInput) => {
@@ -8,8 +8,15 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
         case InputType.MOVE_UNIT:
             const actorStatus = store.getState().actorDict[stampedInput.input.actorId]?.status;
             if (!actorStatus) return;
-
-            const path = BFS(stampedInput.input.origin, stampedInput.input.destination);
+            const a = (new Date).getTime();
+            const path = BFSWithNodes(stampedInput.input.origin, stampedInput.input.destination);
+            const b = (new Date).getTime();
+            const path2 = BFS(stampedInput.input.origin, stampedInput.input.destination);
+            const c = (new Date).getTime();
+            console.log('time diff with nodes', (c - b) - (b - a) )
+            const memA = JSON.stringify(path).length;
+            const memB = JSON.stringify(path2).length
+            console.log('mem diff with nodes', memB - memA, (memB - memA) / memB)
             const frameDiff = stampedInput.timeAgo * getUpdateFrequency();
             const distTravelled = CELLS_PER_MILLISECOND * frameDiff;
             const newStatus = moveActorAlongPath(

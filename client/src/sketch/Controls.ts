@@ -10,6 +10,9 @@ const KeyCodeThree = 51;
 export const bindHumanPlayer = (p: p5, playerId: string, selectActor: (actorId?: string) => void, selectedActor: () => string | undefined) => {
     const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
     const cells = MapStore.getState().mapCells;
+    if (!cells || cells.length === 0) {
+        return;
+    }
     const max_y = cells.length, max_x = cells[0].length;
     const actors = GameStore.getState().actorOwnershipDict[playerId];
 

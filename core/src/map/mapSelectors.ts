@@ -6,5 +6,5 @@ const mapCellsSelector = (state: MapState) => state.mapCells
 
 export const junctionSelector = createSelector(
     mapCellsSelector,
-    (cells: Direction[][]) => { console.log(cells[0]); return preProcessMap(cells); }
+    preProcessMap
 );

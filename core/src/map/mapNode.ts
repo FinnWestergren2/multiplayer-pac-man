@@ -1,11 +1,11 @@
 import { Direction, DirectionUtils } from "../types";
 
 export default class MapNode {
-    public neighbors:  (MapNode | null) [] = new Array(4).fill(null); // 0 = UP, 1 = RIGHT, 2 = DOWN, 3 = LEFT
+    public neighbors: (MapNode | null)[] = new Array(4).fill(null); // 0 = UP, 1 = RIGHT, 2 = DOWN, 3 = LEFT
     public x: number;
     public y: number;
-    
-    public constructor (x: number, y: number) {
+
+    public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -31,6 +31,15 @@ export default class MapNode {
 
         if (otherNode !== null && bothWays) {
             otherNode.TieNeighbor(this, DirectionUtils.getOpposite(dir), false);
+        }
+    }
+
+    public GetNeighbor = (dir: Direction) => {
+        switch (dir) {
+            case Direction.UP: return this.neighbors[0];
+            case Direction.RIGHT: return this.neighbors[1];
+            case Direction.DOWN: return this.neighbors[2];
+            case Direction.LEFT: return this.neighbors[3];
         }
     }
 }
