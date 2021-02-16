@@ -56,6 +56,10 @@ const GameWrapper: FunctionComponent = () => {
                     label='UPS'
                     timer={2000}
                     update={() => Math.floor(getUpdateFrequency() * 1000)} />
+                <DebugIndicator 
+                    label='State'
+                    timer={2000}
+                    update={() => JSON.stringify(GameStore.getState())} />
             </ControllerGrid>
         </FlexContainer>
     );

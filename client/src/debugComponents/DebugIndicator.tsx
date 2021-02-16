@@ -8,26 +8,25 @@ type Props = {
     update: () => string | number;
 };
 
+const StyledKey = styled.div`
+    height: min-content;
+    grid-column-start: 1;
+    grid-column-end: 2;
+` 
+
+const StyledVal = styled.div`
+    height: min-content;
+    grid-column-start: 2;
+    grid-column-end: 3;
+` 
+
 const DebugIndicator: FunctionComponent<Props> = ({ label, update, timer, className }) => {
     const [value, setValue] = useState(update());
     window.setInterval(() => setValue(update()), timer ?? 1000)
-    return (<div className={className}>
-        <div className="key">{label}</div>
-        <div className="value">{value}</div>
-    </div>)
+    return (<>
+        <StyledKey>{label}</StyledKey>
+        <StyledVal>{value}</StyledVal>
+    </>)
 }
 
-export default styled(DebugIndicator)`
-    height: min-content;
-    display: grid;
-    .key {
-        height: min-content;
-        grid-column-start: 1;
-        grid-column-end: 2;
-    }
-    .value {
-        height: min-content;
-        grid-column-start: 2;
-        grid-column-end: 3;
-    }
-`;
+export default DebugIndicator;
