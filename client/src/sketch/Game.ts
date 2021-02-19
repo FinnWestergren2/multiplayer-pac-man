@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { Actor, ActorType, BFSWithNodes, CoordPair, CoordPairUtils, Direction, junctionSelector, MapNode } from "core";
+import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction, junctionSelector, MapNode } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.9;
@@ -48,7 +48,7 @@ export default class Game {
 		});
 		const mousedOverCell = this.cells.flat().find(c => c.withinBounds(p.mouseX, p.mouseY))
 		if (mousedOverCell && selectedActorLocation) {
-			const path = BFSWithNodes(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
+			const path = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
 			this.drawPath(p, path);
 		}
 		drawStack.forEach(d => d());
@@ -96,28 +96,4 @@ export default class Game {
 			}
 		});
 	}
-
-	// private drawEdges = (p: p5) => {
-	// 	const cellSize = MapStore.getState().cellDimensions.cellSize;
-	// 	const center = (cell: CoordPair, index: number) => { return { x: cellSize * cell.x + cellSize * 0.5 + ((index % 2) * 5), y: cellSize * cell.y + cellSize * 0.5 + ((index % 2) * 5)} }
-	// 	const juncs = junctionSelector(MapStore.getState());
-	// 	const firstNode = juncs[0][0]
-	// 	const visitedTable: boolean[][] = juncs.map(row => row.map(() => false));
-	// 	visitedTable[0][0] = true;
-	// 	let queue = [firstNode!];
-	// 	let i = 0;
-	// 	while (queue.length > 0) {
-	// 		const currentNode = queue.splice(0,1)[0];
-	// 		const neighbors = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x]) as MapNode[];
-	// 		console.log(neighbors);
-	// 		neighbors.forEach(n => {
-	// 			visitedTable[n.y][n.x] = true;
-	// 			const a = center(currentNode, i);
-	// 			const b = center({x: n.x, y: n.y }, i + 1);
-	// 			p.line(a.x, a.y, b.x, b.y);
-	// 		});
-	// 		i++;
-	// 		queue.push(...neighbors);
-	// 	}
-	// };
 };

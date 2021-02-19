@@ -5,6 +5,7 @@ import { popActorPath, updateActorStatus } from '../ducks/gameState';
 import { getAverageFrameLength } from './frameManager';
 import { junctionSelector, MapNode } from '../map';
 import { tieAllNodes } from '../map/mapProcessing';
+import PriorityQueue from '../utils/PriorityQueue';
 
 const idleStatus = (location: CoordPair) => {
     return {
@@ -27,12 +28,9 @@ export const updateActors = () => Object.keys(gameStore.getState().actorDict).fo
 });
 
 export const moveActorAlongPath: (dist: number, path: CoordPair[], status: ActorStatus, popPath: () => void) => ActorStatus = (dist, path, status, popPath) => {
-    if (dist === 0) {
-        return status;
-    }
-    if (path.length === 0) {
-        return idleStatus(status.location);
-    }
+    if (dist === 0) return status;
+    if (path.length === 0) return idleStatus(status.location);
+    
     path = checkCurrentPathStatus(status, path, popPath); 
     let nextLocation = CoordPairUtils.snappedPair(status.location);
     let nextDirection = status.direction;
@@ -137,12 +135,21 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     return output.reverse();
 }
 
-// this pathing method takes up around 22% less memory in redux than the pathing method above. More on maps with long corridors, less on maps with a lot of junctions.
-export const BFSWithNodes: (startCell: CoordPair, endCell: CoordPair) => CoordPair[] = (startCell, endCell) => {
+type WeightedNode = {
+    node: MapNode;
+    weight: number
+}
+
+const createdWeightedNode: (node: MapNode, weight: number) => WeightedNode = (node, weight) => {
+    return { node, weight }
+}
+
+export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => CoordPair[] = (startCell, endCell) => {
     const junctions = junctionSelector(mapStore.getState()); // we need to copy here because we add temporary nodes to solve
     const startNode = new MapNode(startCell.x, startCell.y);
     tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
-    const queue = [startNode];
+    const queue = new PriorityQueue<WeightedNode>((a, b) => a.weight > b.weight);
+    queue.push(createdWeightedNode(startNode, 0));
     const visitedTable: { isVisited: boolean, parentNode: MapNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentNode: null }} ));
     visitedTable[startCell.y][startCell.x].isVisited = true;
 
@@ -156,9 +163,9 @@ export const BFSWithNodes: (startCell: CoordPair, endCell: CoordPair) => CoordPa
         }
     }
 
-    while (queue.length > 0) {
-        const currentNode = queue.splice(0,1)[0];
-        const neighbors: MapNode[] = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
+    while (queue.size() > 0) {
+        const currentNode = queue.pop().node;
+        const neighbors = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
         neighbors.forEach(n => {
             visitedTable[n.y][n.x].isVisited = true;
             visitedTable[n.y][n.x].parentNode = currentNode;
@@ -167,7 +174,12 @@ export const BFSWithNodes: (startCell: CoordPair, endCell: CoordPair) => CoordPa
             visitedTable[endCell.y][endCell.x].parentNode = currentNode;
             break;
         }
-        queue.push(...neighbors);
+        const weightedNeighbors = neighbors.map(n => {
+            const location: CoordPair = { x: n.x, y: n.y };
+            const dist = CoordPairUtils.distDirect(location, { x: currentNode.x, y: currentNode.y });
+            return createdWeightedNode(n, dist)
+        });
+        queue.push(...weightedNeighbors);
     }
 
     // we reverse the list at the end

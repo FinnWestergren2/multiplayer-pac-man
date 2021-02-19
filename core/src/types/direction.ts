@@ -15,6 +15,10 @@ const isLeft: (dir: Direction) => boolean = dir =>
 const isRight: (dir: Direction) => boolean = dir =>
     Direction.RIGHT === (Direction.RIGHT & dir);
 
+const isMultipleDirections: (dir: Direction) => boolean = dir => {
+    return getString(dir).split(' ').length > 1;
+}
+
 const getString: (dir: Direction) => string = dir => {
     let out = "";
     if (dir === Direction.NONE) {
@@ -99,5 +103,6 @@ export const DirectionUtils = {
     rotateClockwise,
     getOpposite,
     isAJunction,
-    containsDirection
+    containsDirection,
+    isMultipleDirections
 };

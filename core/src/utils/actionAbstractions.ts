@@ -1,6 +1,6 @@
 import { GameStore, StampedInput, getUpdateFrequency, CELLS_PER_MILLISECOND, popActorPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus, addPlayer } from "..";
 import { addActor } from "../ducks";
-import { BFS, BFSWithNodes, moveActorAlongPath } from "../game/actorUpdater";
+import { BFS, Dijkstras, moveActorAlongPath } from "../game/actorUpdater";
 import { ActorType, CoordPairUtils, InputType } from "../types";
 
 export const handlePlayerInput = (store: GameStore, playerId: string, stampedInput: StampedInput) => {
@@ -13,7 +13,7 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
             // const a = (new Date).getTime();
             const path = CoordPairUtils.equalPairs(startCell, endCell) 
                 ? [startCell]
-                : BFSWithNodes(startCell, endCell);
+                : Dijkstras(startCell, endCell);
             // const b = (new Date).getTime();
             // const path2 = BFS(stampedInput.input.origin, stampedInput.input.destination);
             // const c = (new Date).getTime();
