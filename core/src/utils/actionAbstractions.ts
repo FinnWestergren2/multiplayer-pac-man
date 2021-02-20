@@ -13,7 +13,7 @@ export const handlePlayerInput = (store: GameStore, playerId: string, stampedInp
             // const a = (new Date).getTime();
             const path = CoordPairUtils.equalPairs(startCell, endCell) 
                 ? [startCell]
-                : Dijkstras(startCell, endCell);
+                : Dijkstras(startCell, endCell).path;
             // const b = (new Date).getTime();
             // const path2 = BFS(stampedInput.input.origin, stampedInput.input.destination);
             // const c = (new Date).getTime();

@@ -48,8 +48,8 @@ export default class Game {
 		});
 		const mousedOverCell = this.cells.flat().find(c => c.withinBounds(p.mouseX, p.mouseY))
 		if (mousedOverCell && selectedActorLocation) {
-			const path = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
-			this.drawPath(p, path);
+			const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
+			this.drawPath(p, path, totalDist);
 		}
 		drawStack.forEach(d => d());
 	};
@@ -85,14 +85,18 @@ export default class Game {
 		p.text(playerId.substr(0, 4), 0, 0);
 	};
 
-	private drawPath = (p: p5, path: CoordPair[]) => {
+	private drawPath = (p: p5, path: CoordPair[], totalDist: number) => {
 		const cellSize = MapStore.getState().cellDimensions.cellSize;
 		const center = (cell: CoordPair) => { return { x: cellSize * cell.x + cellSize * 0.5 , y: cellSize * cell.y + cellSize * 0.5 } }
 		path.forEach((cell, i) => {
+			const a = center(cell);
 			if (i < path.length - 1) {
-				const a = center(cell);
 				const b = center(path[i + 1]);
 				p.line(a.x, a.y, b.x, b.y);
+			}
+			else {
+				p.textAlign(p.CENTER);
+				p.text(totalDist, a.x, a.y-10);
 			}
 		});
 	}

@@ -144,14 +144,14 @@ const createdWeightedNode: (node: MapNode, weight: number) => WeightedNode = (no
     return { node, weight }
 }
 
-export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => CoordPair[] = (startCell, endCell) => {
+export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => {totalDist: number, path: CoordPair[]} = (startCell, endCell) => {
     const junctions = junctionSelector(mapStore.getState()); // we need to copy here because we add temporary nodes to solve
     const startNode = new MapNode(startCell.x, startCell.y);
     tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
-    const queue = new PriorityQueue<WeightedNode>((a, b) => a.weight > b.weight);
+    const queue = new PriorityQueue<WeightedNode>((a, b) => a.weight < b.weight);
     queue.push(createdWeightedNode(startNode, 0));
-    const visitedTable: { isVisited: boolean, parentNode: MapNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentNode: null }} ));
-    visitedTable[startCell.y][startCell.x].isVisited = true;
+    const visitedTable: { totalDist: number, parentNode: WeightedNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { totalDist: Number.POSITIVE_INFINITY, parentNode: null }} ));
+    visitedTable[startCell.y][startCell.x].totalDist = 0;
 
     const checkForEndNode = (currentNode: MapNode, neighbor: MapNode) => {
         if (currentNode.x === neighbor.x && endCell.x === currentNode.x) {
@@ -164,21 +164,26 @@ export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => CoordPair[
     }
 
     while (queue.size() > 0) {
-        const currentNode = queue.pop().node;
-        const neighbors = currentNode.neighbors.filter(n => n !== null && !visitedTable[n.y][n.x].isVisited) as MapNode[];
-        neighbors.forEach(n => {
-            visitedTable[n.y][n.x].isVisited = true;
-            visitedTable[n.y][n.x].parentNode = currentNode;
+        const currentNode = queue.pop();
+        const neighbors = currentNode.node.neighbors.filter(n => n !== null) as MapNode[];
+        const weightedNeighbors = neighbors.map(n => {
+            const location: CoordPair = { x: n.x, y: n.y };
+            const dist = currentNode.weight + CoordPairUtils.distDirect(location, { x: currentNode.node.x, y: currentNode.node.y });
+            return createdWeightedNode(n, dist)
+        }).filter(n => (visitedTable[n.node.y][n.node.x].totalDist > n.weight));
+
+        weightedNeighbors.forEach(n => {
+            visitedTable[n.node.y][n.node.x].totalDist = n.weight;
+            visitedTable[n.node.y][n.node.x].parentNode = currentNode;
         });
-        if (neighbors.some(n => checkForEndNode(currentNode, n))) {
+
+        if (neighbors.some(n => checkForEndNode(currentNode.node, n))) {
+            const dist = CoordPairUtils.distDirect(endCell, { x: currentNode.node.x, y: currentNode.node.y });
+            visitedTable[endCell.y][endCell.x].totalDist = currentNode.weight + dist;
             visitedTable[endCell.y][endCell.x].parentNode = currentNode;
             break;
         }
-        const weightedNeighbors = neighbors.map(n => {
-            const location: CoordPair = { x: n.x, y: n.y };
-            const dist = CoordPairUtils.distDirect(location, { x: currentNode.x, y: currentNode.y });
-            return createdWeightedNode(n, dist)
-        });
+
         queue.push(...weightedNeighbors);
     }
 
@@ -186,8 +191,9 @@ export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => CoordPair[
     let output = [endCell];
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
-        const parent = visitedTable[currentCell.y][currentCell.x].parentNode as MapNode
-        output = [...output, { x: parent.x, y: parent.y }];
+        const parent = visitedTable[currentCell.y][currentCell.x].parentNode?.node
+        output = [...output, { x: parent!.x, y: parent!.y }];
     }
-    return output.reverse();
+    const totalDist = visitedTable[endCell.y][endCell.x].totalDist;
+    return {totalDist, path: output.reverse()};
 }
