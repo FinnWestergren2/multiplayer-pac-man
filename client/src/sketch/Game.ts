@@ -86,8 +86,8 @@ export default class Game {
 	};
 
 	private drawPath = (p: p5, path: CoordPair[], totalDist: number) => {
-		const strokeweight = 1;
-		const offset = Math.random() * strokeweight - 1;
+		const strokeweight = 3;
+		const offset = strokeweight * (Math.random() - 0.5) * 0.5;
 		const cellSize = MapStore.getState().cellDimensions.cellSize;
 		const center = (cell: CoordPair) => { return { x: cellSize * cell.x + cellSize * 0.5 , y: cellSize * cell.y + cellSize * 0.5 } }
 		p.push();
@@ -95,16 +95,20 @@ export default class Game {
 			const a = center(cell);
 			if (i < path.length - 1) {
 				const b = center(path[i + 1]);
+				p.blendMode(p.LIGHTEST)
 				p.strokeWeight(strokeweight);
-				p.stroke(255, 0, 0, 255);
+				p.stroke(255, 100, 100, 150);
 				p.line(a.x - offset, a.y - offset, b.x - offset, b.y - offset);
-				p.stroke(0, 255, 0, 150);
+				p.stroke(100, 255, 100, 150);
 				p.line(a.x + offset, a.y + offset, b.x + offset, b.y + offset);
 			}
 			else {
-				p.noStroke();
+				p.strokeWeight(1);
 				p.textAlign(p.CENTER);
-				p.text(totalDist, a.x + 10, a.y - 10);
+				p.stroke(255, 100, 100, 150);
+				p.text(totalDist, a.x + 10 - offset, a.y - 10 - offset);
+				p.stroke(100, 255, 100, 150);
+				p.text(totalDist, a.x + 10 + offset, a.y - 10 + offset);
 			}		
 		});
 		p.pop();

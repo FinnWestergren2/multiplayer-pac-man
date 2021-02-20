@@ -179,9 +179,10 @@ export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => {totalDist
 
         if (neighbors.some(n => checkForEndNode(currentNode.node, n))) {
             const dist = CoordPairUtils.distDirect(endCell, { x: currentNode.node.x, y: currentNode.node.y });
-            visitedTable[endCell.y][endCell.x].totalDist = currentNode.weight + dist;
-            visitedTable[endCell.y][endCell.x].parentNode = currentNode;
-            break;
+            if (visitedTable[endCell.y][endCell.x].totalDist > currentNode.weight + dist) {
+                visitedTable[endCell.y][endCell.x].totalDist = currentNode.weight + dist;
+                visitedTable[endCell.y][endCell.x].parentNode = currentNode;
+            }
         }
 
         queue.push(...weightedNeighbors);
@@ -191,7 +192,7 @@ export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => {totalDist
     let output = [endCell];
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
-        const parent = visitedTable[currentCell.y][currentCell.x].parentNode?.node
+        const parent = visitedTable[currentCell.y][currentCell.x].parentNode?.node;
         if (parent === null) {
             return {totalDist : -1, path: []};
         }

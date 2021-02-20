@@ -85,6 +85,8 @@ export default class Cell {
         }
         p.push()
         p.strokeWeight(0.5);
+        p.stroke(255);
+        p.fill(0);
         p.beginShape(p.QUADS);
         for(let i = 0; i < verteces.length; i += 2) {
             p.vertex(verteces[i].x, verteces[i].y);

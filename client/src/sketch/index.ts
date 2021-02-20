@@ -14,7 +14,7 @@ export default function sketch(p: p5): void {
 	};
 
 	p.draw = function (): void {
-		p.background(255);
+		p.background(0);
 		game.draw(p);
 	};
 
