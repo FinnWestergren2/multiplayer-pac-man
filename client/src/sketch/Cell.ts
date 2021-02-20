@@ -30,7 +30,7 @@ export default class Cell {
         };
     }
 
-    public draw: (p: p5) => void = (p) => {
+    public draw: (p: p5.Graphics) => void = (p) => {
         p.push();
         p.translate(this.location.x, this.location.y);
         p.textAlign("center", "center");

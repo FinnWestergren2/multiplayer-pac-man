@@ -7,7 +7,6 @@ import { bindHumanPlayer } from "./Controls";
 const SIZE_FACTOR = 0.9;
 
 export default class Game {
-	private cells: Cell[][] = [];
 	private champSize: number = 0;
 	private currentPlayer?: string;
 	private selectedActor?: string
@@ -17,7 +16,7 @@ export default class Game {
 			if (this.currentPlayer) {
 				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
 			}
-			this.initializeMap()
+			this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize;
 		});
 		GameStore.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
@@ -27,17 +26,7 @@ export default class Game {
 			}
 		});
 	}
-
-	private initializeMap = () => {
-		this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize
-		const mapCells = MapStore.getState().mapCells;
-		this.cells = mapCells.map((row: Direction[], y: number) =>
-			row.map((column: Direction, x) => new Cell(x, y))
-		);
-	};
-
 	public draw = (p: p5) => {
-		this.cells.forEach(row => row.forEach(cell => cell.draw(p)));
 		let selectedActorLocation: CoordPair | undefined = undefined;
 		const drawStack:(() => void)[] = [];
 		Object.values(GameStore.getState().actorDict).forEach(actor => {
@@ -46,9 +35,11 @@ export default class Game {
 			}
 			drawStack.push(() => this.drawActor(p, actor));
 		});
-		const mousedOverCell = this.cells.flat().find(c => c.withinBounds(p.mouseX, p.mouseY))
-		if (mousedOverCell && selectedActorLocation) {
-			const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell.gridCoords);
+		const cellSize = MapStore.getState().cellDimensions.cellSize;
+		const mousedOverCell = CoordPairUtils.flooredPair({ x: p.mouseX / cellSize, y: p.mouseY / cellSize });
+		const withinBounds = mousedOverCell.x >= 0 && mousedOverCell.y >= 0 && mousedOverCell.y < MapStore.getState().mapCells.length && mousedOverCell.x < MapStore.getState().mapCells[0].length;
+		if (mousedOverCell && withinBounds && selectedActorLocation) {
+			const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell);
 			this.drawPath(p, path, totalDist);
 		}
 		drawStack.forEach(d => d());
