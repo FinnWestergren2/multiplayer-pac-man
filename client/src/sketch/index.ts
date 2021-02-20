@@ -9,7 +9,7 @@ export default function sketch(p: p5): void {
 	p.setup = function (): void {
 		updateAppDimensions(MapStore, 500, 500);
 		const {canvasHeight, canvasWidth} = MapStore.getState().appDimensions;
-		p.createCanvas(canvasWidth, canvasHeight);
+		p.createCanvas(canvasWidth + 10, canvasHeight + 10);
 		game = new Game(p);
 	};
 
