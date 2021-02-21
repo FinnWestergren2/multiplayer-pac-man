@@ -4,7 +4,7 @@ import { MapStore, GameStore } from "../containers/GameWrapper";
 import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction, junctionSelector, MapNode } from "core";
 import { bindHumanPlayer } from "./Controls";
 
-const SIZE_FACTOR = 0.9;
+const SIZE_FACTOR = 0.7;
 
 export default class Game {
 	private champSize: number = 0;
@@ -48,21 +48,37 @@ export default class Game {
 	private drawActor = (p: p5, actor: Actor) => {
 		const location = actor.status.location;
 		const { halfCellSize, cellSize } = MapStore.getState().cellDimensions;
-		p.push();
-		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize);
-		p.noStroke();
-		p.fill(`#${actor.ownerId.substr(0, 6)}`); // arbitrary color just to keep track. eventually we should add preset colors
 		const actorSize = actor.type === ActorType.CHAMPION ? this.champSize : this.champSize * 0.66
-		p.ellipse(0, 0, actorSize);
+		p.push();
+		p.translate(location.x * cellSize + halfCellSize, location.y * cellSize + halfCellSize * 1.3);
+		p.angleMode(p.DEGREES);
+		switch (actor.status.direction) {
+			case Direction.UP:
+				break;
+			case Direction.RIGHT:
+				p.rotate(90);
+				break;
+			case Direction.DOWN:
+				p.rotate(180);
+				break;
+			case Direction.LEFT:
+				p.rotate(270);
+				break;
+		}
+		p.stroke(`#${actor.ownerId.substr(0, 6)}`);
+		p.fill(0, 0, 0, 0);
+		p.beginShape(p.QUADS);
+		p.vertex(0, -actorSize * 0.5); // tip
+		p.vertex(actorSize * 0.3, actorSize * 0.3); // rightwing
+		p.vertex(0, 0); // nut
+		p.vertex(-actorSize * 0.3, actorSize * 0.3); //leftwing
+		p.endShape(p.CLOSE);
+
 		if (this.selectedActor === actor.id) {
 			p.push();
 			p.strokeWeight(3);
-			p.stroke(255); // arbitrary color just to keep track. eventually we should add preset colors
-			p.noFill();
-			p.ellipse(0, 0, actorSize - 7);
 			p.pop();
 		}
-		this.drawPlayerId(p, actor.ownerId);
 		p.pop();
 	};
 
@@ -84,9 +100,9 @@ export default class Game {
 		p.push();
 		path.forEach((cell, i) => {
 			const a = center(cell);
+			p.blendMode(p.LIGHTEST)
 			if (i < path.length - 1) {
 				const b = center(path[i + 1]);
-				p.blendMode(p.LIGHTEST)
 				p.strokeWeight(strokeweight);
 				p.stroke(255, 100, 100, 150);
 				p.line(a.x - offset, a.y - offset, b.x - offset, b.y - offset);
