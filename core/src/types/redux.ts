@@ -29,7 +29,7 @@ export type AppDimensions = {
 
 export type CellDimensions = {
     cellSize: number;
-    halfCellSize: number;
+    oneOverCellSize: number;
 }
 
 export type MapStateAction =

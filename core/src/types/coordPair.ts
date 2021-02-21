@@ -56,11 +56,7 @@ const distSquared = (start: CoordPair, finish: CoordPair) =>
 const distDirect = (start: CoordPair, finish: CoordPair) => {
     const dir = getDirection(start, finish);
     if (DirectionUtils.isMultipleDirections(dir)) {
-        throw new Error(
-            `distDirect() can only calculate distance on cardinal directions. Direction given: ${DirectionUtils.getString(
-                dir
-            )}`
-        );
+        throw new Error(`distDirect() can only calculate distance on cardinal directions. Direction given: ${DirectionUtils.getString(dir)}`);
     }
     switch (dir) {
         case Direction.UP:

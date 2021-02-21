@@ -193,7 +193,7 @@ export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => {totalDist
     while (!CoordPairUtils.equalPairs(output[output.length - 1], startCell)) {
         const currentCell = output[output.length - 1];
         const parent = visitedTable[currentCell.y][currentCell.x].parentNode?.node;
-        if (parent === null) {
+        if (!parent) {
             return {totalDist : -1, path: []};
         }
         output = [...output, { x: parent!.x, y: parent!.y }];

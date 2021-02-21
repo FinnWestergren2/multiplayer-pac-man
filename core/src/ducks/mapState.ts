@@ -11,7 +11,7 @@ const initialState: MapState = {
     },
     cellDimensions: {
         cellSize: 0,
-        halfCellSize: 0
+        oneOverCellSize: 0
     }
 };
 
@@ -44,9 +44,10 @@ const generateCellDimensions = (data: Direction[][], appDimensions: AppDimension
     const size = Math.min(
         (appDimensions.canvasWidth - 1) / Math.max(...(data.map(r => r.length))),
         (appDimensions.canvasHeight - 1) / data.length);
+        const oneOver =  size !== 0 ? 1 / size : 0;
 
     return {
         cellSize: size,
-        halfCellSize: size * 0.5
+        oneOverCellSize: oneOver
     };
 };
