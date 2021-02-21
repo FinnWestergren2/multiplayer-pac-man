@@ -1,13 +1,11 @@
-import * as p5 from "p5";
+import p5 from "p5";
 import { MapStore } from "../containers/GameWrapper";
 import {
     CellModifier,
     CoordPair,
-    CoordPairUtils,
     Direction,
     DirectionUtils,
     junctionSelector,
-    MapNode,
 } from "core";
 
 export default class Cell {

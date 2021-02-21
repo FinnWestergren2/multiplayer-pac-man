@@ -1,7 +1,6 @@
-import Cell from "./Cell";
 import p5 from "p5";
 import { MapStore, GameStore } from "../containers/GameWrapper";
-import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction, junctionSelector, MapNode } from "core";
+import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction } from "core";
 import { bindHumanPlayer } from "./Controls";
 
 const SIZE_FACTOR = 0.7;
@@ -65,6 +64,9 @@ export default class Game {
 				p.rotate(270);
 				break;
 		}
+		if (this.selectedActor === actor.id) {
+			p.strokeWeight(2);
+		}
 		p.stroke(`#${actor.ownerId.substr(0, 6)}`);
 		p.fill(0, 0, 0, 0);
 		p.beginShape(p.QUADS);
@@ -74,11 +76,6 @@ export default class Game {
 		p.vertex(-actorSize * 0.3, actorSize * 0.3); //leftwing
 		p.endShape(p.CLOSE);
 
-		if (this.selectedActor === actor.id) {
-			p.push();
-			p.strokeWeight(3);
-			p.pop();
-		}
 		p.pop();
 	};
 
