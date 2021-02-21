@@ -76,7 +76,6 @@ export default class Game {
 		p.vertex(0, 0); // nut
 		p.vertex(-actorSize * 0.3, actorSize * 0.3); //leftwing
 		p.endShape(p.CLOSE);
-
 		p.pop();
 	};
 

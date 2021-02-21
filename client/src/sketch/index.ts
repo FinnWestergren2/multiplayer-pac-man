@@ -12,14 +12,16 @@ export default function sketch(p: p5): void {
 		updateAppDimensions(MapStore, 500, 500);
 		const { canvasHeight, canvasWidth } = MapStore.getState().appDimensions;
 		p.createCanvas(canvasWidth + 10, canvasHeight + 10);
-		mapLayer = p.createGraphics(canvasWidth + 10, canvasHeight + 10, p.P2D);
+		mapLayer = p.createGraphics(canvasWidth + 10, canvasHeight + 10);
+		mapLayer.pixelDensity(1);
 		MapStore.subscribe(() => drawMap(mapLayer));
 		game = new Game(p);
 	};
 
 	p.draw = function (): void {
+		const { canvasHeight, canvasWidth } = MapStore.getState().appDimensions;
 		p.background(0);
-		p.image(mapLayer, 0, 0);
+		p.image(mapLayer, 0, 0, canvasWidth + 10, canvasHeight + 10, 0, 0);
 		game.draw(p);
 	};
 
