@@ -19,9 +19,8 @@ export default function sketch(p: p5): void {
 	};
 
 	p.draw = function (): void {
-		const { canvasHeight, canvasWidth } = MapStore.getState().appDimensions;
 		p.background(0);
-		p.image(mapLayer, 0, 0, canvasWidth + 10, canvasHeight + 10, 0, 0);
+		p.image(mapLayer, 0, 0);
 		game.draw(p);
 	};
 
