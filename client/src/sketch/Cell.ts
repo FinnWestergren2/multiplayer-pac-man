@@ -20,12 +20,13 @@ export default class Cell {
         this.cellType = MapStore.getState().mapCells[y][x];
         this.cellModifier = MapStore.getState().cellModifiers[y][x];
         this.gridCoords = { x, y };
-        this.halfSize = MapStore.getState().cellDimensions.halfCellSize;
+        this.halfSize = MapStore.getState().cellDimensions.cellSize * 0.5;
         this.cellSize = MapStore.getState().cellDimensions.cellSize;
         this.location = {
             x: this.halfSize + x * this.cellSize,
             y: this.halfSize + y * this.cellSize,
         };
+        console.log(this.location);
     }
 
     public draw: (p: p5.Graphics) => void = (p) => {
@@ -35,7 +36,7 @@ export default class Cell {
         // this.drawDebugText(p);
         // this.drawDebugNodeOverlay(p);
         this.drawWalls(p);
-        this.drawModifier(p);
+        // this.drawModifier(p);
         // this.drawShadedCellOnHover(p);
         p.pop();
     };

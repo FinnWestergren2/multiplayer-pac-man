@@ -16,6 +16,7 @@ export default class Game {
 				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
 			}
 			this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize;
+			console.log('from game',MapStore.getState().cellDimensions.cellSize);
 		});
 		GameStore.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
