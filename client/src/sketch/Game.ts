@@ -9,7 +9,7 @@ const SIZE_FACTOR = 0.7;
 export default class Game {
 	private champSize: number = 0;
 	private currentPlayer?: string;
-	private selectedActor?: string;
+	private selectedActorId?: string;
 
 	private mapGraphicsContext: p5.Graphics;
 
@@ -19,7 +19,7 @@ export default class Game {
 
 		MapStore.subscribe(() => {
 			if (this.currentPlayer) {
-				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActorId = actorId }, () => this.selectedActorId);
 			}
 			this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize;
 			this.drawMap();
@@ -29,14 +29,14 @@ export default class Game {
 			const oldAssignment = this.currentPlayer;
 			this.currentPlayer = GameStore.getState().currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
-				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActor = actorId }, () => this.selectedActor);
+				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActorId = actorId }, () => this.selectedActorId);
 			}
 		});
 	}
 	public draw = (p: p5) => {
 		p.image(this.mapGraphicsContext, 0, 0);
 		let pathOrigin: CoordPair | undefined = undefined;
-		const selectedActor = this.selectedActor ? GameStore.getState().actorDict[this.selectedActor] : undefined;
+		const selectedActor = this.selectedActorId ? GameStore.getState().actorDict[this.selectedActorId] : undefined;
 		if (selectedActor && selectedActor.ownerId === GameStore.getState().currentPlayer) {
 			pathOrigin = selectedActor.status.location;
 		}
@@ -52,7 +52,7 @@ export default class Game {
 		}
 		Object.values(GameStore.getState().actorDict)
 		.sort((a) => {
-			if (a.id === this.selectedActor) {
+			if (a.id === this.selectedActorId) {
 				return 2;
 			}
 			if (a.ownerId === GameStore.getState().currentPlayer) {
@@ -72,7 +72,7 @@ export default class Game {
 		p.translate((location.x + 0.5) * cellSize, (location.y + 0.65) * cellSize);
 		p.angleMode(p.DEGREES);
 		p.rotate(Math.log2(actor.status.direction) * 90); // *chefs kiss*
-		this.selectedActor === actor.id ? p.fill(color) : p.fill(0);
+		this.selectedActorId === actor.id ? p.fill(color) : p.fill(0);
 		p.stroke(color);
 		p.beginShape(p.QUADS);
 		p.vertex(0, -actorSize * 0.5); // tip
@@ -101,7 +101,7 @@ export default class Game {
 
 	private makeItLookSick = (p: p5, render: () => void) => {
 		if (p.frameCount % 4 === 0) {
-			this.sicknessOffset = 4 * (Math.random() - 0.5) * 0.5
+			this.sicknessOffset = 2 * (Math.random() - 0.5)
 		}
 		p.push();
 		p.noFill()

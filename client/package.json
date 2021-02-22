@@ -25,6 +25,7 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
+    "reselect": "^4.0.0",
     "shared": "^0.2.0",
     "typescript": "^3.8.3",
     "websocket": "^1.0.31"
