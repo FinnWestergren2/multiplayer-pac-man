@@ -35,25 +35,32 @@ export default class Game {
 	}
 	public draw = (p: p5) => {
 		p.image(this.mapGraphicsContext, 0, 0);
-		let selectedActorLocation: CoordPair | undefined = undefined;
-		const actorDrawStack: (() => void)[] = [];
-		Object.values(GameStore.getState().actorDict).forEach(actor => {
-			if (actor.id === this.selectedActor) {
-				selectedActorLocation = actor.status.location;
-			}
-			actorDrawStack.push(() => this.drawActor(p, actor));
-		});
-		
-		if (MapStore.getState().mapCells.length > 0) {
+		let pathOrigin: CoordPair | undefined = undefined;
+		const selectedActor = this.selectedActor ? GameStore.getState().actorDict[this.selectedActor] : undefined;
+		if (selectedActor && selectedActor.ownerId === GameStore.getState().currentPlayer) {
+			pathOrigin = selectedActor.status.location;
+		}
+		if (MapStore.getState().mapCells.length > 0 && pathOrigin) {
 			const oneOverCellSize = MapStore.getState().cellDimensions.oneOverCellSize;
 			const mousedOverCell = CoordPairUtils.flooredPair({ x: p.mouseX * oneOverCellSize, y: p.mouseY * oneOverCellSize });
 			const withinBounds = mousedOverCell.x >= 0 && mousedOverCell.x < MapStore.getState().mapCells[0].length
-				&& mousedOverCell.y >= 0 && mousedOverCell.y < MapStore.getState().mapCells.length; 
-			if (mousedOverCell && withinBounds && selectedActorLocation) {
-				const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(selectedActorLocation), mousedOverCell);
+				&& mousedOverCell.y >= 0 && mousedOverCell.y < MapStore.getState().mapCells.length;
+			if (mousedOverCell && withinBounds) {
+				const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(pathOrigin), mousedOverCell);
 				this.drawPath(p, path, totalDist);
-		}}
-		actorDrawStack.forEach(d => d());
+			}
+		}
+		Object.values(GameStore.getState().actorDict)
+		.sort((a) => {
+			if (a.id === this.selectedActor) {
+				return 2;
+			}
+			if (a.ownerId === GameStore.getState().currentPlayer) {
+				return 1;
+			}
+			return 0;
+		})
+		.forEach(actor => this.drawActor(p, actor));
 	};
 
 	private drawActor = (p: p5, actor: Actor) => {
@@ -65,7 +72,7 @@ export default class Game {
 		p.translate((location.x + 0.5) * cellSize, (location.y + 0.65) * cellSize);
 		p.angleMode(p.DEGREES);
 		p.rotate(Math.log2(actor.status.direction) * 90); // *chefs kiss*
-		this.selectedActor === actor.id ? p.fill(color): p.fill(0);
+		this.selectedActor === actor.id ? p.fill(color) : p.fill(0);
 		p.stroke(color);
 		p.beginShape(p.QUADS);
 		p.vertex(0, -actorSize * 0.5); // tip
@@ -76,44 +83,35 @@ export default class Game {
 		p.pop();
 	};
 
-	private drawPlayerId = (p: p5, playerId: string) => {
-		const factor = 0.28;
-		p.fill(255);
-		p.rect(-factor * (this.champSize), -0.18 * (this.champSize), factor * 2 * (this.champSize), 0.2 * (this.champSize));
-		p.fill(0);
-		p.textAlign(p.CENTER);
-		p.textSize(14);
-		p.text(playerId.substr(0, 4), 0, 0);
-	};
-
 	private drawPath = (p: p5, path: CoordPair[], totalDist: number) => {
 		const textOffset = 5;
 		const cellSize = MapStore.getState().cellDimensions.cellSize;
 		const center = (cell: CoordPair) => [cellSize * cell.x + cellSize * 0.5, cellSize * cell.y + cellSize * 0.5]
-		p.push();
 		this.makeItLookSick(p, () => {
 			p.textAlign(p.CENTER);
 			p.text(path.length === 0 ? 'X' : totalDist, p.mouseX + textOffset, p.mouseY - textOffset);
-			p.noFill()
 			p.beginShape();
-			p.strokeWeight(2);
 			// @ts-ignore
 			path.forEach(cell => p.vertex(...center(cell)));
 			p.endShape();
-		}, 3 * (Math.random() - 0.5) * 0.5)
-		p.pop();
+		})
 	}
 
-	private makeItLookSick = (p: p5, render: () => void, offset: number) => {
-		p.blendMode(p.LIGHTEST)
+	private sicknessOffset = 0;
+
+	private makeItLookSick = (p: p5, render: () => void) => {
+		if (p.frameCount % 4 === 0) {
+			this.sicknessOffset = 4 * (Math.random() - 0.5) * 0.5
+		}
 		p.push();
-		p.translate(offset, offset);
+		p.noFill()
+		p.strokeWeight(2);
+		p.blendMode(p.LIGHTEST)
+		p.translate(this.sicknessOffset, this.sicknessOffset);
 		p.stroke(255, 100, 100, 150);
 		render();
-		p.pop();
-		p.push();
-		p.translate(-offset, -offset);
-		p.stroke(100, 255, 100, 150);
+		p.translate(-this.sicknessOffset, -this.sicknessOffset);
+		p.stroke(0, 255, 100, 150);
 		render();
 		p.pop();
 	}

@@ -64,7 +64,7 @@ export const moveActorAlongPath: (dist: number, path: CoordPair[], status: Actor
 
 const checkCurrentPathStatus = (status: ActorStatus, path: CoordPair[], popPath: () => void) => {
     let out = [...path]
-    for(let i = 0; i < path.length - 1; i++ ) {
+    for(let i = 0; i < path.length - 1; i++) {
         const firstDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(status.location), path[i]);
         const secondDir = CoordPairUtils.getDirection(CoordPairUtils.snappedPair(status.location), path[i + 1]);
         if (DirectionUtils.getOpposite(firstDir) === secondDir) {

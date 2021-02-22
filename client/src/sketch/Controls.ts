@@ -38,22 +38,34 @@ export const bindHumanPlayer = (p: p5, playerId: string, selectActor: (actorId?:
         if (p.keyCode === KeyCodeThree && actors.length > 2) {
             selectActor(actors[2]);
         }
+        if (p.keyCode === p.ESCAPE) {
+            selectActor();
+        }
     }
 
-    p.mouseClicked = (e: any) => { 
+    window.oncontextmenu = (e: MouseEvent) => {
+        mouseClicked(e);
+        return false;
+    }
+
+    p.mouseClicked = (e: MouseEvent) => mouseClicked(e);
+    
+    const mouseClicked = (e: MouseEvent) => { 
         const mouse = {x: e.clientX, y: e.clientY} // can't use p.mouse because of scrolling / changing screen sizes
         const actorId = selectedActor();
         const clickedTile = getClickedTile(mouse);
         if (!clickedTile) {
+            selectActor();
             return;
         }
-        if (p.keyIsDown(p.CONTROL) && actorId) {
+        if (e.button === 2 && actorId) {
             moveUnit(actorId, clickedTile);
         }
         else {
             selectActor(checkForActorInCell(clickedTile)?.id);
         }
     }
+        
 };
 
 const checkForActorInCell = (tile: CoordPair) => {
@@ -62,5 +74,4 @@ const checkForActorInCell = (tile: CoordPair) => {
     if (actors.length === 0) return;
     const ownedActors = actors.filter(a => a.ownerId === GameStore.getState().currentPlayer);
     return ownedActors[0] ?? actors[0];
-    
 }
