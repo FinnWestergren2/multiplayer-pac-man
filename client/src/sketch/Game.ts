@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { MapStore, GameStore } from "../containers/GameWrapper";
+import { Store } from "../containers/GameWrapper";
 import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction } from "core";
 import { bindHumanPlayer } from "./Controls";
 import Cell from "./Cell";
@@ -17,17 +17,17 @@ export default class Game {
 		this.mapGraphicsContext = p.createGraphics(p.width, p.height);
 		this.mapGraphicsContext.pixelDensity(1);
 
-		MapStore.subscribe(() => {
+		Store.subscribe(() => {
 			if (this.currentPlayer) {
 				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActorId = actorId }, () => this.selectedActorId);
 			}
-			this.champSize = SIZE_FACTOR * MapStore.getState().cellDimensions.cellSize;
+			this.champSize = SIZE_FACTOR * Store.getState().mapState.cellDimensions.cellSize;
 			this.drawMap();
 		});
 
-		GameStore.subscribe(() => {
+		Store.subscribe(() => {
 			const oldAssignment = this.currentPlayer;
-			this.currentPlayer = GameStore.getState().currentPlayer;
+			this.currentPlayer = Store.getState().actorState.currentPlayer;
 			if (this.currentPlayer !== oldAssignment && this.currentPlayer) {
 				bindHumanPlayer(p, this.currentPlayer, (actorId) => { this.selectedActorId = actorId }, () => this.selectedActorId);
 			}
@@ -36,26 +36,26 @@ export default class Game {
 	public draw = (p: p5) => {
 		p.image(this.mapGraphicsContext, 0, 0);
 		let pathOrigin: CoordPair | undefined = undefined;
-		const selectedActor = this.selectedActorId ? GameStore.getState().actorDict[this.selectedActorId] : undefined;
-		if (selectedActor && selectedActor.ownerId === GameStore.getState().currentPlayer) {
+		const selectedActor = this.selectedActorId ? Store.getState().actorState.actorDict[this.selectedActorId] : undefined;
+		if (selectedActor && selectedActor.ownerId === Store.getState().actorState.currentPlayer) {
 			pathOrigin = selectedActor.status.location;
 		}
-		if (MapStore.getState().mapCells.length > 0 && pathOrigin) {
-			const oneOverCellSize = MapStore.getState().cellDimensions.oneOverCellSize;
+		if (Store.getState().mapState.mapCells.length > 0 && pathOrigin) {
+			const oneOverCellSize = Store.getState().mapState.cellDimensions.oneOverCellSize;
 			const mousedOverCell = CoordPairUtils.flooredPair({ x: p.mouseX * oneOverCellSize, y: p.mouseY * oneOverCellSize });
-			const withinBounds = mousedOverCell.x >= 0 && mousedOverCell.x < MapStore.getState().mapCells[0].length
-				&& mousedOverCell.y >= 0 && mousedOverCell.y < MapStore.getState().mapCells.length;
+			const withinBounds = mousedOverCell.x >= 0 && mousedOverCell.x < Store.getState().mapState.mapCells[0].length
+				&& mousedOverCell.y >= 0 && mousedOverCell.y < Store.getState().mapState.mapCells.length;
 			if (mousedOverCell && withinBounds) {
 				const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(pathOrigin), mousedOverCell);
 				this.drawPath(p, path, totalDist);
 			}
 		}
-		Object.values(GameStore.getState().actorDict)
+		Object.values(Store.getState().actorState.actorDict)
 		.sort((a) => {
 			if (a.id === this.selectedActorId) {
 				return 2;
 			}
-			if (a.ownerId === GameStore.getState().currentPlayer) {
+			if (a.ownerId === Store.getState().actorState.currentPlayer) {
 				return 1;
 			}
 			return 0;
@@ -65,7 +65,7 @@ export default class Game {
 
 	private drawActor = (p: p5, actor: Actor) => {
 		const location = actor.status.location;
-		const cellSize = MapStore.getState().cellDimensions.cellSize;
+		const cellSize = Store.getState().mapState.cellDimensions.cellSize;
 		const actorSize = actor.type === ActorType.CHAMPION ? this.champSize : this.champSize * 0.66
 		const color = `#${actor.ownerId.substr(0, 6)}`;
 		p.push();
@@ -85,7 +85,7 @@ export default class Game {
 
 	private drawPath = (p: p5, path: CoordPair[], totalDist: number) => {
 		const textOffset = 5;
-		const cellSize = MapStore.getState().cellDimensions.cellSize;
+		const cellSize = Store.getState().mapState.cellDimensions.cellSize;
 		const center = (cell: CoordPair) => [cellSize * cell.x + cellSize * 0.5, cellSize * cell.y + cellSize * 0.5]
 		this.makeItLookSick(p, () => {
 			p.textAlign(p.CENTER);
@@ -118,7 +118,7 @@ export default class Game {
 
 	private drawMap = () => {
 		this.mapGraphicsContext.clear();
-		const mapCells = MapStore.getState().mapCells;
+		const mapCells = Store.getState().mapState.mapCells;
 		mapCells.map((row: Direction[], y: number) =>
 			row.map((column: Direction, x) => new Cell(x, y))
 		).flat().forEach(c => c.draw(this.mapGraphicsContext));

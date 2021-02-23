@@ -7,7 +7,13 @@ import { CellModifier } from "./cellModifier";
 import { MapResponse } from "../socketObject";
 
 export type MapStore = Store<MapState, MapStateAction>;
-export type GameStore = Store<GameState, GameStateAction>;
+export type ActorStore = Store<ActorState, ActorStateAction>;
+export type ReduxStore = Store<ReduxState, MapStateAction | ActorStateAction>;
+
+export type ReduxState = {
+    actorState: ActorState,
+    mapState: MapState
+}
 
 export type MapState = {
     mapCells: Direction[][];
@@ -37,7 +43,7 @@ export type MapStateAction =
     { type: MapStateActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions } |
     { type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions }
 
-export type GameState = {
+export type ActorState = {
     currentPlayer?: string;
     actorPathDict: Dictionary<CoordPair[]>;
     actorDict: Dictionary<Actor>;
@@ -45,7 +51,7 @@ export type GameState = {
     playerList: string[];
 };
 
-export enum GameStateActionTypes {
+export enum ActorStateActionTypes {
     SET_ACTOR_STATUS = "SET_ACTOR_STATUS",
     ADD_PLAYER = "ADD_PLAYER",
     ADD_ACTOR = "ADD_ACTOR",
@@ -56,12 +62,12 @@ export enum GameStateActionTypes {
     SET_GAME_STATE = "SET_GAME_STATE"
 };
 
-export type GameStateAction =
-    { type: GameStateActionTypes.SET_ACTOR_STATUS; payload: { actorId: string, status: ActorStatus } } |
-    { type: GameStateActionTypes.ADD_PLAYER; payload: string } |
-    { type: GameStateActionTypes.REMOVE_PLAYER; payload: string } |
-    { type: GameStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |
-    { type: GameStateActionTypes.REMOVE_ACTOR; payload: string } |
-    { type: GameStateActionTypes.SET_ACTOR_PATH; payload: { actorId: string, path: CoordPair[] } } |
-    { type: GameStateActionTypes.POP_ACTOR_PATH; payload: string } |
-    { type: GameStateActionTypes.SET_GAME_STATE; payload: GameState }
+export type ActorStateAction =
+    { type: ActorStateActionTypes.SET_ACTOR_STATUS; payload: { actorId: string, status: ActorStatus } } |
+    { type: ActorStateActionTypes.ADD_PLAYER; payload: string } |
+    { type: ActorStateActionTypes.REMOVE_PLAYER; payload: string } |
+    { type: ActorStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |
+    { type: ActorStateActionTypes.REMOVE_ACTOR; payload: string } |
+    { type: ActorStateActionTypes.SET_ACTOR_PATH; payload: { actorId: string, path: CoordPair[] } } |
+    { type: ActorStateActionTypes.POP_ACTOR_PATH; payload: string } |
+    { type: ActorStateActionTypes.SET_GAME_STATE; payload: ActorState }

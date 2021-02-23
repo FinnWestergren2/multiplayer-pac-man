@@ -2,7 +2,7 @@ import http from 'http';
 import nodeStatic from 'node-static';
 import crypto from 'crypto';
 import { handleMessage, getCurrentMap } from './serverExtensions';
-import { ServerMessage, ClientMessage, mapStateReducer, gameStateReducer, MessageType, addPlayer, removePlayer, runGame, generateGuid, initPlayer } from "core";
+import { ServerMessage, ClientMessage, MessageType, removePlayer, runGame, generateGuid, initPlayer, gameReducer } from "core";
 import { createStore } from "redux";
 import {Socket} from "net"
 import { serverStateReducer } from './ducks/serverState';
@@ -15,12 +15,11 @@ const server = http.createServer((req, res) => {
 });
 server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
 
-export const MapStore = createStore(mapStateReducer);
-export const GameStore = createStore(gameStateReducer);
+export const Store = createStore(gameReducer);
 export const ServerStore = createStore(serverStateReducer);
 
 let socketList: { [key: string]: Socket } = {};
-runGame(MapStore, GameStore, setInterval);
+runGame(Store, setInterval);
 
 const generateHash = (acceptKey: string) => crypto
 	.createHash('sha1')
@@ -95,14 +94,14 @@ export const writeToSinglePlayer = (message: ServerMessage, playerId: string, re
 
 const addPlayerEverywhere = (playerId: string) => {
 	const championId = generateGuid();
-	initPlayer(GameStore, playerId, championId);
+	initPlayer(Store, playerId, championId);
 	writeToSinglePlayer({ type: MessageType.MAP_RESPONSE, payload: getCurrentMap() }, playerId);
-	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayer: playerId, ...GameStore.getState() }}, playerId);
+	writeToSinglePlayer({ type: MessageType.INIT_PLAYER, payload: { currentPlayer: playerId, ...Store.getState().actorState }}, playerId);
 	writeToAllPlayers({ type: MessageType.ADD_PLAYER, payload: { playerId, championId} }, 2, playerId);
 }
 
 const removePlayerEverywhere = (playerId: string) => {
-	removePlayer(GameStore, playerId);
+	removePlayer(Store, playerId);
 	socketList[playerId].end();
 	socketList[playerId].destroy();
 	delete socketList[playerId];

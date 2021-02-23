@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { Direction, MapResponse } from "..";
-import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, MapStore } from "../types/redux";
+import { MapState, MapStateAction, MapStateActionTypes, AppDimensions, ReduxStore } from "../types/redux";
 
 const initialState: MapState = {
     mapCells: [],
@@ -28,15 +28,15 @@ export const mapStateReducer: Reducer<MapState, MapStateAction>  = (state: MapSt
     }
 };
 
-export const refreshMap = (store: MapStore, mapResponse: MapResponse) => {
+export const refreshMap = (store: ReduxStore, mapResponse: MapResponse) => {
     store.dispatch({ type: MapStateActionTypes.REFRESH_MAP, payload: mapResponse });
-    store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse.cells, store.getState().appDimensions) });
+    store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(mapResponse.cells, store.getState().mapState.appDimensions) });
 };
 
-export const updateAppDimensions = (store: MapStore, width: number, height: number) => {
+export const updateAppDimensions = (store: ReduxStore, width: number, height: number) => {
     store.dispatch({ type: MapStateActionTypes.UPDATE_APP_DIMENSIONS, payload: { canvasHeight: height, canvasWidth: width } });
-    if (store.getState().mapCells.length > 0) {
-        store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(store.getState().mapCells, { canvasHeight: height, canvasWidth: width }) });
+    if (store.getState().mapState.mapCells.length > 0) {
+        store.dispatch({ type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS, payload: generateCellDimensions(store.getState().mapState.mapCells, { canvasHeight: height, canvasWidth: width }) });
     }
 };
 

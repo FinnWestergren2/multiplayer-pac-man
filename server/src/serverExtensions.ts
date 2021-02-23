@@ -12,10 +12,9 @@ import {
 } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import {
-    MapStore,
-    GameStore,
+    Store,
     writeToSinglePlayer,
-    ServerStore,
+    ServerStore
 } from ".";
 import { setLag, setSimulatedLag } from "./ducks/serverState";
 
@@ -39,9 +38,9 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
             return;
         case MessageType.PLAYER_INPUT:
             const timeAgo = (ServerStore.getState().lag[fromPlayer] ?? 0) * 0.5;
-            handlePlayerInput(GameStore, fromPlayer, {...message.payload.input, timeAgo});
+            handlePlayerInput(Store, fromPlayer, {...message.payload.input, timeAgo});
             // can't use writeToAllPlayers for this message because we need to cater for everyones lag
-            GameStore.getState().playerList.filter(pId => pId !== fromPlayer).forEach(pId => {
+            Store.getState().actorState.playerList.filter(pId => pId !== fromPlayer).forEach(pId => {
                 const convertedMessage = { ...message };
                 convertedMessage.payload.input.timeAgo = (ServerStore.getState().lag[pId] ?? 0) * 0.5 + timeAgo;
                 writeToSinglePlayer(convertedMessage, pId);
@@ -73,12 +72,12 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 };
 
 export const getCurrentMap: () => MapResponse = () => {
-    if (MapStore.getState().mapCells.length === 0) {
+    if (Store.getState().mapState.mapCells.length === 0) {
         const newMap = generateMapUsingRandomDFS();
-        refreshMap(MapStore, newMap);
+        refreshMap(Store, newMap);
         return newMap;
     }
-    return { cells: MapStore.getState().mapCells, cellModifiers: MapStore.getState().cellModifiers };
+    return { cells: Store.getState().mapState.mapCells, cellModifiers: Store.getState().mapState.cellModifiers };
 };
 
 const getPerceptionUpdate: (locationMap: { [actorId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
@@ -88,7 +87,7 @@ const getPerceptionUpdate: (locationMap: { [actorId: string]: CoordPair }, fromP
     const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
     const smoothCorrectionMap: { [actorId: string]: CoordPair } = {};
     const snapMap: { [actorId: string]: ActorStatus } = {};
-    const actorDict = GameStore.getState().actorDict;
+    const actorDict = Store.getState().actorState.actorDict;
     Object.keys(locationMap)
         .filter((pId) => !!actorDict[pId])
         .forEach((pId) => {

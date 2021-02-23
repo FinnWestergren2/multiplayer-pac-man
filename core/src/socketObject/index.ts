@@ -1,4 +1,4 @@
-import { Direction, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, GameState } from "../types"
+import { Direction, StampedInput, CoordPair, Dictionary, ActorStatus, Actor, ActorState } from "../types"
 import { CellModifier } from "../types/cellModifier"
 
 export enum MessageType {
@@ -29,7 +29,7 @@ export type ClientMessage =
     { type: MessageType.LATENCY_UPDATE, payload: number }
 
 export type ServerMessage = 
-    { type: MessageType.INIT_PLAYER, payload: GameState }|
+    { type: MessageType.INIT_PLAYER, payload: ActorState }|
     { type: MessageType.ADD_PLAYER, payload: { playerId: string; championId: string } } |
     { type: MessageType.REMOVE_PLAYER, payload: string } |
     { type: MessageType.PONG } |

@@ -8,10 +8,10 @@ import {
     StampedInput,
     refreshMap,
     initPlayer,
-    setGameState
+    setActorState
 } from "core";
 
-import { MapStore, ClientSocket, GameStore } from "../containers/GameWrapper";
+import { ClientSocket, Store } from "../containers/GameWrapper";
 
 let lastPing = 0;
 
@@ -23,25 +23,25 @@ export function handleMessage(message: ServerMessage): void {
             sendLatencyUpdate(ping);
             return;
         case MessageType.INIT_PLAYER:
-            setGameState(GameStore, message.payload);
+            setActorState(Store, message.payload);
             return;
         case MessageType.MAP_RESPONSE:
-            refreshMap(MapStore, message.payload);
+            refreshMap(Store, message.payload);
             return;
         case MessageType.ADD_PLAYER:
-            initPlayer(GameStore, message.payload.playerId, message.payload.championId);
+            initPlayer(Store, message.payload.playerId, message.payload.championId);
             return;
         case MessageType.REMOVE_PLAYER:
-            removePlayer(GameStore, message.payload);
+            removePlayer(Store, message.payload);
             return;
         case MessageType.PLAYER_INPUT:
-            handlePlayerInput(GameStore, message.payload.playerId, message.payload.input);
+            handlePlayerInput(Store, message.payload.playerId, message.payload.input);
             return;
         case MessageType.INVALID:
             console.error('sent an invalid message to server')
             return;
         case MessageType.STATE_CORRECTION:
-            handleStateCorrection(GameStore, message.payload);
+            handleStateCorrection(Store, message.payload);
             return
         default:
             console.error('recieved an invalid message type from server')
@@ -67,7 +67,7 @@ export const sendPlayerInput = (playerId: string, input: StampedInput) => {
 
 export const sendPerceptionUpdate = () => { 
     const timeStamp = (new Date()).getTime();
-    const currentState = GameStore.getState().actorDict
+    const currentState = Store.getState().actorState.actorDict
     let locationMap = {};
     Object.keys(currentState).forEach(playerId => {
         locationMap = {...locationMap, [playerId]: currentState[playerId].status.location }

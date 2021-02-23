@@ -1,7 +1,7 @@
-import { gameStore, mapStore, CELLS_PER_MILLISECOND } from '.';
+import { store, CELLS_PER_MILLISECOND } from '.';
 import { ActorStatus } from '../types/actor';
 import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from '../types';
-import { popActorPath, updateActorStatus } from '../ducks/gameState';
+import { popActorPath, updateActorStatus } from '../ducks/actorState';
 import { getAverageFrameLength } from './frameManager';
 import { junctionSelector, MapNode } from '../map';
 import { tieAllNodes } from '../map/mapProcessing';
@@ -14,16 +14,16 @@ const idleStatus = (location: CoordPair) => {
     }
 };
 
-export const updateActors = () => Object.keys(gameStore.getState().actorDict).forEach(actorId => {
-    const status = gameStore.getState().actorDict[actorId].status;
-    const path = gameStore.getState().actorPathDict[actorId];
+export const updateActors = () => Object.keys(store.getState().actorState.actorDict).forEach(actorId => {
+    const status = store.getState().actorState.actorDict[actorId].status;
+    const path = store.getState().actorState.actorPathDict[actorId];
     if (path) {
-        const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status, () => popActorPath(gameStore, actorId));
-        updateActorStatus(gameStore, actorId, newStatus);
+        const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status, () => popActorPath(store, actorId));
+        updateActorStatus(store, actorId, newStatus);
         return;
     }
     if (!path && status && status.direction !== Direction.NONE) {
-        updateActorStatus(gameStore, actorId, idleStatus(status.location));
+        updateActorStatus(store, actorId, idleStatus(status.location));
     }
 });
 
@@ -83,14 +83,14 @@ export const BFS: (startFloat: CoordPair, endCell: CoordPair) => CoordPair[] = (
     }
     let queue = [startCell];
     let popIndex = 0;
-    const visitedTable = mapStore.getState().mapCells.map(row => row.map(() => { return { isVisited: false, parentCell: {x: -1, y: -1}}} ));
+    const visitedTable = store.getState().mapState.mapCells.map(row => row.map(() => { return { isVisited: false, parentCell: {x: -1, y: -1}}} ));
     visitedTable[startCell.y][startCell.x].isVisited = true;
 
     const getAllBranches = (location: CoordPair) => {
         const branches: CoordPair[] = []
         const x = Math.floor(location.x);
         const y = Math.floor(location.y);
-        const directions = mapStore.getState().mapCells[y][x];
+        const directions = store.getState().mapState.mapCells[y][x];
         if (visitedTable[y + 1] && visitedTable[y + 1][x] && DirectionUtils.isDown(directions) && !visitedTable[y + 1][x].isVisited){
             branches.push({x: x, y: y + 1});
             visitedTable[y + 1][x].isVisited = true;
@@ -145,12 +145,12 @@ const createdWeightedNode: (node: MapNode, weight: number) => WeightedNode = (no
 }
 
 export const Dijkstras: (startCell: CoordPair, endCell: CoordPair) => {totalDist: number, path: CoordPair[]} = (startCell, endCell) => {
-    const junctions = junctionSelector(mapStore.getState()); // we need to copy here because we add temporary nodes to solve
+    const junctions = junctionSelector(store.getState().mapState); // we need to copy here because we add temporary nodes to solve
     const startNode = new MapNode(startCell.x, startCell.y);
-    tieAllNodes(startNode, junctions, mapStore.getState().mapCells[startCell.y][startCell.x]);
+    tieAllNodes(startNode, junctions, store.getState().mapState.mapCells[startCell.y][startCell.x]);
     const queue = new PriorityQueue<WeightedNode>((a, b) => a.weight < b.weight);
     queue.push(createdWeightedNode(startNode, 0));
-    const visitedTable: { totalDist: number, parentNode: WeightedNode | null }[][] = mapStore.getState().mapCells.map(row => row.map(() => { return { totalDist: Number.POSITIVE_INFINITY, parentNode: null }} ));
+    const visitedTable: { totalDist: number, parentNode: WeightedNode | null }[][] = store.getState().mapState.mapCells.map(row => row.map(() => { return { totalDist: Number.POSITIVE_INFINITY, parentNode: null }} ));
     visitedTable[startCell.y][startCell.x].totalDist = 0;
 
     const checkForEndNode = (currentNode: MapNode, neighbor: MapNode) => {

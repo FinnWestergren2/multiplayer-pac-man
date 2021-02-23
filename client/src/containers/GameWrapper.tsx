@@ -5,7 +5,7 @@ import styled from "@emotion/styled";
 import { createStore } from "redux";
 import initializeSocket from "../socket";
 import { requestMap, sendSimulatedLagInput } from "../socket/clientExtensions";
-import { mapStateReducer, gameStateReducer, runGame, CoordPairUtils, ActorType, getUpdateFrequency, refreshMap, Direction, MapResponse, DirectionUtils } from "core";
+import { runGame, CoordPairUtils, ActorType, getUpdateFrequency, refreshMap, Direction, MapResponse, DirectionUtils, ReduxStore, gameReducer } from "core";
 import Slider from "../debugComponents/DebugSlider";
 import ControllerGrid from "../debugComponents/ControllerGrid";
 import DebugButton from "../debugComponents/DebugButton";
@@ -27,12 +27,11 @@ const FlexContainer = styled.div`
         }
     }
 `;
-export const MapStore = createStore(mapStateReducer);
-export const GameStore = createStore(gameStateReducer);
+export const Store: ReduxStore = createStore(gameReducer)
 export const ClientSocket = initializeSocket();
 
 const GameWrapper: FunctionComponent = () => {
-    runGame(MapStore, GameStore, window.setInterval);
+    runGame(Store, window.setInterval);
     return (
         <FlexContainer>
             <P5Wrapper log={console.log} />
@@ -65,7 +64,7 @@ const GameWrapper: FunctionComponent = () => {
 };
 
 const deleteRandomWall = () => {
-    const cells = [...MapStore.getState().mapCells]
+    const cells = [...Store.getState().mapState.mapCells]
     let randomDir = DirectionUtils.randomSingleDirection();
     let x = Math.floor(Math.random() * (cells[0].length - 2)) + 1;
     let y = Math.floor(Math.random() * (cells.length - 2)) + 1;
@@ -82,9 +81,9 @@ const deleteRandomWall = () => {
     cells[y][x] = cells[y][x] | DirectionUtils.getOpposite(randomDir); 
     const response: MapResponse = {
         cells,
-        cellModifiers: MapStore.getState().cellModifiers
+        cellModifiers: Store.getState().mapState.cellModifiers
     }
-    refreshMap(MapStore, response);
+    refreshMap(Store, response);
 }
 
 export default GameWrapper;

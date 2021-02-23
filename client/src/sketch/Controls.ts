@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { CoordPair, CoordPairUtils } from "core";
-import { GameStore, MapStore } from "../containers/GameWrapper";
+import { Store } from "../containers/GameWrapper";
 import { moveUnit } from "../utils/clientActions";
 
 const KeyCodeOne = 49;
@@ -8,13 +8,13 @@ const KeyCodeTwo = 50;
 const KeyCodeThree = 51;
 
 export const bindHumanPlayer = (p: p5, playerId: string, selectActor: (actorId?: string) => void, selectedActor: () => string | undefined) => {
-    const oneOverCellSize = 1 / MapStore.getState().cellDimensions.cellSize;
-    const cells = MapStore.getState().mapCells;
+    const oneOverCellSize = 1 / Store.getState().mapState.cellDimensions.cellSize;
+    const cells = Store.getState().mapState.mapCells;
     if (!cells || cells.length === 0) {
         return;
     }
     const max_y = cells.length, max_x = cells[0].length;
-    const actors = GameStore.getState().actorOwnershipDict[playerId];
+    const actors = Store.getState().actorState.actorOwnershipDict[playerId];
 
     const getClickedTile = (mouse: CoordPair) => {
         const element = document.getElementById("app-p5_container");
@@ -69,9 +69,9 @@ export const bindHumanPlayer = (p: p5, playerId: string, selectActor: (actorId?:
 };
 
 const checkForActorInCell = (tile: CoordPair) => {
-    const actors = Object.values(GameStore.getState().actorDict)
+    const actors = Object.values(Store.getState().actorState.actorDict)
     .filter(a => CoordPairUtils.equalPairs(tile, CoordPairUtils.snappedPair(a.status.location)));
     if (actors.length === 0) return;
-    const ownedActors = actors.filter(a => a.ownerId === GameStore.getState().currentPlayer);
+    const ownedActors = actors.filter(a => a.ownerId === Store.getState().actorState.currentPlayer);
     return ownedActors[0] ?? actors[0];
 }

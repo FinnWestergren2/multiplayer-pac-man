@@ -1,4 +1,4 @@
-import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from "shared/static/types";
+import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from "core";
 import Stack from "./Stack";
 import { emptyMap, getAdjacentCell } from ".";
 
