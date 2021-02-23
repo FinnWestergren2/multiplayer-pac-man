@@ -1,6 +1,6 @@
 import { ReduxStore, StampedInput, getUpdateFrequency, CELLS_PER_MILLISECOND, popActorPath, updateActorStatus, setActorPath, Dictionary, CoordPair, ActorStatus, addPlayer } from "..";
 import { addActor } from "../ducks";
-import { BFS, Dijkstras, moveActorAlongPath } from "../game/actorUpdater";
+import { Dijkstras, moveActorAlongPath } from "../game/actorUpdater";
 import { ActorType, CoordPairUtils, InputType } from "../types";
 
 export const handlePlayerInput = (store: ReduxStore, playerId: string, stampedInput: StampedInput) => {
@@ -10,17 +10,9 @@ export const handlePlayerInput = (store: ReduxStore, playerId: string, stampedIn
             if (!actorStatus) return;
             const startCell = CoordPairUtils.roundedPair(stampedInput.input.origin);
             const endCell = stampedInput.input.destination;
-            // const a = (new Date).getTime();
             const path = CoordPairUtils.equalPairs(startCell, endCell) 
                 ? [startCell]
                 : Dijkstras(startCell, endCell).path;
-            // const b = (new Date).getTime();
-            // const path2 = BFS(stampedInput.input.origin, stampedInput.input.destination);
-            // const c = (new Date).getTime();
-            // console.log('time diff with nodes', (c - b) - (b - a) )
-            // const memA = JSON.stringify(path).length;
-            // const memB = JSON.stringify(path2).length
-            // console.log('mem diff with nodes', memB - memA, (memB - memA) / memB)
             const frameDiff = stampedInput.timeAgo * getUpdateFrequency();
             const distTravelled = CELLS_PER_MILLISECOND * frameDiff;
             const newStatus = moveActorAlongPath(
