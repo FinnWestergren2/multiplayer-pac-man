@@ -9,6 +9,8 @@ import {
     getUpdateFrequency,
     handlePlayerInput,
     ActorStatus,
+    Direction,
+    CellModifier,
 } from "core";
 import { generateMapUsingRandomDFS } from "./mapGenerator";
 import {
@@ -17,6 +19,7 @@ import {
     ServerStore
 } from ".";
 import { setLag, setSimulatedLag } from "./ducks/serverState";
+import SevenByEight from "./mapFiles/7x8.json";
 
 const potentialDriftFactor = () => CELLS_PER_MILLISECOND * 2 * getUpdateFrequency(); // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.5;
@@ -73,7 +76,7 @@ export const handleMessage = (message: ClientMessage, fromPlayer: string) => {
 
 export const getCurrentMap: () => MapResponse = () => {
     if (Store.getState().mapState.mapCells.length === 0) {
-        const newMap = generateMapUsingRandomDFS();
+        const newMap = { cells: SevenByEight.cells as Direction[][], cellModifiers: SevenByEight.modifiers as CellModifier[][] };
         refreshMap(Store, newMap);
         return newMap;
     }
