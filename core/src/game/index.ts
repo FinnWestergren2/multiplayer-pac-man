@@ -2,7 +2,7 @@ import { ReduxStore } from "../types/redux";
 import { updateActors } from "./actorUpdater";
 import { getAverageFrameLength, updateFrameManager } from "./frameManager";
 
-export const IDEAL_FRAME_LENGTH = 16;
+export const IDEAL_FRAME_LENGTH = 1000 / 60; // 60 FPS
 export const CELLS_PER_MILLISECOND = 0.005;
 
 export let store: ReduxStore
@@ -17,4 +17,4 @@ export const getUpdateFrequency = () => 1 / getAverageFrameLength();
 const update = () => {
     updateFrameManager();
     updateActors();
-}
+};

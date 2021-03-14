@@ -36,7 +36,7 @@ export default class Cell {
         // this.drawDebugText(p);
         // this.drawDebugNodeOverlay(p);
         this.drawWalls(p);
-        // this.drawModifier(p);
+        this.drawModifier(p);
         // this.drawShadedCellOnHover(p);
         p.pop();
     };
@@ -99,6 +99,8 @@ export default class Cell {
 
     private drawModifier = (p: p5) => {
         if (this.cellModifier === CellModifier.MINE) {
+            p.stroke(255);
+            p.fill(255);
             p.text("MINE", 0, 0);
         }
     };

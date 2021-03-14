@@ -21,7 +21,6 @@ import {
 import { setLag, setSimulatedLag } from "./ducks/serverState";
 import SevenByEight from "./mapFiles/7x8.json";
 
-const potentialDriftFactor = () => CELLS_PER_MILLISECOND * 2 * getUpdateFrequency(); // multiply by two since they could be going the opposite direction by now.
 const smoothOverrideTriggerDist = 0.5;
 const snapOverrideTriggerDist = 0.8;
 
@@ -85,7 +84,7 @@ export const getCurrentMap: () => MapResponse = () => {
 
 const getPerceptionUpdate: (locationMap: { [actorId: string]: CoordPair }, fromPlayer: string) => ServerMessage | null = 
 	(locationMap, fromPlayer) => {
-    const potentialDrift = Math.abs((ServerStore.getState().lag[fromPlayer] ?? 0)* 0.5 * potentialDriftFactor());
+    const potentialDrift = Math.abs((ServerStore.getState().lag[fromPlayer] ?? 0) * CELLS_PER_MILLISECOND * getUpdateFrequency());
     const snapOverrideSquared = Math.pow(snapOverrideTriggerDist + potentialDrift, 2);
     const smoothOverrideSquared = Math.pow(smoothOverrideTriggerDist + potentialDrift, 2);
     const smoothCorrectionMap: { [actorId: string]: CoordPair } = {};
