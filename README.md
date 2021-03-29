@@ -10,7 +10,7 @@ To play around with the game engine, clone this repo, navigate to the root, and 
 
 To move your ship around the map, click on your character and right click on the destination. To see the full picture, open up a new tab and nav to the same url. You can play against yourself there. Or if you like, you can even play on multiple devices once the servers are running. Just navigate to [your_IP]:3000 on a browser from another computer and you can see the two clients interact!
 
-Enjoy and let me know if you have any sweet ideas / want to contribute!
+Enjoy and let me know if you have any sweet ideas / want to contribute! I have no "grand vision", its just something to kinda tack stuff onto when I feel like writing some code.
 fwesterg@gmail.com
 
 ![image](https://user-images.githubusercontent.com/16493075/112911287-1927e700-90c3-11eb-87db-8adccbea8966.png)
