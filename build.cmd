@@ -1,1 +1,0 @@
-(cd core && npm run build)

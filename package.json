@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "install-everything": "cd ./core && npm i && cd ../server && npm i && cd ../client && npm i",
+        "build": "cd ./core && npm run build",
+        "start": "concurrently --kill-others \"cd ./server && npm run host\" \"cd ./client && npm start\"",
+        "all": "npm run install-everything && npm run build && npm run start"
+    },
+    "dependencies": {
+        "concurrently": "^6.0.0"
+    }
+}
