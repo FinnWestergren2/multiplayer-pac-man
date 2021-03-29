@@ -1,6 +1,6 @@
 # micro-rts
 
-Welcome to micro-rts! It's a project I've been working on and will likely continue to work on for a long time. An RTS, or real time strategy game, is a type game where you create and control multiple units to gather resources and destroy enemy units in real time (not turn-based). If you've ever played "Starcraft" or "Age of Empires", you've played an RTS. 
+Welcome to micro-rts! It's a project I've been working on and will likely continue to work on for a long time. An RTS, or real time strategy game, is a type of game where you create and control multiple units to gather resources and destroy enemy units in real time (not turn-based). If you've ever played "Starcraft" or "Age of Empires", you've played an RTS. 
 
 The purpose of this project was to create something I could show to my friends and to test my skills as a software engineer. I hope that one day my friends might actually have fun playing this game; more realistically I hope one day this game will be an actual game. Currently as of March 2021 it is still just a game engine, but a cool one at that.
 
@@ -12,3 +12,5 @@ To move your ship around the map, click on your character and right click on the
 
 Enjoy and let me know if you have any sweet ideas / want to contribute!
 fwesterg@gmail.com
+
+![image](https://user-images.githubusercontent.com/16493075/112911287-1927e700-90c3-11eb-87db-8adccbea8966.png)
