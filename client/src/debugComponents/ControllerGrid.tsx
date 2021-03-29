@@ -3,7 +3,8 @@ import styled from "@emotion/styled";
 
 const StyledControllerGrid = styled.div`
     display: grid;
-    grid-template-columns: 12em 12em;
+    grid-template-columns: 12em 5em;
+    grid-auto-rows: max-content;
     * {
         margin-bottom: 1em;
     }
