@@ -18,7 +18,8 @@ const idleStatus = (location: CoordPair) => {
 export const updateActors = () => Object.keys(store.getState().actorState.actorDict).forEach(actorId => {
     const status = store.getState().actorState.actorDict[actorId].status;
     const path = store.getState().actorState.actorPathDict[actorId];
-    if (path) {
+    if (path && path.length > 0) {
+        console.log(path);
         const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status, () => popActorPath(store, actorId));
         updateActorStatus(store, actorId, newStatus);
         return;
@@ -59,6 +60,9 @@ export const moveActorAlongPath: (dist: number, path: CoordPair[], status: Actor
                 break;
         }
         break;
+    }
+    if (CoordPairUtils.equalPairs(nextLocation, status.location)) {
+        popPath();
     }
     return { location: nextLocation, direction: nextDirection };
 }
