@@ -67,6 +67,13 @@ const distDirect = (start: CoordPair, finish: CoordPair) => {
     }
 };
 
+//transform to primitive type
+const hash = (val: CoordPair) => (val.x << 8) + val.y;
+//transform from primitive type
+const unhash = (val: number) => {
+    return { x: val >>> 8, y: val & 0xFF}
+}
+
 export const CoordPairUtils = {
     zeroPair,
     addPairs,
@@ -77,5 +84,7 @@ export const CoordPairUtils = {
     snappedPair,
     getDirection,
     distSquared,
-    distDirect
+    distDirect,
+    hash,
+    unhash
 };

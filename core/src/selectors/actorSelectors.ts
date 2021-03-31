@@ -1,12 +1,13 @@
 import { createCachedSelector } from 're-reselect'
-import { ActorState, ActorStatus, CoordPair, Direction, MapState } from '../types'
+import { ActorState, ActorStatus, CoordPair, CoordPairUtils, Direction, MapState } from '../types'
 
 
 export const getActorStatus = createCachedSelector(
-    (actorState: ActorState, actorId: string) => actorState.actorDict[actorId].status.location,
+    (actorState: ActorState, actorId: string) => CoordPairUtils.hash(CoordPairUtils.roundedPair(actorState.actorDict[actorId].status.location)),
     (actorState: ActorState, actorId: string) => actorId,
-    (location, actorId) => {
-        console.log(`beep boop recalculatin' ${actorId} ${location.x}, ${location.y}`);
+    (hashLocation, actorId) => {
+        const location = CoordPairUtils.unhash(hashLocation);
+        console.log(`beep boop recalculating... ${actorId} ${location.x}, ${location.y} ${hashLocation}`);
         return `${actorId} ${location.x}, ${location.y}`;
     }
 )(

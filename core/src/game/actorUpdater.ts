@@ -19,7 +19,6 @@ export const updateActors = () => Object.keys(store.getState().actorState.actorD
     const status = store.getState().actorState.actorDict[actorId].status;
     const path = store.getState().actorState.actorPathDict[actorId];
     if (path && path.length > 0) {
-        console.log(path);
         const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status, () => popActorPath(store, actorId));
         updateActorStatus(store, actorId, newStatus);
         return;
