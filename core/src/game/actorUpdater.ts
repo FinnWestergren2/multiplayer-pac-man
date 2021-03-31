@@ -3,9 +3,10 @@ import { ActorStatus } from '../types/actor';
 import { Direction, CoordPair, CoordPairUtils, DirectionUtils } from '../types';
 import { popActorPath, updateActorStatus } from '../ducks/actorState';
 import { getAverageFrameLength } from './frameManager';
-import { junctionSelector, MapNode } from '../map';
+import { MapNode } from '../map';
 import { tieAllNodes } from '../map/mapProcessing';
 import PriorityQueue from '../utils/PriorityQueue';
+import { junctionSelector } from '../selectors/mapSelectors';
 
 const idleStatus = (location: CoordPair) => {
     return {

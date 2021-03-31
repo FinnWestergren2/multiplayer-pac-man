@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { CoordPair, Direction, MapState } from '../types'
-import { preProcessMap } from './mapProcessing'
+import { preProcessMap } from '../map/mapProcessing'
 
 const allCellsSelector = (state: MapState) => state.mapCells;
 

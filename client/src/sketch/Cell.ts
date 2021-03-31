@@ -26,7 +26,6 @@ export default class Cell {
             x: this.halfSize + x * this.cellSize,
             y: this.halfSize + y * this.cellSize,
         };
-        console.log(this.location);
     }
 
     public draw: (p: p5.Graphics) => void = (p) => {

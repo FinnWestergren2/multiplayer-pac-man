@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { Store } from "../containers/GameWrapper";
-import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction } from "core";
+import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction, getActorStatus } from "core";
 import { bindHumanPlayer } from "./Controls";
 import Cell from "./Cell";
 
@@ -63,6 +63,7 @@ export default class Game {
 	};
 
 	private drawActor = (p: p5, actor: Actor) => {
+		getActorStatus(Store.getState().actorState, actor.id);
 		const location = actor.status.location;
 		const cellSize = Store.getState().mapState.cellDimensions.cellSize;
 		const drawShape = (actorSize: number) => {
