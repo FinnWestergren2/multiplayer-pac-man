@@ -7,7 +7,7 @@ export const getActorStatus = createCachedSelector(
     (actorState: ActorState, actorId: string) => actorId,
     (hashLocation, actorId) => {
         const location = CoordPairUtils.unhash(hashLocation);
-        console.log(`beep boop recalculating... ${actorId} ${location.x}, ${location.y} ${hashLocation}`);
+        console.log(`beep boop recalculating... ${actorId} x: ${location.x}, y: ${location.y}, hash: ${hashLocation}`);
         return `${actorId} ${location.x}, ${location.y}`;
     }
 )(
