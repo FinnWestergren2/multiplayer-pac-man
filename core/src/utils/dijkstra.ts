@@ -16,7 +16,9 @@ const createdWeightedNode: (node: MapNode, weight: number) => WeightedNode = (no
 export const dijkstras: (startCell: CoordPair, endCell: CoordPair, junctions: (MapNode | null)[][]) => {totalDist: number, path: CoordPair[]} = (startCell, endCell, junctions) => {
     console.log('running dijkstras', startCell, endCell);
     if (CoordPairUtils.equalPairs(startCell, endCell)) {
-        return {totalDist: 0, path: [endCell]}
+        // gotta return the end cell because the start cell might be rounded, meaning that the actor might 
+        // not have reached the center of the tile yet
+        return {totalDist: 0, path: [endCell]} 
     }
     const startNode = new MapNode(startCell.x, startCell.y);
     tieAllNodes(startNode, junctions, store.getState().mapState.mapCells[startCell.y][startCell.x]);

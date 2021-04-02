@@ -13,21 +13,19 @@ const idleStatus = (location: CoordPair) => {
 };
 
 export const updateActors = () => Object.keys(store.getState().actorState.actorDict).forEach(actorId => {
-    const status = store.getState().actorState.actorDict[actorId].status;
-    const path = checkCurrentPathStatus(status, getActorPath(store.getState(), actorId).path); 
-    const newStatus = moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), path, status);
-    if (status.destination && !CoordPairUtils.equalPairs(newStatus.location, status.location) ) {
+    const newStatus = getNextDestinationAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), actorId);
+    if (newStatus) {
         updateActorStatus(store, actorId, newStatus);
-        return;
-    }
-    if (!path && status && status.direction !== Direction.NONE) {
-        updateActorStatus(store, actorId, idleStatus(status.location));
     }
 });
 
-export const moveActorAlongPath: (dist: number, path: CoordPair[], status: ActorStatus) => ActorStatus = (dist, path, status) => {
-    if (dist === 0) return status;
-    if (path.length === 0) return idleStatus(status.location);
+export const getNextDestinationAlongPath: (dist: number, actorId: string) => ActorStatus | null = (dist, actorId) => {
+    const status = store.getState().actorState.actorDict[actorId].status;
+    if (dist === 0 || !status.destination) return null;
+    if (CoordPairUtils.equalPairs(status.location, status.destination)) {
+        return idleStatus(status.location)
+    }
+    const path = checkCurrentPathStatus(status, getActorPath(store.getState(), actorId).path); 
     
     let nextLocation = CoordPairUtils.snappedPair(status.location);
     let nextDirection = status.direction;
@@ -38,6 +36,7 @@ export const moveActorAlongPath: (dist: number, path: CoordPair[], status: Actor
         const distToCell = Math.sqrt(CoordPairUtils.distSquared(nextLocation, targetCell));
         if (remainingDist > distToCell) {
             nextLocation = { ...targetCell };
+            remainingDist -= distToCell;
             continue;
         }
         switch (nextDirection) {
