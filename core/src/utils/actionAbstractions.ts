@@ -1,4 +1,4 @@
-import { ReduxStore, StampedInput, updateActorStatus, Dictionary, CoordPair, ActorStatus, addPlayer, CELLS_PER_MILLISECOND, getUpdateFrequency } from "..";
+import { ReduxStore, StampedInput, updateActorStatus, Dictionary, CoordPair, ActorStatus, addPlayer, CELLS_PER_MILLISECOND } from "..";
 import { addActor } from "../ducks";
 import { moveActorAlongPath } from "../game/actorUpdater";
 import { ActorType, CoordPairUtils, InputType } from "../types";
@@ -8,10 +8,10 @@ export const handlePlayerInput = (store: ReduxStore, playerId: string, stampedIn
         case InputType.MOVE_UNIT:
             const actorStatus = store.getState().actorState.actorDict[stampedInput.input.actorId]?.status;
             if (!actorStatus) return;
-            const newStatus = {...actorStatus, destination: stampedInput.input.destination};
+            const newStatus = {...actorStatus, location: stampedInput.input.origin, destination: stampedInput.input.destination};
             updateActorStatus(store, stampedInput.input.actorId, newStatus);
             const distTravelled = stampedInput.timeAgo * CELLS_PER_MILLISECOND;
-            console.log(`${playerId} made a move input ${stampedInput.timeAgo} ms ago`, 'distance travelled since then', distTravelled);
+            console.log(`${playerId.substring(0, 4)} made a move input ${stampedInput.timeAgo}ms ago\t`, 'distance travelled since then', distTravelled);
             moveActorAlongPath(distTravelled, stampedInput.input.actorId)
             return;
         case InputType.CREATE_UNIT:
