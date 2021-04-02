@@ -11,7 +11,7 @@ export const handlePlayerInput = (store: ReduxStore, playerId: string, stampedIn
             const newStatus = {...actorStatus, destination: stampedInput.input.destination};
             updateActorStatus(store, stampedInput.input.actorId, newStatus);
             const distTravelled = stampedInput.timeAgo * CELLS_PER_MILLISECOND;
-            console.log('time ago', stampedInput.timeAgo, 'dist travelled', distTravelled);
+            console.log(`${playerId} made a move input ${stampedInput.timeAgo} ms ago`, 'distance travelled since then', distTravelled);
             moveActorAlongPath(distTravelled, stampedInput.input.actorId)
             return;
         case InputType.CREATE_UNIT:
