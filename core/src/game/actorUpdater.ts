@@ -13,11 +13,15 @@ const idleStatus = (location: CoordPair) => {
 };
 
 export const updateActors = () => Object.keys(store.getState().actorState.actorDict).forEach(actorId => {
-    const newStatus = getNextDestinationAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), actorId);
+    moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), actorId);
+});
+
+export const moveActorAlongPath = (distance: number, actorId: string) => {
+    const newStatus = getNextDestinationAlongPath(distance, actorId);
     if (newStatus) {
         updateActorStatus(store, actorId, newStatus);
     }
-});
+}
 
 export const getNextDestinationAlongPath: (dist: number, actorId: string) => ActorStatus | null = (dist, actorId) => {
     const status = store.getState().actorState.actorDict[actorId].status;

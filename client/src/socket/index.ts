@@ -1,7 +1,7 @@
 import { ClientMessage, MessageType, ServerMessage } from "core";
 import { handleMessage, pingServer, sendPerceptionUpdate } from "./clientExtensions";
 
-export const PERCEPTION_UPDATE_PERIOD = 1000000000000;
+export const PERCEPTION_UPDATE_PERIOD = 1000;
 export const PING_PERIOD = 500;
 
 export default () => {
