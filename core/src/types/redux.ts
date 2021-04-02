@@ -57,8 +57,6 @@ export enum ActorStateActionTypes {
     ADD_ACTOR = "ADD_ACTOR",
     REMOVE_PLAYER = "REMOVE_PLAYER",
     REMOVE_ACTOR = "REMOVE_ACTOR",
-    SET_ACTOR_PATH = "SET_ACTOR_PATH",
-    POP_ACTOR_PATH = "POP_ACTOR_PATH",
     SET_GAME_STATE = "SET_GAME_STATE"
 };
 
@@ -68,6 +66,4 @@ export type ActorStateAction =
     { type: ActorStateActionTypes.REMOVE_PLAYER; payload: string } |
     { type: ActorStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |
     { type: ActorStateActionTypes.REMOVE_ACTOR; payload: string } |
-    { type: ActorStateActionTypes.SET_ACTOR_PATH; payload: { actorId: string, path: CoordPair[] } } |
-    { type: ActorStateActionTypes.POP_ACTOR_PATH; payload: string } |
     { type: ActorStateActionTypes.SET_GAME_STATE; payload: ActorState }

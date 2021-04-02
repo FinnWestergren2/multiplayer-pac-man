@@ -11,6 +11,7 @@ export type Actor = {
 export type ActorStatus = {
     location: CoordPair;
     direction: Direction;
+    destination?: CoordPair;
 };
 
 export enum ActorType {

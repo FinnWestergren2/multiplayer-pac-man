@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { Store } from "../containers/GameWrapper";
-import { Actor, ActorType, Dijkstras, CoordPair, CoordPairUtils, Direction, getActorStatus } from "core";
+import { Actor, ActorType, CoordPair, CoordPairUtils, dijkstras, Direction, junctionSelector } from "core";
 import { bindHumanPlayer } from "./Controls";
 import Cell from "./Cell";
 
@@ -45,7 +45,7 @@ export default class Game {
 			const withinBounds = mousedOverCell.x >= 0 && mousedOverCell.x < Store.getState().mapState.mapCells[0].length
 				&& mousedOverCell.y >= 0 && mousedOverCell.y < Store.getState().mapState.mapCells.length;
 			if (mousedOverCell && withinBounds) {
-				const { totalDist, path } = Dijkstras(CoordPairUtils.roundedPair(pathOrigin), mousedOverCell);
+				const { totalDist, path } = dijkstras(CoordPairUtils.roundedPair(pathOrigin), mousedOverCell, junctionSelector(Store.getState().mapState));
 				this.drawPath(p, path, totalDist);
 			}
 		}
@@ -63,7 +63,6 @@ export default class Game {
 	};
 
 	private drawActor = (p: p5, actor: Actor) => {
-		getActorStatus(Store.getState().actorState, actor.id);
 		const location = actor.status.location;
 		const cellSize = Store.getState().mapState.cellDimensions.cellSize;
 		const drawShape = (actorSize: number) => {
@@ -129,7 +128,7 @@ export default class Game {
 		this.mapGraphicsContext.clear();
 		const mapCells = Store.getState().mapState.mapCells;
 		mapCells.map((row: Direction[], y: number) =>
-			row.map((column: Direction, x) => new Cell(x, y))
+			row.map((_column, x) => new Cell(x, y))
 		).flat().forEach(c => c.draw(this.mapGraphicsContext));
 	}
 };

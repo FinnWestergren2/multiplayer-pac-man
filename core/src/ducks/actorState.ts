@@ -48,12 +48,6 @@ export const actorStateReducer: Reducer<ActorState, ActorStateAction> = (state: 
             const obj = draft.actorDict[action.payload];
             draft.actorOwnershipDict[obj.ownerId] = draft.actorOwnershipDict[obj.ownerId].filter(o => o != action.payload); 
             break;
-        case ActorStateActionTypes.SET_ACTOR_PATH:
-            draft.actorPathDict[action.payload.actorId] = action.payload.path;
-            break;
-        case ActorStateActionTypes.POP_ACTOR_PATH:
-            draft.actorPathDict[action.payload] = draft.actorPathDict[action.payload].slice(1);
-            break;
     }
     return draft;
 };
@@ -72,9 +66,3 @@ export const addActor = (store: ReduxStore, ownerId: string, actorId: string, ac
 
 export const removePlayer = (store: ReduxStore, playerId: string) =>
     store.dispatch({ type: ActorStateActionTypes.REMOVE_PLAYER, payload: playerId });
-
-export const setActorPath = (store: ReduxStore, actorId: string, path: CoordPair[]) =>
-    store.dispatch({ type: ActorStateActionTypes.SET_ACTOR_PATH, payload: { actorId, path } });
-    
-export const popActorPath = (store: ReduxStore, playerId: string) =>
-    store.dispatch({ type: ActorStateActionTypes.POP_ACTOR_PATH, payload: playerId });
