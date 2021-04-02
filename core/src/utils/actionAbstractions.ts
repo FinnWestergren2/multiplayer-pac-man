@@ -10,9 +10,8 @@ export const handlePlayerInput = (store: ReduxStore, playerId: string, stampedIn
             if (!actorStatus) return;
             const newStatus = {...actorStatus, destination: stampedInput.input.destination};
             updateActorStatus(store, stampedInput.input.actorId, newStatus);
-            const frameDiff = stampedInput.timeAgo * getUpdateFrequency();
-            const distTravelled = CELLS_PER_MILLISECOND * frameDiff;
-            console.log('time ago', stampedInput.timeAgo, 'frame diff', frameDiff, 'dist travelled', distTravelled);
+            const distTravelled = stampedInput.timeAgo * CELLS_PER_MILLISECOND;
+            console.log('time ago', stampedInput.timeAgo, 'dist travelled', distTravelled);
             moveActorAlongPath(distTravelled, stampedInput.input.actorId)
             return;
         case InputType.CREATE_UNIT:
