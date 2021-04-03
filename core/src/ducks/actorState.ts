@@ -27,7 +27,7 @@ export const actorStateReducer: Reducer<ActorState, ActorStateAction> = (state: 
             draft.actorDict[action.payload.actorId] = { 
                 type: action.payload.actorType,
                 ownerId: action.payload.ownerId,
-                status: { location: action.payload.location, direction: Direction.NONE },
+                status: { location: action.payload.location, orientation: Direction.NONE },
                 id: action.payload.actorId
             };
             if (draft.actorOwnershipDict[action.payload.ownerId]) {

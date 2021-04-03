@@ -10,7 +10,7 @@ export type Actor = {
 
 export type ActorStatus = {
     location: CoordPair;
-    direction: Direction;
+    orientation: Direction;
     destination?: CoordPair;
 };
 

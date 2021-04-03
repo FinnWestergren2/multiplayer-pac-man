@@ -15,8 +15,8 @@ export const maxDistPair = (mapCells: Direction[][], deepestCell: CoordPair, pla
         cellB = { ...cellBNext };
     }
     return {
-        [playerIds[0]]: { location: cellA, direction: Direction.NONE },
-        [playerIds[1]]: { location: cellB, direction: Direction.NONE }
+        [playerIds[0]]: { location: cellA, orientation: Direction.NONE },
+        [playerIds[1]]: { location: cellB, orientation: Direction.NONE }
     }
 }
 
