@@ -5,7 +5,7 @@ export const PERCEPTION_UPDATE_PERIOD = 1000;
 export const PING_PERIOD = 500;
 
 export default () => {
-    const ws = new WebSocket(`ws://server-izjuiq3ksa-ue.a.run.app`, ['json', 'xml']);
+    const ws = new WebSocket(`wss://server-izjuiq3ksa-ue.a.run.app`, ['json', 'xml']);
     console.log(process.env);
 
     ws.addEventListener('open', () => {

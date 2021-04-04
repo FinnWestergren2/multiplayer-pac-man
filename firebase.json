@@ -5,16 +5,6 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html",
-        "run": {
-          "serviceId": "server",
-          "region": "us-east1"  
-        }
-      }
     ]
   },
   "emulators": {
