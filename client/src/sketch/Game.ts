@@ -76,7 +76,7 @@ export default class Game {
 		p.push();
 		p.translate((location.x + 0.5) * cellSize, (location.y + 0.65) * cellSize);
 		p.angleMode(p.DEGREES);
-		p.rotate(Math.log2(actor.status.direction) * 90); // *chefs kiss*
+		p.rotate(Math.log2(actor.status.orientation) * 90); // *chefs kiss*
 		p.noFill();
 		p.stroke(color);
 		if (this.selectedActorId === actor.id) {

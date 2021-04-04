@@ -5,13 +5,6 @@ import { updateActorStatus } from '../ducks/actorState';
 import { getAverageFrameLength } from './frameManager';
 import { getActorPath } from '../selectors/actorSelectors';
 
-const idleStatus = (location: CoordPair) => {
-    return {
-        location: CoordPairUtils.roundedPair(location), // snap to grid
-        direction: Direction.NONE
-    }
-};
-
 export const updateActors = () => Object.keys(store.getState().actorState.actorDict).forEach(actorId => {
     moveActorAlongPath(CELLS_PER_MILLISECOND * getAverageFrameLength(), actorId);
 });
@@ -27,12 +20,11 @@ export const getNextDestinationAlongPath: (dist: number, actorId: string) => Act
     const status = store.getState().actorState.actorDict[actorId].status;
     if (dist === 0 || !status.destination) return null;
     if (CoordPairUtils.equalPairs(status.location, status.destination)) {
-        return idleStatus(status.location)
+        return { ...status, destination: undefined };
     }
     const path = checkCurrentPathStatus(status, getActorPath(store.getState(), actorId).path); 
-    
     let nextLocation = CoordPairUtils.snappedPair(status.location);
-    let nextDirection = status.direction;
+    let nextDirection = status.orientation;
     let remainingDist = dist;
     for (let pathIndex = 0; pathIndex < path.length; pathIndex++) {
         const targetCell = path[pathIndex];
@@ -59,7 +51,7 @@ export const getNextDestinationAlongPath: (dist: number, actorId: string) => Act
         }
         break;
     }
-    return { ...status, location: nextLocation, direction: nextDirection };
+    return { ...status, location: nextLocation, orientation: nextDirection };
 }
 
 const checkCurrentPathStatus = (status: ActorStatus, path: CoordPair[]) => {
