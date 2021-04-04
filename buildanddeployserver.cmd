@@ -1,0 +1,1 @@
+gcloud builds submit --tag gcr.io/micro-rts/server && gcloud beta run deploy --image gcr.io/micro-rts/server

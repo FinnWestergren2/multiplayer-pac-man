@@ -13,7 +13,8 @@ const port = 8080;
 const server = http.createServer((req, res) => {
 	req.addListener('end', () => file.serve(req, res)).resume();
 });
-server.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+// @ts-ignore
+server.listen(port, () => console.log(`Server running at ${server.address().address}:${server.address().port}`));
 
 export const Store = createStore(gameReducer);
 export const ServerStore = createStore(serverStateReducer);

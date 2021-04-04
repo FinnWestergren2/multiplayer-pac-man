@@ -5,6 +5,7 @@
         "start-client": "cd ./client && npm install core && npm run start",
         "start-server": "cd ./server && npm install core && npm run host",
         "start": "start npm run start-server && npm run start-client",
-        "all": "npm run install-everything && npm run build && npm run start"
+        "all": "npm run install-everything && npm run build && npm run start",
+        "build-server": "npm run build && cd ./server && npm i && npm build-server"
     }
 }

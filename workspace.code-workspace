@@ -7,11 +7,11 @@
 	"settings": {
 		"files.exclude": {
 			"*/static": false,
-			"*/node_modules": true,
+			"*/node_modules": false,
 			".git*": false,
 			"*.cmd": false,
 			"*/package-lock.json": true,
-			"client/public": true
+			"client/public": false
 		}
 	}
 }

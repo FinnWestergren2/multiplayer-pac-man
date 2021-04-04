@@ -1,0 +1,26 @@
+{
+  "hosting": {
+    "public": ".\\client\\build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html",
+        "run": {
+          "serviceId": "server",
+          "region": "us-east1"  
+        }
+      }
+    ]
+  },
+  "emulators": {
+    "hosting": {
+      "host": "localhost",
+      "port": "3000"
+    }
+  }
+}
