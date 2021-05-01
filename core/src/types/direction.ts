@@ -1,9 +1,9 @@
 export enum Direction {
-    "NONE" = 0,
-    "UP" = 1,
-    "RIGHT" = 2,
-    "DOWN" = 4,
-    "LEFT" = 8
+    "NONE" = 0,     // 0000
+    "UP" = 1,       // 0001
+    "RIGHT" = 2,    // 0010
+    "DOWN" = 4,     // 0100
+    "LEFT" = 8      // 1000
 }
 
 const isUp: (dir: Direction) => boolean = dir =>
