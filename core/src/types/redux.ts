@@ -8,13 +8,17 @@ import { MapResponse } from "../socketObject";
 
 export type MapStore = Store<MapState, MapStateAction>;
 export type ActorStore = Store<ActorState, ActorStateAction>;
-export type ReduxStore = Store<ReduxState, MapStateAction | ActorStateAction>;
+export type PlayerStore = Store<PlayerState, PlayerStateAction>;
+export type ReduxStore = Store<ReduxState, MapStateAction | ActorStateAction | PlayerStateAction>;
 
 export type ReduxState = {
     actorState: ActorState,
-    mapState: MapState
+    mapState: MapState,
+    PlayerState: PlayerState
+
 }
 
+/* #region MapTypes  */
 export type MapState = {
     mapCells: Direction[][];
     appDimensions: AppDimensions;
@@ -42,13 +46,15 @@ export type MapStateAction =
     { type: MapStateActionTypes.REFRESH_MAP; payload: MapResponse } |
     { type: MapStateActionTypes.UPDATE_APP_DIMENSIONS; payload: AppDimensions } |
     { type: MapStateActionTypes.UPDATE_CELL_DIMENSIONS; payload: CellDimensions }
+/* #endregion MapTypes  */
+/* #region ActorTypes  */
 
 export type ActorState = {
-    currentPlayer?: string;
+    currentPlayer?: string; // should move this to playerState
     actorPathDict: Dictionary<CoordPair[]>;
     actorDict: Dictionary<Actor>;
     actorOwnershipDict: Dictionary<string[]>;
-    playerList: string[];
+    playerList: string[];  // should move this to playerState
 };
 
 export enum ActorStateActionTypes {
@@ -67,3 +73,18 @@ export type ActorStateAction =
     { type: ActorStateActionTypes.ADD_ACTOR; payload: { ownerId: string, actorId: string, actorType: ActorType, location: CoordPair } } |
     { type: ActorStateActionTypes.REMOVE_ACTOR; payload: string } |
     { type: ActorStateActionTypes.SET_GAME_STATE; payload: ActorState }
+/* #endregion ActorTypes  */
+/* #region PlayerTypes  */
+    export type PlayerState = {
+        playerMineralsDict: Dictionary<number>
+    }
+
+    export enum PlayerStateActionTypes {
+        SET_PLAYER_MINERALS = "SET_PLAYER_MINERALS",
+        ADD_PLAYER_MINERALS = "ADD_PLAYER_MINERALS"
+    };
+    
+    export type PlayerStateAction =
+        { type: PlayerStateActionTypes.SET_PLAYER_MINERALS; payload: { playerId: string, minerals: number } } |
+        { type: PlayerStateActionTypes.ADD_PLAYER_MINERALS; payload: { playerId: string, minerals: number } } 
+/* #endregion PlayerTypes  */

@@ -5,6 +5,7 @@ import { mapStateReducer } from "./mapState";
 export * from "./mapState";
 export * from "./actorState";
 
+
 const combined = combineReducers({
     actorState: actorStateReducer,
     mapState: mapStateReducer
